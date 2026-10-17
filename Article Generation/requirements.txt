@@ -1,0 +1,34 @@
+# Versions the reported runs used. Pinned, not bounded: the generated text and the judges'
+# decisions depend on the behaviour of these libraries, so other versions can give other results.
+#
+# Generation and evaluation ran in two environments that pin torch and transformers to
+# different versions. Every line therefore carries a python_version marker: run
+#     pip install -r requirements.txt
+# inside each environment and pip installs only that environment's block. Building the
+# content plans and running the threshold audit need only the standard library.
+
+# ---------------------------------------------------------------------------
+# Generation: one NVIDIA A100 40 GB per run, Python 3.11.5
+# ---------------------------------------------------------------------------
+vllm==0.19.1 ; python_version == "3.11"
+xgrammar==0.1.33 ; python_version == "3.11"
+codecarbon==3.3.0 ; python_version == "3.11"
+# torch 2.10.0 is the version vllm 0.19.1 requires; transformers 5.6.2 is the version declared for
+# the same GPU environment in Chapter 4 of the dissertation.
+torch==2.10.0 ; python_version == "3.11"
+transformers==5.6.2 ; python_version == "3.11"
+
+# ---------------------------------------------------------------------------
+# Evaluation: Python 3.14.4, plus the Gemini API
+# ---------------------------------------------------------------------------
+torch==2.13.0 ; python_version == "3.14"
+transformers==5.14.1 ; python_version == "3.14"
+numpy==2.4.6 ; python_version == "3.14"
+google-genai==2.25.0 ; python_version == "3.14"
+jsonschema==4.26.0 ; python_version == "3.14"
+# tokenizers, safetensors and huggingface-hub load the NLI judge; python-dotenv reads the
+# credential from .env.
+tokenizers==0.22.2 ; python_version == "3.14"
+safetensors==0.8.0 ; python_version == "3.14"
+huggingface-hub==1.24.0 ; python_version == "3.14"
+python-dotenv==1.2.2 ; python_version == "3.14"

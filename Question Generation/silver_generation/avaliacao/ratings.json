@@ -1,0 +1,626 @@
+{
+  "input_part317.txt:894:1060::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part317.txt:894:1060::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part040.txt:2736:2844::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part040.txt:2736:2844::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part550.txt:1163:1217::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part550.txt:1163:1217::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part523.txt:877:998::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part523.txt:877:998::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part510.txt:3365:3471::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part510.txt:3365:3471::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part376.txt:3148:3212::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part376.txt:3148:3212::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part271.txt:4347:4424::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part271.txt:4347:4424::q2": {
+    "relevancia": 0,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part220.txt:897:999::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part220.txt:897:999::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part862.txt:4187:4298::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part862.txt:4187:4298::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part060.txt:2578:2711::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part060.txt:2578:2711::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part050.txt:1995:2156::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part050.txt:1995:2156::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part248.txt:2257:2298::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part248.txt:2257:2298::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part510.txt:1160:1241::q1": {
+    "relevancia": 1,
+    "fidelidade": 0,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part510.txt:1160:1241::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part512.txt:3218:3305::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part512.txt:3218:3305::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part_1288.txt:878:999::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part_1288.txt:878:999::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part050.txt:1225:1325::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part050.txt:1225:1325::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part449.txt:2064:2217::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part449.txt:2064:2217::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part449.txt:2064:2217::q3": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part860.txt:2097:2242::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part860.txt:2097:2242::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part510.txt:2722:2944::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 0,
+    "ancora": 1
+  },
+  "input_part510.txt:2722:2944::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 0,
+    "ancora": 1
+  },
+  "input_part_1022.txt:690:762::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part_1022.txt:690:762::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part551.txt:3908:3995::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part551.txt:3908:3995::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part551.txt:3908:3995::q3": {
+    "relevancia": 0,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part009.txt:433:544::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part009.txt:433:544::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part401.txt:1914:2054::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part401.txt:1914:2054::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part638.txt:1667:1855::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part638.txt:1667:1855::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part397.txt:2527:2648::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part397.txt:2527:2648::q2": {
+    "relevancia": 1,
+    "fidelidade": 0,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part500.txt:3049:3091::q1": {
+    "relevancia": 1,
+    "fidelidade": 0,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part500.txt:3049:3091::q2": {
+    "relevancia": 1,
+    "fidelidade": 0,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part624.txt:1263:1379::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part624.txt:1263:1379::q2": {
+    "relevancia": 1,
+    "fidelidade": 0,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part240.txt:1506:1649::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part240.txt:1506:1649::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part695.txt:3221:3480::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part695.txt:3221:3480::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 0,
+    "ancora": 1
+  },
+  "input_part250.txt:1077:1155::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part250.txt:1077:1155::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 0
+  },
+  "input_part655.txt:2065:2146::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part655.txt:2065:2146::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part642.txt:1591:1688::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part642.txt:1591:1688::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part536.txt:1878:1914::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part536.txt:1878:1914::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 0,
+    "ancora": 1
+  },
+  "input_part095.txt:1656:1771::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part095.txt:1656:1771::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part_1105.txt:3840:4009::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part_1105.txt:3840:4009::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part354.txt:2508:2557::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part354.txt:2508:2557::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part695.txt:2787:2892::q1": {
+    "relevancia": 1,
+    "fidelidade": 0,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part695.txt:2787:2892::q2": {
+    "relevancia": 1,
+    "fidelidade": 0,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part695.txt:2787:2892::q3": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part200.txt:2826:2856::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part200.txt:2826:2856::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part569.txt:1243:1318::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part569.txt:1243:1318::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part656.txt:1256:1308::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part656.txt:1256:1308::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part441.txt:3900:3965::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part441.txt:3900:3965::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part170.txt:2506:2602::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part170.txt:2506:2602::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part095.txt:2338:2390::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part095.txt:2338:2390::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part511.txt:7433:7524::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part511.txt:7433:7524::q2": {
+    "relevancia": 0,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part560.txt:1349:1471::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part560.txt:1349:1471::q2": {
+    "relevancia": 0,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part203.txt:3146:3220::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part203.txt:3146:3220::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part269.txt:3497:3574::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part269.txt:3497:3574::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part_1084.txt:1059:1162::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part_1084.txt:1059:1162::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part656.txt:873:1013::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part656.txt:873:1013::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part401.txt:2608:2703::q1": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part401.txt:2608:2703::q2": {
+    "relevancia": 1,
+    "fidelidade": 1,
+    "clareza": 1,
+    "ancora": 1
+  },
+  "input_part317.txt:894:1060::q3": {
+    "fidelidade": 1,
+    "relevancia": 1,
+    "clareza": 1,
+    "ancora": 1
+  }
+}

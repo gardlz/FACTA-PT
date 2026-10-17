@@ -1,0 +1,309 @@
+/* FACTA-PT — base styles: default tokens, top bar, document drawer and shared components.
+   `app.css` overrides the tokens and draws the page. */
+
+:root {
+  color-scheme: light;
+
+  --tinta-900: #0d1522;
+  --tinta-700: #1d2b3f;
+  --tinta-500: #4a5a71;
+  --tinta-400: #6b7b92;
+  --tinta-300: #97a5b8;
+
+  --papel: #f6f4ef;
+  --papel-alto: #fffefb;
+  --papel-fundo: #ecebe4;
+  --linha: #ddd9cf;
+  --linha-forte: #c8c3b6;
+
+  --acento: #b5731a;
+  --acento-forte: #8f5a12;
+  --acento-tenue: #f7ecd9;
+
+  --apoia: #1f7a4d;
+  --apoia-tenue: #e2f2e9;
+  --contraria: #b23434;
+  --contraria-tenue: #fbe8e6;
+  --neutro: #6b7b92;
+  --neutro-tenue: #eceef2;
+
+  --sombra-1: 0 1px 2px rgb(13 21 34 / .06), 0 2px 8px rgb(13 21 34 / .05);
+  --sombra-2: 0 10px 30px rgb(13 21 34 / .10), 0 2px 6px rgb(13 21 34 / .06);
+  --sombra-3: -24px 0 60px rgb(13 21 34 / .18);
+  --contorno-bandeira: rgb(13 21 34 / .14);
+  --lingua-activa: var(--papel-alto);
+
+  --raio: 14px;
+  --raio-p: 9px;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  --transicao: 200ms cubic-bezier(.2, .7, .3, 1);
+  --barra-altura: 58px;
+  --goteira: clamp(14px, 3vw, 28px);
+  --coluna: 1000px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --tinta-900: #eef2f8; --tinta-700: #d3dbe6; --tinta-500: #9fadc0;
+    --tinta-400: #7f8ea3; --tinta-300: #5f6d81;
+    --papel: #0e141d; --papel-alto: #161e29; --papel-fundo: #0a0f16;
+    --linha: #232d3b; --linha-forte: #33404f;
+    --acento: #e6a94a; --acento-forte: #f2c579; --acento-tenue: #2a2214;
+    --apoia: #55c18c; --apoia-tenue: #12291f;
+    --contraria: #e97d76; --contraria-tenue: #2c1717;
+    --neutro: #8493a7; --neutro-tenue: #1a222d;
+    --sombra-1: 0 1px 2px rgb(0 0 0 / .4), 0 2px 10px rgb(0 0 0 / .3);
+    --sombra-2: 0 14px 40px rgb(0 0 0 / .5);
+    --sombra-3: -24px 0 70px rgb(0 0 0 / .55);
+    --contorno-bandeira: rgb(255 255 255 / .18);
+    --lingua-activa: color-mix(in oklab, var(--tinta-900) 10%, var(--papel-alto));
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --tinta-900: #eef2f8; --tinta-700: #d3dbe6; --tinta-500: #9fadc0;
+  --tinta-400: #7f8ea3; --tinta-300: #5f6d81;
+  --papel: #0e141d; --papel-alto: #161e29; --papel-fundo: #0a0f16;
+  --linha: #232d3b; --linha-forte: #33404f;
+  --acento: #e6a94a; --acento-forte: #f2c579; --acento-tenue: #2a2214;
+  --apoia: #55c18c; --apoia-tenue: #12291f;
+  --contraria: #e97d76; --contraria-tenue: #2c1717;
+  --neutro: #8493a7; --neutro-tenue: #1a222d;
+  --sombra-1: 0 1px 2px rgb(0 0 0 / .4), 0 2px 10px rgb(0 0 0 / .3);
+  --sombra-2: 0 14px 40px rgb(0 0 0 / .5);
+  --sombra-3: -24px 0 70px rgb(0 0 0 / .55);
+  --contorno-bandeira: rgb(255 255 255 / .18);
+  --lingua-activa: color-mix(in oklab, var(--tinta-900) 10%, var(--papel-alto));
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* HTML's `hidden` has to beat any `display` a component declares. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--papel-fundo);
+  color: var(--tinta-900);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4 { margin: 0; line-height: 1.25; letter-spacing: -.012em; }
+p { margin: 0; }
+button { font: inherit; color: inherit; }
+
+
+.skip {
+  position: absolute; left: 12px; top: -48px; z-index: 60;
+  background: var(--papel-alto); color: var(--tinta-900);
+  padding: 10px 16px; border-radius: var(--raio-p);
+  text-decoration: none; transition: top var(--transicao);
+}
+/* The shadow only when it shows: hidden above the page, it would bleed into the top bar. */
+.skip:focus { top: 12px; box-shadow: var(--sombra-2); }
+
+/* --- Top bar --------------------------------------------------------------- */
+
+.barra {
+  position: sticky; top: 0; z-index: 30;
+  height: var(--barra-altura);
+  display: flex; align-items: center; justify-content: space-between; gap: 18px;
+  padding-inline: max(var(--goteira), calc((100% - var(--coluna)) / 2 + var(--goteira)));
+  background: color-mix(in oklab, var(--papel-fundo) 86%, transparent);
+  backdrop-filter: saturate(160%) blur(14px);
+  border-bottom: 1px solid var(--linha);
+}
+
+.barra__marca { flex: none; }
+.marca__nome { font-weight: 660; letter-spacing: .02em; font-size: 15.5px; }
+
+.barra__acoes { display: flex; align-items: center; gap: 8px; flex: none; }
+
+@media (max-width: 620px) {
+  .marca__nome { display: none; }
+}
+
+/* --- Language switch -------------------------------------------------------- */
+
+.lingua {
+  display: inline-flex; align-items: center; gap: 2px;
+  padding: 3px; border-radius: 999px;
+  background: color-mix(in oklab, var(--tinta-900) 4%, transparent);
+  border: 1px solid var(--linha);
+}
+
+.lingua__opcao {
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 26px; padding: 0 10px 0 6px;
+  border: 0; border-radius: 999px; background: transparent;
+  color: var(--tinta-400); cursor: pointer;
+  font-size: 11.5px; font-weight: 680; letter-spacing: .08em; line-height: 1;
+  transition: background var(--transicao), color var(--transicao), box-shadow var(--transicao);
+}
+.lingua__opcao:hover { color: var(--tinta-900); }
+.lingua__opcao:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.lingua__opcao[aria-pressed="true"] {
+  background: var(--lingua-activa); color: var(--tinta-900); cursor: default;
+  box-shadow: var(--sombra-1), 0 0 0 1px var(--linha);
+}
+
+.bandeira {
+  position: relative; display: block; flex: none;
+  width: 20px; height: 14px; border-radius: 3px; overflow: hidden;
+  transition: filter var(--transicao), opacity var(--transicao);
+}
+.bandeira svg { display: block; width: 100%; height: 100%; }
+/* A hairline inside the edge, so the white of a flag does not melt into the paper. */
+.bandeira::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--contorno-bandeira);
+}
+.lingua__opcao[aria-pressed="false"] .bandeira { filter: saturate(.3); opacity: .7; }
+.lingua__opcao[aria-pressed="false"]:hover .bandeira { filter: none; opacity: 1; }
+
+/* --- Buttons ---------------------------------------------------------------- */
+
+.botao {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border: 1px solid var(--linha-forte); background: var(--papel-alto);
+  border-radius: var(--raio-p); padding: 10px 16px; cursor: pointer;
+  font-weight: 560; letter-spacing: -.01em;
+  transition: background var(--transicao), border-color var(--transicao), transform var(--transicao), box-shadow var(--transicao);
+}
+.botao:hover { border-color: var(--tinta-400); transform: translateY(-1px); box-shadow: var(--sombra-1); }
+.botao:active { transform: translateY(0); }
+.botao:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.botao[disabled] { opacity: .55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.botao--primario { background: var(--tinta-900); color: var(--papel-alto); border-color: var(--tinta-900); padding: 12px 20px; }
+.botao--primario:hover { background: var(--tinta-700); border-color: var(--tinta-700); }
+.botao--primario svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.botao--primario.ocupado .botao__seta { display: none; }
+.botao--primario.ocupado::after {
+  content: ""; width: 15px; height: 15px; border-radius: 50%;
+  border: 2px solid color-mix(in oklab, currentColor 35%, transparent); border-top-color: currentColor;
+  animation: girar .7s linear infinite;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.botao--fantasma { background: transparent; border-color: transparent; color: var(--tinta-500); }
+.botao--fantasma:hover { border-color: var(--linha); background: var(--papel-alto); }
+
+.botao--icone { padding: 7px; border-radius: 50%; }
+.botao--icone svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#tema svg { fill: currentColor; stroke: none; }
+
+/* --- Fields ------------------------------------------------------------------ */
+
+.campo { display: grid; gap: 6px; }
+.campo label { font-size: 12.5px; font-weight: 620; letter-spacing: .015em; color: var(--tinta-700); }
+.campo__opcional { font-weight: 450; color: var(--tinta-400); }
+.campo__pista { font-size: 11.5px; color: var(--tinta-400); }
+.campo textarea, .campo input {
+  width: 100%; font: inherit; color: var(--tinta-900);
+  background: var(--papel); border: 1px solid var(--linha-forte);
+  border-radius: var(--raio-p); padding: 11px 13px; resize: vertical;
+  transition: border-color var(--transicao), box-shadow var(--transicao), background var(--transicao);
+}
+.campo textarea:focus, .campo input:focus {
+  outline: none; border-color: var(--acento); background: var(--papel-alto);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--acento) 18%, transparent);
+}
+.campo textarea::placeholder { color: var(--tinta-300); }
+
+.erro {
+  padding: 10px 13px; border-radius: var(--raio-p);
+  background: var(--contraria-tenue); color: var(--contraria);
+  border: 1px solid color-mix(in oklab, var(--contraria) 30%, transparent); font-size: 13px;
+}
+
+/* --- Labels and citations ----------------------------------------------------- */
+
+.rotulo {
+  font-size: 10.6px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase;
+  padding: 2px 8px; border-radius: 100px; white-space: nowrap;
+}
+.rotulo--supported { background: var(--apoia-tenue); color: var(--apoia); }
+.rotulo--refuted { background: var(--contraria-tenue); color: var(--contraria); }
+.rotulo--nei { background: var(--indeciso-tenue); color: var(--indeciso); }
+
+.cite {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 19px; height: 19px; padding: 0 5px; margin: 0 1px 0 3px;
+  vertical-align: 3px; cursor: pointer;
+  font-family: var(--mono); font-size: 10.5px; font-weight: 700; line-height: 1;
+  border-radius: 6px; border: 1px solid color-mix(in oklab, var(--acento) 42%, transparent);
+  background: var(--acento-tenue); color: var(--acento-forte);
+  transition: background var(--transicao), transform var(--transicao), box-shadow var(--transicao);
+}
+.cite:hover, .cite:focus-visible {
+  background: var(--acento); color: #fff; transform: translateY(-1px);
+  box-shadow: 0 2px 8px color-mix(in oklab, var(--acento) 45%, transparent); outline: none;
+}
+.cite[data-label="supported"] { border-color: color-mix(in oklab, var(--apoia) 42%, transparent); background: var(--apoia-tenue); color: var(--apoia); }
+.cite[data-label="supported"]:hover, .cite[data-label="supported"]:focus-visible { background: var(--apoia); color: #fff; box-shadow: 0 2px 8px color-mix(in oklab, var(--apoia) 45%, transparent); }
+.cite[data-label="refuted"] { border-color: color-mix(in oklab, var(--contraria) 42%, transparent); background: var(--contraria-tenue); color: var(--contraria); }
+.cite[data-label="refuted"]:hover, .cite[data-label="refuted"]:focus-visible { background: var(--contraria); color: #fff; box-shadow: 0 2px 8px color-mix(in oklab, var(--contraria) 45%, transparent); }
+/* "Undecided" citations take the same colour as the "nei" label, not the default accent. */
+.cite[data-label="nei"] { border-color: color-mix(in oklab, var(--indeciso) 42%, transparent); background: var(--indeciso-tenue); color: var(--indeciso); }
+.cite[data-label="nei"]:hover, .cite[data-label="nei"]:focus-visible { background: var(--indeciso); color: var(--sobre-cor); box-shadow: 0 2px 8px color-mix(in oklab, var(--indeciso) 45%, transparent); }
+
+/* --- Document drawer ----------------------------------------------------------- */
+
+.veu { position: fixed; inset: 0; z-index: 40; background: rgb(10 15 22 / .42); backdrop-filter: blur(2px); animation: aparecer 200ms ease both; }
+@keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+
+.gaveta {
+  position: fixed; top: 0; right: 0; bottom: 0; z-index: 50;
+  width: min(720px, 100vw); display: flex; flex-direction: column;
+  background: var(--papel-alto); border-left: 1px solid var(--linha);
+  box-shadow: var(--sombra-3);
+  animation: deslizar 280ms cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes deslizar { from { transform: translateX(100%); } to { transform: none; } }
+
+.gaveta__topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 20px clamp(18px, 3vw, 28px) 16px; border-bottom: 1px solid var(--linha); }
+.gaveta__identidade { min-width: 0; }
+.gaveta__etiqueta { display: block; font-size: 10.6px; letter-spacing: .09em; text-transform: uppercase; font-weight: 700; color: var(--tinta-400); }
+.gaveta__titulo { margin-top: 6px; font-family: var(--serif); font-size: clamp(17px, 2.2vw, 21px); font-weight: 600; }
+.gaveta__meta { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 11.8px; color: var(--tinta-400); }
+.gaveta__meta-item:not(:last-child)::after { content: " -"; }
+.gaveta__fechar { flex: none; }
+.gaveta__corpo { flex: 1; overflow-y: auto; padding: clamp(18px, 3vw, 28px); font-family: var(--serif); font-size: 15.6px; line-height: 1.74; color: var(--tinta-700); white-space: pre-wrap; word-break: break-word; }
+.gaveta__corpo:focus-visible { outline: none; }
+
+mark.realce {
+  background: color-mix(in oklab, var(--acento) 26%, transparent);
+  color: var(--tinta-900); border-radius: 3px; padding: 2px 1px;
+  box-decoration-break: clone; -webkit-box-decoration-break: clone;
+  animation: acender 1.1s ease-out;
+}
+@keyframes acender {
+  0% { background: color-mix(in oklab, var(--acento) 72%, transparent); }
+  100% { background: color-mix(in oklab, var(--acento) 26%, transparent); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+
+/* Shown when the app fails to start, instead of a blank page. */
+.arranque-falhou {
+  max-width: 52ch; margin: clamp(40px, 12vh, 120px) auto; padding: 0 20px;
+  display: grid; gap: 12px; text-align: center;
+}
+.arranque-falhou h1 { font-size: 20px; font-weight: 640; }
+.arranque-falhou p { color: var(--tinta-500); font-size: 14px; }
+.arranque-falhou code {
+  font-family: var(--mono); font-size: 12px; color: var(--contraria);
+  background: var(--contraria-tenue); border-radius: var(--raio-p); padding: 10px 12px;
+  word-break: break-word;
+}

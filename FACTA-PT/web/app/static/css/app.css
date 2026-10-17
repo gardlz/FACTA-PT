@@ -1,0 +1,625 @@
+/* FACTA-PT — page styles. Overrides the base.css tokens (brown ink on cream, a ferrous blue
+   accent, serif figures) and lays out the page. */
+
+:root {
+  --papel-fundo: #e8e0d1;
+  --papel: #f2ece0;
+  --papel-alto: #faf6ec;
+  --linha: #ded5c2;
+  --linha-forte: #b9ac92;
+
+  --tinta-900: #1f1a14;
+  --tinta-700: #3a3227;
+  --tinta-500: #5d5445;
+  --tinta-400: #695f4f;
+  --tinta-300: #716754;
+
+  --acento: #234f70;
+  --acento-forte: #1a3d58;
+  --acento-tenue: #e0e6ea;
+
+  --apoia: #1d6644;
+  --apoia-tenue: #e2e8dd;
+  --contraria: #9b3324;
+  --contraria-tenue: #f4e2da;
+  --neutro: #5d5445;
+  --neutro-tenue: #eae4d7;
+  /* Ochre for "undecided", so it does not read like the grey of "no evidence". */
+  --indeciso: #8a6a08;
+  --indeciso-tenue: #f5ecd2;
+  --sobre-cor: #faf6ec;
+
+  --raio: 16px;
+  --raio-p: 10px;
+  /* Warm-toned shadows, so the cards lift off the cream background. */
+  --sombra-1: 0 1px 2px rgb(62 48 26 / .06), 0 2px 10px rgb(62 48 26 / .05);
+  --sombra-2: 0 14px 38px rgb(62 48 26 / .12);
+  --sombra-3: -24px 0 60px rgb(62 48 26 / .20);
+  --coluna: 1000px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --papel-fundo: #12100c; --papel: #1a1712; --papel-alto: #211d17;
+    --linha: #342e24; --linha-forte: #4d4436;
+    --tinta-900: #efe7d7; --tinta-700: #ded4c0; --tinta-500: #b0a591;
+    --tinta-400: #9a8f7b; --tinta-300: #928772;
+    --acento: #86b3d6; --acento-forte: #aecfe8; --acento-tenue: #182530;
+    --apoia: #63b487; --apoia-tenue: #14271c;
+    --contraria: #e0897a; --contraria-tenue: #2c1a15;
+    --neutro: #a0957f; --neutro-tenue: #23201a;
+    --indeciso: #d4ad4a; --indeciso-tenue: #2b2412;
+    --sobre-cor: #14110c;
+
+    --sombra-1: 0 1px 2px rgb(0 0 0 / .45), 0 2px 12px rgb(0 0 0 / .35);
+    --sombra-2: 0 16px 44px rgb(0 0 0 / .55);
+    --sombra-3: -24px 0 70px rgb(0 0 0 / .6);
+  }
+}
+
+:root[data-theme="dark"] {
+  --papel-fundo: #12100c; --papel: #1a1712; --papel-alto: #211d17;
+  --linha: #342e24; --linha-forte: #4d4436;
+  --tinta-900: #efe7d7; --tinta-700: #ded4c0; --tinta-500: #b0a591;
+  --tinta-400: #9a8f7b; --tinta-300: #928772;
+  --acento: #86b3d6; --acento-forte: #aecfe8; --acento-tenue: #182530;
+  --apoia: #63b487; --apoia-tenue: #14271c;
+  --contraria: #e0897a; --contraria-tenue: #2c1a15;
+  --neutro: #a0957f; --neutro-tenue: #23201a;
+  --indeciso: #d4ad4a; --indeciso-tenue: #2b2412;
+  --sobre-cor: #14110c;
+
+  --sombra-1: 0 1px 2px rgb(0 0 0 / .45), 0 2px 12px rgb(0 0 0 / .35);
+  --sombra-2: 0 16px 44px rgb(0 0 0 / .55);
+  --sombra-3: -24px 0 70px rgb(0 0 0 / .6);
+}
+
+body {
+  background:
+    radial-gradient(1200px 560px at 50% -10%, color-mix(in oklab, var(--tinta-500) 7%, transparent), transparent 62%),
+    var(--papel-fundo);
+}
+
+.ideal {
+  max-width: var(--coluna);
+  margin: 0 auto;
+  padding: clamp(18px, 3vw, 34px) var(--goteira) 96px;
+  display: grid;
+  gap: clamp(14px, 2vw, 22px);
+}
+
+.entrada, .progresso, .resultado, .artigo { scroll-margin-top: calc(var(--barra-altura) + 18px); }
+
+/* --- Entry form ------------------------------------------------------------ */
+
+.entrada {
+  background: var(--papel-alto); border: 1px solid var(--linha);
+  border-radius: var(--raio); padding: clamp(24px, 3.4vw, 40px);
+  box-shadow: var(--sombra-1);
+}
+
+.entrada__titulo { font-size: clamp(22px, 3vw, 28px); font-weight: 660; letter-spacing: -.02em; }
+.entrada__nota { margin-top: 10px; color: var(--tinta-500); font-size: 14.2px; line-height: 1.65; }
+
+.entrada .forma {
+  margin-top: clamp(20px, 2.4vw, 28px);
+  display: grid; gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 300px);
+}
+.entrada .forma > .campo { align-self: start; align-content: start; }
+.entrada .campo:nth-child(1) { grid-column: 1; }
+.entrada .campo:nth-child(2) { grid-column: 2; }
+.entrada .campo:nth-child(3) { grid-column: 1 / -1; }
+.entrada .forma__accao { grid-column: 1 / -1; display: flex; gap: 10px; }
+.entrada .erro { grid-column: 1 / -1; }
+@media (max-width: 760px) {
+  .entrada .forma { grid-template-columns: minmax(0, 1fr); }
+  .entrada .campo { grid-column: 1 !important; }
+}
+
+.entrada .campo label { font-size: 13px; }
+.entrada .campo textarea,
+.entrada .campo input { font-size: 15px; padding: 14px 16px; line-height: 1.62; }
+/* Same height on the claim input and the date button, so the two boxes line up. */
+.entrada #campo-claim, .entrada .calendario__alvo { height: 54px; }
+.entrada #campo-contexto { min-height: 208px; }
+.entrada .botao--primario { padding: 14px 26px; font-size: 14.8px; }
+
+.casos { margin-top: 24px; padding-top: 20px; border-top: 1px dashed var(--linha-forte); }
+.casos__titulo { font-size: 11.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--tinta-400); font-weight: 680; }
+.caso__claim { font-size: 13.2px; font-weight: 560; line-height: 1.42; }
+
+/* --- Calendar -------------------------------------------------------------- */
+
+.calendario { position: relative; }
+.calendario__alvo {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--papel); border: 1px solid var(--linha-forte);
+  border-radius: var(--raio-p); padding: 14px 16px; cursor: pointer;
+  font-size: 15px; color: var(--tinta-300); text-align: left;
+  transition: border-color var(--transicao), box-shadow var(--transicao), background var(--transicao);
+}
+.calendario[data-preenchido="true"] .calendario__alvo { color: var(--tinta-900); }
+.calendario__alvo:hover { border-color: var(--tinta-400); }
+.calendario__alvo:focus-visible,
+.calendario__alvo[aria-expanded="true"] {
+  outline: none; border-color: var(--acento); background: var(--papel-alto);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--acento) 18%, transparent);
+}
+.calendario__icone { width: 18px; height: 18px; flex: none; fill: none; stroke: var(--tinta-400); stroke-width: 1.7; stroke-linecap: round; }
+.calendario[data-preenchido="true"] .calendario__icone { stroke: var(--acento); }
+
+.calendario__painel {
+  position: absolute; z-index: 20; top: calc(100% + 8px); left: 0; right: 0; min-width: min(288px, 100%);
+  background: var(--papel-alto); border: 1px solid var(--linha);
+  border-radius: var(--raio); box-shadow: var(--sombra-2);
+  padding: 14px; display: grid; gap: 10px;
+  animation: cair 160ms cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes cair { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.calendario__cabeca { display: flex; align-items: center; gap: 6px; }
+.calendario__mes { flex: 1; }
+.calendario__mes { font-size: 13.6px; font-weight: 640; text-transform: capitalize; text-align: center; }
+.calendario__ano {
+  font: inherit; font-size: 13px; font-weight: 600; color: var(--tinta-900);
+  background: var(--papel); border: 1px solid var(--linha); border-radius: 7px;
+  padding: 5px 6px; cursor: pointer; font-variant-numeric: tabular-nums;
+}
+.calendario__ano:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+.calendario__navegar {
+  width: 30px; height: 30px; display: grid; place-items: center; cursor: pointer;
+  border: 1px solid transparent; border-radius: 8px; background: transparent;
+  transition: background var(--transicao), border-color var(--transicao);
+}
+.calendario__navegar:hover { background: var(--papel); border-color: var(--linha); }
+.calendario__navegar:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+.calendario__texto { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.calendario__navegar svg { width: 17px; height: 17px; fill: none; stroke: var(--tinta-500); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.calendario__semana, .calendario__grelha { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+/* The rows exist for ARIA only; the days lay out on the parent grid. */
+.calendario__fila { display: contents; }
+.calendario__inicial { text-align: center; font-size: 10.6px; font-weight: 700; color: var(--tinta-300); text-decoration: none; text-transform: uppercase; }
+.calendario__dia {
+  aspect-ratio: 1; display: grid; place-items: center; cursor: pointer;
+  border: 1px solid transparent; border-radius: 8px; background: transparent;
+  font-size: 13px; font-variant-numeric: tabular-nums; color: var(--tinta-700);
+  transition: background var(--transicao), color var(--transicao), border-color var(--transicao);
+}
+.calendario__dia[data-fora="true"] { color: var(--tinta-300); }
+.calendario__dia:hover { background: var(--acento-tenue); color: var(--acento-forte); }
+.calendario__dia:focus-visible { outline: 2px solid var(--acento); outline-offset: -1px; }
+.calendario__dia[data-hoje="true"] { border-color: var(--linha-forte); font-weight: 680; }
+.calendario__dia[data-escolhido="true"] { background: var(--acento); border-color: var(--acento); color: var(--sobre-cor); font-weight: 700; }
+.calendario__dia[data-escolhido="true"]:focus-visible { outline: 2px solid var(--papel-alto); outline-offset: -3px; box-shadow: 0 0 0 2px var(--acento); }
+.calendario__rodape { display: flex; justify-content: space-between; gap: 8px; padding-top: 2px; border-top: 1px solid var(--linha); }
+.calendario__atalho { background: transparent; border: 0; cursor: pointer; padding: 7px 4px; font-size: 12.4px; font-weight: 580; color: var(--acento); border-radius: 6px; }
+.calendario__atalho:hover { text-decoration: underline; }
+.calendario__atalho:focus-visible { outline: 2px solid var(--acento); outline-offset: 1px; }
+
+/* --- Progress ------------------------------------------------------------------ */
+
+.progresso {
+  background: var(--papel-alto); border: 1px solid var(--linha);
+  border-radius: var(--raio); padding: clamp(18px, 2.2vw, 24px);
+  box-shadow: var(--sombra-1);
+  animation: subir 320ms cubic-bezier(.2,.7,.3,1) both;
+}
+@keyframes subir { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+.trilho {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0;
+}
+
+.etapa {
+  position: relative; display: flex; align-items: center; gap: 11px;
+  padding: 4px 14px 4px 0; min-width: 0;
+  transition: opacity var(--transicao);
+}
+.etapa[data-status="pending"] .etapa__nome,
+.etapa[data-status="skipped"] .etapa__nome { color: var(--tinta-400); font-weight: 560; }
+.etapa[data-status="skipped"] .etapa__marca { border-style: dashed; }
+
+.etapa__marca {
+  flex: none;
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+  border: 2px solid var(--linha-forte); color: var(--tinta-400); background: var(--papel-alto);
+  transition: background var(--transicao), border-color var(--transicao), color var(--transicao);
+}
+.etapa[data-status="running"] .etapa__marca {
+  border-color: var(--acento); color: var(--acento);
+  animation: bater 1.4s ease-in-out infinite;
+}
+@keyframes bater {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--acento) 45%, transparent); }
+  50% { box-shadow: 0 0 0 9px transparent; }
+}
+.etapa[data-status="done"] .etapa__marca { background: var(--apoia); border-color: var(--apoia); color: var(--sobre-cor); }
+.etapa[data-status="error"] .etapa__marca { background: var(--contraria); border-color: var(--contraria); color: var(--sobre-cor); }
+
+.etapa__corpo { display: grid; gap: 1px; min-width: 0; padding-right: 8px; }
+.etapa__nome { font-size: 12.8px; font-weight: 620; letter-spacing: -.01em; line-height: 1.3; }
+.etapa__estado { font-size: 11.2px; color: var(--tinta-400); }
+.etapa[data-status="running"] .etapa__estado { color: var(--acento); font-weight: 580; }
+.etapa[data-status="error"] .etapa__estado { color: var(--contraria); font-weight: 560; }
+
+@media (max-width: 900px) {
+  .trilho { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 14px; }
+}
+@media (max-width: 520px) {
+  .trilho { grid-template-columns: minmax(0, 1fr); row-gap: 12px; }
+}
+
+.progresso__anuncio {
+  margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--linha);
+  font-size: 14px; color: var(--tinta-700); min-height: 1.5em;
+  display: flex; align-items: center; gap: 11px;
+}
+.progresso__anuncio:empty { display: none; }
+.progresso[data-activo="true"] .progresso__anuncio::before {
+  content: ""; flex: none; width: 15px; height: 15px; border-radius: 50%;
+  border: 2px solid color-mix(in oklab, var(--acento) 30%, transparent); border-top-color: var(--acento);
+  animation: girar .8s linear infinite;
+}
+
+/* --- Result --------------------------------------------------------------------- */
+
+.resultado { display: grid; gap: clamp(12px, 1.6vw, 18px); }
+
+.bloco {
+  background: var(--papel-alto); border: 1px solid var(--linha);
+  border-radius: var(--raio); padding: clamp(18px, 2.2vw, 24px); box-shadow: var(--sombra-1);
+  animation: subir 340ms cubic-bezier(.2,.7,.3,1) both;
+}
+.bloco__topo { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+.bloco__titulo { font-size: 12px; text-transform: uppercase; letter-spacing: .09em; color: var(--tinta-400); font-weight: 700; }
+
+/* Timeline */
+
+/* `--remate` is the axis tail after the claim wall (the hatched band) and `--raio` half a
+   marker dot. `--pos` is a 0-1 fraction, so positions can scale `100% - var(--remate)`. */
+.pista, .regua { --remate: 22px; --raio: 6.5px; }
+.pista { position: relative; margin-top: 26px; height: calc(30px + var(--niveis, 1) * 20px); }
+.pista__linha {
+  position: absolute; left: 0; right: 0; bottom: 12px; height: 2px;
+  background: var(--linha-forte); border-radius: 2px;
+}
+
+.marcador {
+  /* Above the ruler ticks, which come later in the DOM and could cover a dot. */
+  z-index: 1;
+  /* Centred on its date; `min()` keeps the whole dot before the wall. */
+  position: absolute;
+  left: min(calc(var(--pos) * (100% - var(--remate))),
+            calc(100% - var(--remate) - 2px - var(--raio)));
+  bottom: calc(7px + var(--nivel) * 20px);
+  width: 13px; height: 13px; padding: 0; cursor: pointer;
+  transform: translateX(-50%);
+  border-radius: 50%; border: 2px solid var(--papel-alto); background: var(--tinta-300);
+  transition: transform var(--transicao), box-shadow var(--transicao), background var(--transicao);
+}
+.marcador::before {
+  content: ""; position: absolute; inset: -6px; border-radius: 50%;
+}
+.marcador::after {
+  content: ""; position: absolute; left: 50%; top: 100%;
+  width: 1px; height: calc(var(--nivel) * 20px); transform: translateX(-50%);
+  background: var(--linha-forte);
+}
+.marcador[data-rotulo="supported"] { background: var(--apoia); }
+.marcador[data-rotulo="refuted"] { background: var(--contraria); }
+.marcador[data-rotulo="nei"] { background: var(--tinta-300); }
+.marcador[data-rotulo="ambos"] { background: linear-gradient(90deg, var(--apoia) 50%, var(--contraria) 50%); }
+.marcador:hover, .marcador[data-aceso="true"] {
+  transform: translateX(-50%) scale(1.45);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--acento) 26%, transparent);
+}
+.marcador:focus-visible {
+  transform: translateX(-50%) scale(1.45);
+  outline: 2px solid var(--acento); outline-offset: 3px;
+}
+
+.parede {
+  position: absolute; left: calc(100% - var(--remate)); margin-left: -2px; top: 0; bottom: 6px;
+  width: 2px; background: var(--acento); border-radius: 2px;
+}
+/* Hatched band from the wall to the axis end: time after the claim, which the search
+   ignores. */
+.parede::before {
+  content: ""; position: absolute; left: 2px; top: 0; bottom: 0; width: var(--remate);
+  background: repeating-linear-gradient(45deg, transparent, transparent 4px,
+    color-mix(in oklab, var(--acento) 13%, transparent) 4px,
+    color-mix(in oklab, var(--acento) 13%, transparent) 8px);
+}
+/* The claim date sits above the axis, so it is not read as a ruler mark, and lines up with
+   the axis end rather than the wall. */
+.parede__etiqueta {
+  position: absolute; bottom: calc(100% + 5px); right: calc(-1px - var(--remate)); white-space: nowrap;
+  display: inline-flex; align-items: baseline; gap: 5px;
+  color: var(--sobre-cor); background: var(--acento);
+  padding: 3px 9px; border-radius: 100px;
+}
+.parede__nome { font-size: 9.6px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; opacity: .85; }
+.parede__data { font-size: 11.4px; font-weight: 640; font-variant-numeric: tabular-nums; }
+
+
+/* The ruler has no line of its own: its ticks hang from the markers' line, as two parallel
+   lines would read as two axes. */
+.regua { position: relative; height: 18px; margin-top: -6px; }
+.regua__marca {
+  position: absolute; left: calc(var(--pos) * (100% - var(--remate))); top: 2px; transform: translateX(-50%);
+  font-size: 10.6px; color: var(--tinta-400); font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.regua__marca::before {
+  content: ""; position: absolute; left: 50%; top: -8px; width: 1px; height: 6px;
+  background: var(--linha-forte); transform: translateX(-50%);
+}
+/* The first mark is left-aligned, so its label stays inside the track. */
+.regua__marca--inicio { transform: none; }
+.regua__marca--inicio::before { left: 0; transform: none; }
+
+/* Two lines reserved, so the card does not resize as hovered headlines wrap; the negative
+   margin takes back part of that space. */
+.leitura {
+  margin-top: 22px; margin-bottom: -10px;
+  font-size: 12.8px; color: var(--tinta-500); min-height: calc(2 * 1.5em); line-height: 1.5;
+}
+.leitura strong { color: var(--tinta-900); font-weight: 620; }
+
+/* Evidence tally */
+
+.cartoes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 11px; }
+@media (max-width: 620px) { .cartoes { grid-template-columns: minmax(0, 1fr); } }
+
+.cartao { display: grid; gap: 4px; padding: 18px 20px; border-radius: var(--raio-p); border: 1px solid transparent; }
+.cartao--supported { background: var(--apoia-tenue); border-color: color-mix(in oklab, var(--apoia) 24%, transparent); }
+.cartao--refuted { background: var(--contraria-tenue); border-color: color-mix(in oklab, var(--contraria) 24%, transparent); }
+.cartao--nei { background: var(--indeciso-tenue); border-color: color-mix(in oklab, var(--indeciso) 24%, transparent); }
+.cartao__numero { font-size: clamp(28px, 3.6vw, 36px); font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.cartao--supported .cartao__numero { color: var(--apoia); }
+.cartao--refuted .cartao__numero { color: var(--contraria); }
+.cartao--nei .cartao__numero { color: var(--indeciso); }
+.cartao__rotulo { font-size: 12.8px; font-weight: 600; color: var(--tinta-700); }
+
+/* --- Article --------------------------------------------------------------------- */
+
+.artigo {
+  background: var(--papel-alto); border: 1px solid var(--linha);
+  border-radius: var(--raio); box-shadow: var(--sombra-2); overflow: hidden;
+  animation: subir 460ms cubic-bezier(.2,.7,.3,1) both;
+}
+.artigo__cabecalho {
+  padding: clamp(28px, 3.4vw, 46px) clamp(24px, 4vw, 60px) 24px;
+  border-bottom: 1px solid var(--linha);
+  background: linear-gradient(180deg, var(--acento-tenue), transparent);
+}
+.selo {
+  display: inline-block; font-size: 10.4px; letter-spacing: .1em; text-transform: uppercase;
+  font-weight: 700; color: var(--acento-forte); background: var(--papel-alto);
+  border: 1px solid color-mix(in oklab, var(--acento) 30%, transparent);
+  padding: 4px 11px; border-radius: 100px; margin-bottom: 14px;
+}
+.artigo__titulo { font-family: var(--serif); font-size: clamp(25px, 3.4vw, 36px); font-weight: 600; letter-spacing: -.02em; }
+.artigo__lead { margin-top: 13px; font-family: var(--serif); font-size: clamp(15.5px, 1.7vw, 18.5px); color: var(--tinta-500); line-height: 1.6; }
+
+.artigo__corpo { padding: clamp(24px, 3vw, 36px) clamp(24px, 4vw, 60px); }
+.artigo__corpo h3 { font-family: var(--sans); font-size: 15.5px; letter-spacing: -.01em; color: var(--tinta-900); font-weight: 640; margin: 30px 0 10px; }
+.artigo__corpo h3:first-child { margin-top: 0; }
+.artigo__corpo p { font-family: var(--serif); font-size: clamp(16px, 1.75vw, 17.8px); line-height: 1.74; margin-bottom: 17px; }
+.artigo__corpo p:last-child { margin-bottom: 0; }
+
+.artigo__rodape { padding: 22px clamp(24px, 4vw, 60px) clamp(26px, 3vw, 34px); border-top: 1px solid var(--linha); background: var(--papel); }
+.artigo__rodape h3 { font-size: 11.5px; text-transform: uppercase; letter-spacing: .09em; color: var(--tinta-400); font-weight: 700; }
+.fontes { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+
+.fonte {
+  display: grid; grid-template-columns: 22px 1fr; gap: 11px; align-items: start;
+  padding: 12px 14px; border-radius: var(--raio-p); cursor: pointer; text-align: left; width: 100%;
+  background: var(--papel-alto); border: 1px solid var(--linha);
+  transition: border-color var(--transicao), transform var(--transicao);
+}
+.fonte:hover { border-color: var(--acento); transform: translateY(-1px); }
+.fonte:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.fonte__n { font-family: var(--mono); font-size: 10.6px; font-weight: 700; color: var(--acento); padding-top: 2px; }
+.fonte__conteudo { min-width: 0; }
+.fonte__titulo { font-size: 13.2px; font-weight: 580; line-height: 1.4; }
+.fonte__meta { margin-top: 5px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 11.2px; color: var(--tinta-400); }
+
+/* --- Typography overrides ----------------------------------------------------------- */
+
+/* The article's serif face, also on the entry title and tally figures. */
+.entrada__titulo { font-family: var(--serif); font-weight: 600; letter-spacing: -.015em; }
+.cartao__numero { font-family: var(--serif); font-weight: 600; }
+
+/* Small caps instead of forced uppercase: less noise in the same space. */
+.bloco__titulo, .casos__titulo, .selo, .parede__etiqueta {
+  font-variant-caps: all-small-caps;
+  text-transform: none;
+  letter-spacing: .09em;
+  font-size: 13px;
+}
+.selo { font-size: 12px; }
+.parede__etiqueta { font-size: 11.5px; }
+
+/* Hairline axis and small-caps tick labels, like a printed ruler. */
+.pista__linha { height: 1px; background: var(--linha-forte); }
+.regua__marca { font-variant-caps: all-small-caps; letter-spacing: .05em; font-size: 11.5px; }
+
+.artigo__rodape { border-top: 2px solid var(--linha-forte); }
+
+/* --- Examples by topic, in a carousel ----------------------------------------------- */
+
+.casos__cabeca { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.casos__nota { font-size: 11.8px; color: var(--tinta-400); }
+
+.topico { margin-top: 16px; }
+.topico__cabeca { display: flex; align-items: baseline; gap: 9px; margin-bottom: 8px; }
+.topico__nome { font-family: var(--serif); font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+.topico__conta {
+  font-size: 11px; font-weight: 700; color: var(--tinta-400);
+  background: var(--papel); border: 1px solid var(--linha);
+  border-radius: 100px; padding: 1px 8px; font-variant-numeric: tabular-nums;
+}
+
+.carrossel {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 6px; align-items: center;
+}
+/* Nothing to scroll: the track takes the whole row, with no space kept for arrows. */
+.carrossel[data-rolavel="false"] { grid-template-columns: minmax(0, 1fr); }
+
+/* No `scroll-snap`: it fights the mouse drag and shifts the arrow steps, which already move
+   exactly one dot. */
+.carrossel__pista {
+  display: flex; gap: 9px; overflow-x: auto;
+  padding: 2px; margin: -2px; scrollbar-width: none;
+}
+.carrossel__pista::-webkit-scrollbar { display: none; }
+/* Pointer at rest, grabbing hand while dragging. Cards are named explicitly, or `.caso`'s
+   own `cursor: pointer` would win on specificity. */
+.carrossel[data-rolavel="true"] .carrossel__pista,
+.carrossel[data-rolavel="true"] .carrossel__pista .caso { cursor: pointer; }
+.carrossel .carrossel__pista[data-arrasto="true"],
+.carrossel .carrossel__pista[data-arrasto="true"] .caso { cursor: grabbing; }
+/* Grabbing hand on the whole page while dragging: pointer capture holds the drag when the
+   cursor drifts off the row. Browsers without `:has()` ignore this rule. */
+body:has(.carrossel__pista[data-arrasto="true"]),
+body:has(.carrossel__pista[data-arrasto="true"]) * { cursor: grabbing; }
+/* No text selection while the track is held. */
+.carrossel__pista[data-agarrado="true"] {
+  user-select: none; -webkit-user-select: none;
+}
+
+/* Every card the same height: two lines of claim and the date underneath. */
+.caso {
+  flex: 0 0 clamp(220px, 26vw, 268px);
+  display: grid; grid-template-rows: 1fr auto; gap: 6px;
+  height: 90px; text-align: left; cursor: pointer;
+  background: var(--papel); border: 1px solid var(--linha);
+  border-radius: var(--raio-p); padding: 12px 14px;
+  transition: border-color var(--transicao), background var(--transicao), transform var(--transicao);
+}
+
+/* --- Each example's verdict, in colour ----------------------------------------------- */
+
+/* `--veredito` is the verdict colour, set from `data-veracity` on both cards and legend so
+   the two always agree. */
+.caso, .legenda__item { --veredito: var(--neutro); }
+[data-veracity="supported"] { --veredito: var(--apoia); }
+[data-veracity="refuted"] { --veredito: var(--contraria); }
+[data-veracity="nei"] { --veredito: var(--indeciso); }
+[data-veracity="nei_sem_evidencia"] { --veredito: var(--neutro); }
+
+/* `--veste` is the muted tint for backgrounds, light enough to read text on. */
+.caso, .legenda__item { --veste: var(--papel); }
+[data-veracity="supported"] { --veste: var(--apoia-tenue); }
+[data-veracity="refuted"] { --veste: var(--contraria-tenue); }
+[data-veracity="nei"] { --veste: var(--indeciso-tenue); }
+[data-veracity="nei_sem_evidencia"] { --veste: var(--neutro-tenue); }
+
+.caso { position: relative; overflow: hidden; }
+
+/* The whole card in the verdict tone, with a rule on its left edge. */
+.casos[data-marca="fundo"] .caso {
+  background: var(--veste);
+  border-color: color-mix(in oklab, var(--veredito) 26%, transparent);
+}
+.casos[data-marca="fundo"] .caso::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--veredito);
+}
+
+.caso:hover, .caso:focus-visible { border-color: var(--veredito); }
+
+.legenda {
+  list-style: none; margin: 10px 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: 6px 16px;
+}
+.legenda__item { display: flex; align-items: center; gap: 7px; font-size: 11.8px; }
+/* Swatch: the card tint ringed with the verdict colour. */
+.legenda__marca {
+  width: 13px; height: 13px; border-radius: 50%; flex: none;
+  background: var(--veste); border: 2px solid var(--veredito);
+}
+.legenda__nome { font-weight: 640; color: var(--tinta-700); }
+.legenda__nota { color: var(--tinta-400); }
+/* Narrow screens: one verdict per line and no notes, so the examples stay in view. */
+@media (max-width: 620px) {
+  .legenda { flex-direction: column; gap: 4px; }
+  .legenda__nota { display: none; }
+}
+.caso:hover { border-color: var(--acento); background: var(--acento-tenue); transform: translateY(-1px); }
+.caso:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+/* A claim that doesn't fit two lines is ellipsised; the whole of it goes in the tooltip. */
+.caso__claim {
+  font-family: var(--serif); font-size: 13.8px; line-height: 1.42; min-width: 0;
+  display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+}
+.caso__meta { font-size: 11.4px; color: var(--tinta-400); font-variant-numeric: tabular-nums; }
+
+.carrossel__seta {
+  width: 30px; height: 30px; flex: none; display: grid; place-items: center; cursor: pointer;
+  border: 1px solid var(--linha); background: var(--papel-alto); border-radius: 50%;
+  transition: border-color var(--transicao), background var(--transicao);
+}
+.carrossel__seta:hover { border-color: var(--acento); background: var(--acento-tenue); }
+.carrossel__seta:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.carrossel__seta svg { width: 16px; height: 16px; fill: none; stroke: var(--tinta-500); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.carrossel__seta:hover svg { stroke: var(--acento-forte); }
+
+.carrossel__pontos {
+  grid-column: 1 / -1; display: flex; justify-content: center; align-items: center;
+  gap: 5px; margin-top: 9px; flex-wrap: wrap;
+}
+.carrossel__ponto {
+  position: relative;
+  width: 6px; height: 6px; padding: 0; border: 0; cursor: pointer;
+  border-radius: 100px; background: var(--linha-forte);
+  transition: background var(--transicao), width var(--transicao);
+}
+/* A hit area larger than the 6px dot: below 620px the arrows hide and the dots are the only
+   buttons. */
+.carrossel__ponto::before { content: ""; position: absolute; inset: -9px -2px; }
+.carrossel__ponto:hover { background: var(--tinta-400); }
+.carrossel__ponto[data-activo="true"] { width: 17px; background: var(--acento); }
+.carrossel__ponto:focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; }
+
+/* The tooltip hangs off the body, clear of the track's clipping, placed with `--x`/`--y`. */
+.balao {
+  position: fixed; left: var(--x, 0); top: var(--y, 0); z-index: 60;
+  max-width: min(420px, 92vw);
+  background: var(--tinta-900); color: var(--papel-alto);
+  padding: 9px 12px; border-radius: 9px;
+  font-family: var(--serif); font-size: 13.4px; line-height: 1.5;
+  box-shadow: var(--sombra-2); pointer-events: none;
+  opacity: 0; transition: opacity 120ms ease;
+}
+.balao[data-visivel="true"] { opacity: 1; }
+
+@media (max-width: 620px) {
+  .carrossel { grid-template-columns: minmax(0, 1fr); }
+  .carrossel__seta { display: none; }
+  .caso { flex-basis: 78%; }
+}
+
+/* --- Verification questions ------------------------------------------------------------ */
+
+.perguntas { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.pergunta {
+  display: flex; gap: 10px; align-items: baseline;
+  padding: 11px 13px; border-radius: var(--raio-p);
+  background: var(--papel); border: 1px solid var(--linha);
+  font-size: 14px; line-height: 1.5;
+}
+.pergunta__n { font-family: var(--mono); font-size: 10.6px; color: var(--acento); font-weight: 700; flex: none; }
+
+/* The evidence total, under the tally cards. */
+.balanco__total {
+  margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--linha);
+  font-size: 13.6px; color: var(--tinta-500);
+}
+.balanco__total strong { color: var(--tinta-900); font-weight: 700; font-variant-numeric: tabular-nums; }

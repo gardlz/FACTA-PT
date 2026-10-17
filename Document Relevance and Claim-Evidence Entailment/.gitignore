@@ -1,0 +1,41 @@
+# Data: everything derived from CLEVER (pairs, folds) cannot be redistributed, wherever it is
+# placed. No JSON or CSV file belongs to this stage.
+data/
+*.json
+*.jsonl
+*.csv
+
+# Everything the scripts write: records, figures, emissions
+outputs/
+
+# Trained model weights
+checkpoints/
+*.safetensors
+*.bin
+*.pt
+
+# Credentials and local environment
+.env
+.env.*
+*.key
+*.pem
+id_*
+
+# Python and caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.cache/
+.ipynb_checkpoints/
+
+# Shell scripts and logs
+*.sh
+*.out
+*.err
+*.log
+
+# OS files
+.DS_Store
+._*
+Thumbs.db

@@ -1,0 +1,19 @@
+# The versions the three models were trained with (the adapter records its own in its
+# checkpoint_info.json). The GPU image installs the CUDA 12.8 build of the same torch.
+fastapi==0.141.1
+uvicorn[standard]==0.53.0
+pydantic==2.13.5
+pydantic-settings==2.7.0
+httpx==0.28.1
+torch==2.10.0
+transformers==5.6.2
+tokenizers==0.22.2
+huggingface-hub==1.33.0
+safetensors==0.8.0
+peft==0.19.1
+accelerate==1.13.0
+# Grammar engine for the article: the version vLLM 0.19.1 used in the evaluation.
+xgrammar==0.1.33
+numpy==2.5.3
+sentencepiece==0.2.0
+protobuf==5.29.3

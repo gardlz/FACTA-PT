@@ -1,0 +1,69 @@
+# The eight decoder-only models. The adaptation method is not declared here: it comes
+# from qg_kfold/configs/models_manifest.json (decided by model size).
+#
+# load_in_4bit applies to zero-/few-shot inference only (run_inference.py); in fine-tuning
+# the adaptation family decides, and only the QLoRA family is quantised.
+
+models:
+  - short_name: tucano_1b1
+    model_name_or_path: "TucanoBR/Tucano-1b1-Instruct"
+    architecture: "decoder_only"
+    language_group: "pt-br"
+    load_in_4bit: true
+    max_seq_length: 2048
+
+  - short_name: llama32_1b
+    model_name_or_path: "meta-llama/Llama-3.2-1B-Instruct"
+    architecture: "decoder_only"
+    language_group: "multilingual"
+    load_in_4bit: true
+    max_seq_length: 2048
+    # The Llama 3.2 template writes today's date into the system block; fix it to the date
+    # the Llama 3.1 template writes, so the prompt does not change from day to day.
+    chat_template_kwargs:
+      date_string: "26 Jul 2024"
+
+  - short_name: gloria_1b3
+    model_name_or_path: "NOVA-vision-language/GlorIA-1.3B"
+    architecture: "decoder_only"
+    language_group: "pt-pt"
+    load_in_4bit: true
+    # The repository's generation_config points eos_token_id to an ordinary word; this is
+    # the end-of-text token the training targets end with.
+    eos_token: "<|endoftext|>"
+    max_seq_length: 2048        # = max_position_embeddings
+
+  - short_name: bode_7b
+    model_name_or_path: "recogna-nlp/bode-7b-alpaca-pt-br-no-peft"
+    architecture: "decoder_only"
+    language_group: "pt-br"
+    load_in_4bit: true
+    max_seq_length: 2048
+
+  - short_name: llama_8b
+    model_name_or_path: "meta-llama/Llama-3.1-8B-Instruct"
+    architecture: "decoder_only"
+    language_group: "multilingual"
+    load_in_4bit: true
+    max_seq_length: 2048
+
+  - short_name: gervasio_8b
+    model_name_or_path: "PORTULAN/gervasio-8b-portuguese-ptpt-decoder"
+    architecture: "decoder_only"
+    language_group: "pt-pt"
+    load_in_4bit: true
+    max_seq_length: 2048
+
+  - short_name: amalia_9b
+    model_name_or_path: "amalia-llm/AMALIA-9B-0626-DPO"
+    architecture: "decoder_only"
+    language_group: "pt-pt"
+    load_in_4bit: true
+    max_seq_length: 2048
+
+  - short_name: mistral_nemo
+    model_name_or_path: "mistralai/Mistral-Nemo-Instruct-2407"
+    architecture: "decoder_only"
+    language_group: "multilingual"
+    load_in_4bit: true
+    max_seq_length: 2048

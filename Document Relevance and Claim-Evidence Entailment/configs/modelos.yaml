@@ -1,0 +1,147 @@
+# The eleven encoders of Table 6.1, keyed by the name used on the command line.
+#
+# The descriptive fields (grupo, base, lingua, supervisao, nli, rte, similaridade) come from the
+# model cards; src/inventario.py measures the parameter count of each checkpoint (Table 6.1).
+# `cabeca_original_classes` is the size of the checkpoint's own classification head (0: none);
+# a 3-class NLI head is reused in entailment (see src/grelhas.py).
+#
+# `grupo` (prior specialization):
+#   nli_multilingue   inference supervision on multilingual data (XNLI / MNLI / ANLI)
+#   rte_portugues     binary inference supervision in Portuguese (ASSIN2)
+#   pt_sem_nli        Portuguese encoder without task supervision
+#   similaridade      sentence encoder trained for semantic similarity
+#
+# Memory-saving options (see src/motor.py) for the larger encoders:
+#   gradient_checkpointing: true   non-reentrant gradient checkpointing
+#   poupar_memoria: true           gradient checkpointing + AdamW on the CPU
+
+mdeberta_xnli:
+  id: MoritzLaurer/mDeBERTa-v3-base-xnli-multilingual-nli-2mil7
+  gradient_checkpointing: true
+  grupo: nli_multilingue
+  base: mDeBERTa-v3-base
+  lingua: multilingue (100 línguas, pt incluído)
+  supervisao: XNLI + multilingual-NLI-26lang-2mil7 (MNLI, ANLI, Fever-NLI, LingNLI, WANLI)
+  nli: true
+  rte: false
+  similaridade: false
+  cabeca_original_classes: 3
+
+minilm_xnli:
+  id: MoritzLaurer/multilingual-MiniLMv2-L12-mnli-xnli
+  grupo: nli_multilingue
+  base: multilingual-MiniLMv2-L12
+  lingua: multilingue
+  supervisao: MNLI + XNLI
+  nli: true
+  rte: false
+  similaridade: false
+  cabeca_original_classes: 3
+
+xlmr_large_xnli:
+  id: joeddav/xlm-roberta-large-xnli
+  gradient_checkpointing: true
+  grupo: nli_multilingue
+  base: XLM-R-large
+  lingua: multilingue (100 línguas)
+  supervisao: MNLI + XNLI
+  nli: true
+  rte: false
+  similaridade: false
+  cabeca_original_classes: 3
+
+xlmr_large_xnli_anli:
+  id: vicgalle/xlm-roberta-large-xnli-anli
+  gradient_checkpointing: true
+  grupo: nli_multilingue
+  base: XLM-R-large
+  lingua: multilingue (100 línguas)
+  supervisao: XNLI + ANLI (adversarial)
+  nli: true
+  rte: false
+  similaridade: false
+  cabeca_original_classes: 3
+
+assin2_mdeberta:
+  id: ruanchaves/mdeberta-v3-base-assin2-entailment
+  gradient_checkpointing: true
+  grupo: rte_portugues
+  base: mDeBERTa-v3-base
+  lingua: multilingue (100 línguas, pt incluído)
+  supervisao: ASSIN2 entailment (RTE binário, PT-BR; 6 500 pares de treino)
+  nli: false
+  rte: true
+  similaridade: false
+  cabeca_original_classes: 2
+  # the published config.json has integer id2label values and does not load in transformers
+  # 5.6.2; rewrite it once in the local cache (see README)
+
+assin2_bertimbau:
+  id: ruanchaves/bert-large-portuguese-cased-assin2-entailment
+  grupo: rte_portugues
+  base: BERTimbau-large (BERT-large PT-BR)
+  lingua: português (PT-BR)
+  supervisao: ASSIN2 entailment (RTE binário, PT-BR; 6 500 pares de treino)
+  nli: false
+  rte: true
+  similaridade: false
+  cabeca_original_classes: 2
+  # same config.json problem as assin2_mdeberta (see README)
+
+bertimbau_large:
+  id: neuralmind/bert-large-portuguese-cased
+  grupo: pt_sem_nli
+  base: BERT-large
+  lingua: português (PT-BR)
+  supervisao: nenhuma para além do pré-treino
+  nli: false
+  rte: false
+  similaridade: false
+  cabeca_original_classes: 0
+
+bertimbau_base:
+  id: neuralmind/bert-base-portuguese-cased
+  grupo: pt_sem_nli
+  base: BERT-base
+  lingua: português (PT-BR)
+  supervisao: nenhuma para além do pré-treino
+  nli: false
+  rte: false
+  similaridade: false
+  cabeca_original_classes: 0
+
+albertina_100m:
+  id: PORTULAN/albertina-100m-portuguese-ptpt-encoder
+  gradient_checkpointing: true
+  grupo: pt_sem_nli
+  base: DeBERTa-v2
+  lingua: português europeu
+  supervisao: nenhuma para além do pré-treino
+  nli: false
+  rte: false
+  similaridade: false
+  cabeca_original_classes: 0
+
+albertina_900m:
+  id: PORTULAN/albertina-900m-portuguese-ptpt-encoder
+  grupo: pt_sem_nli
+  base: DeBERTa-v2
+  poupar_memoria: true
+  lingua: português europeu
+  supervisao: nenhuma para além do pré-treino
+  nli: false
+  rte: false
+  similaridade: false
+  cabeca_original_classes: 0
+
+serafim_335m:
+  id: PORTULAN/serafim-335m-portuguese-pt-sentence-encoder
+  grupo: similaridade
+  base: BERT-large / sentence-transformers
+  lingua: português europeu
+  supervisao: semelhança semântica de frases
+  nli: false
+  rte: false
+  similaridade: true
+  cabeca_original_classes: 0
+  # the tokenizer declares model_max_length 128; motor.Modelo raises it to max_len (512)

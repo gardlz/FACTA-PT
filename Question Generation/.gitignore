@@ -1,0 +1,55 @@
+# ---------------------------------------------------------------------------
+# Data. CLEVER and ClaimPT sit at the root of the repository (see the README);
+# everything derived from them (prepared examples, regenerated silver
+# questions) is not redistributable.
+# ---------------------------------------------------------------------------
+data/
+silver_generation/outputs/
+*.jsonl
+*.csv
+
+# ---------------------------------------------------------------------------
+# Everything the pipeline writes: folds, per-fold training files, run records,
+# predictions, metrics, carbon logs, temporary checkpoints and figures. None of
+# it is versioned.
+# ---------------------------------------------------------------------------
+outputs/
+tmp/
+qg_kfold/data/
+qg_kfold/folds/
+qg_kfold/runs/
+figuras/*.pdf
+figuras/*.png
+
+# Model weights and adapters
+checkpoints/
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+
+# Logs
+*.out
+*.err
+*.log
+
+# Credentials
+.env
+.env.*
+*.key
+*.pem
+id_*
+
+# Python and tooling
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+.streamlit/
+
+# OS
+.DS_Store
+._*
+__MACOSX/
+Thumbs.db

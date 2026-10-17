@@ -1,0 +1,25 @@
+# Exact versions with which this code was tested (Python 3.12.11, CUDA 12.8).
+torch==2.11.0  # CUDA 12.8 build (2.11.0+cu128)
+transformers==5.13.0
+tokenizers==0.22.2
+huggingface-hub==1.22.0
+safetensors==0.8.0
+peft==0.20.0
+accelerate==1.14.0  # used by the Trainer and by device_map
+bitsandbytes==0.50.1  # 4-bit NF4 loading (QLoRA and decoder-only inference)
+datasets==5.0.0
+sentencepiece==0.2.2  # T5/mT5 tokenizers
+protobuf==7.35.1  # SentencePiece tokenizer conversion
+bert-score==0.3.13
+rouge-score==0.1.2
+nltk==3.10.0
+scipy==1.18.0
+numpy==2.3.1
+PyYAML==6.0.3
+codecarbon==3.3.0
+pandas==3.0.3
+matplotlib==3.10.3
+spacy==3.8.15  # only for figuras/fig_contexto.py --ner (model pt_core_news_lg 3.8.0)
+streamlit==1.59.0
+google-genai==2.12.0
+python-dotenv==1.2.2

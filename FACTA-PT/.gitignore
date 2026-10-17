@@ -1,0 +1,27 @@
+# Credentials: .env holds the LUSA account. Never commit it.
+.env
+.env.*
+!.env.example
+
+# Model weights, downloaded as the README describes.
+checkpoints/
+
+# Stored examples: claim spans and news text, not distributed.
+web/app/demo/exemplos*.json
+
+# Stored runs, which carry the same text.
+execucoes/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Editors and operating system
+.DS_Store
+._*
+.idea/
+.vscode/
+*.swp

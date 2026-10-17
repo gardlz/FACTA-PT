@@ -1,0 +1,44 @@
+# ---------------------------------------------------------------------------
+# Data. None of it is redistributable; CLEVER sits at the root of the
+# repository (see the README).
+# ---------------------------------------------------------------------------
+# dados/ holds the labels of the candidate removals and everything the
+# pipeline writes from CLEVER: content plans, generated articles and energy
+# records. Plans and articles carry claim spans and news text.
+dados/
+*.jsonl
+
+# ---------------------------------------------------------------------------
+# Evaluation outputs: judge caches, per-article results and aggregates. They
+# hold per-article judge decisions, with justifications that quote the
+# articles; metric values belong in the dissertation.
+# ---------------------------------------------------------------------------
+evaluation/outputs/
+*.csv
+
+# ---------------------------------------------------------------------------
+# Credentials and environment. The Gemini key lives in .env in this folder.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+*.env
+*.key
+*.pem
+id_*
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+.venv-*/
+venv/
+.ipynb_checkpoints/
+
+# ---------------------------------------------------------------------------
+# OS
+# ---------------------------------------------------------------------------
+.DS_Store
+._*
+Thumbs.db

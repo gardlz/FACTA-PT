@@ -1,0 +1,19 @@
+# Overlay for machines with an NVIDIA GPU:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+#
+# Reserves the GPU and builds the inference image with 4-bit quantisation. These lines are not
+# in the base file because they stop the stack from starting where there is no NVIDIA device.
+
+services:
+  inference:
+    build:
+      args:
+        COM_GPU: "true"
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${INFERENCE_GPUS:-1}
+              capabilities: [gpu]

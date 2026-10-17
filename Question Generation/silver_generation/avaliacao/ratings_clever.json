@@ -1,0 +1,951 @@
+{
+  "input_part317.txt:894:1060": {
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 0,
+      "comparacao_presente": 1,
+      "estudo_mencionado": 0,
+      "comparacao_coberta": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "3": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    },
+    "estrutura": 0
+  },
+  "input_part040.txt:2736:2844": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part550.txt:1163:1217": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part523.txt:877:998": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 1,
+      "estudo_localizavel": 1
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part510.txt:3365:3471": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part376.txt:3148:3212": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 1,
+      "estudo_localizavel": 1
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part271.txt:4347:4424": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 0,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part220.txt:897:999": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part862.txt:4187:4298": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part060.txt:2578:2711": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part050.txt:1995:2156": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 0,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part248.txt:2257:2298": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part510.txt:1160:1241": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 0,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part512.txt:3218:3305": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part_1288.txt:878:999": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part050.txt:1225:1325": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part449.txt:2064:2217": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "3": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part860.txt:2097:2242": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part510.txt:2722:2944": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 1,
+      "estudo_localizavel": 1
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 0,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part_1022.txt:690:762": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 1,
+      "estudo_localizavel": 1
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part551.txt:3908:3995": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "3": {
+        "objeto": 0,
+        "neutralidade": 0
+      }
+    }
+  },
+  "input_part009.txt:433:544": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 0,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part401.txt:1914:2054": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part638.txt:1667:1855": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part397.txt:2527:2648": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part500.txt:3049:3091": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part624.txt:1263:1379": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part240.txt:1506:1649": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 1,
+      "estudo_localizavel": 1
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part695.txt:3221:3480": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 1,
+      "estudo_localizavel": 1
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 0,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part250.txt:1077:1155": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part655.txt:2065:2146": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part642.txt:1591:1688": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part536.txt:1878:1914": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part095.txt:1656:1771": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 1,
+      "estudo_localizavel": 1
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 0,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part_1105.txt:3840:4009": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 1,
+      "estudo_localizavel": 1
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 0,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part354.txt:2508:2557": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part695.txt:2787:2892": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 0,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "3": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part200.txt:2826:2856": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part569.txt:1243:1318": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part656.txt:1256:1308": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part441.txt:3900:3965": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 0,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part170.txt:2506:2602": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part095.txt:2338:2390": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part511.txt:7433:7524": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 0,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part560.txt:1349:1471": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part203.txt:3146:3220": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part269.txt:3497:3574": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 1,
+      "claimer_incorporado": 1,
+      "comparacao_presente": 0,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part_1084.txt:1059:1162": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part656.txt:873:1013": {
+    "estrutura": 1,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  },
+  "input_part401.txt:2608:2703": {
+    "estrutura": 0,
+    "casos": {
+      "claimer_necessario": 0,
+      "comparacao_presente": 1,
+      "comparacao_coberta": 1,
+      "estudo_mencionado": 0
+    },
+    "perguntas": {
+      "1": {
+        "objeto": 1,
+        "neutralidade": 1
+      },
+      "2": {
+        "objeto": 1,
+        "neutralidade": 1
+      }
+    }
+  }
+}

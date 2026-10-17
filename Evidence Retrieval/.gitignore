@@ -1,0 +1,29 @@
+# Stored search results and everything derived from CLEVER: not redistributable (see README.md).
+data/
+outputs/
+*.json
+*.jsonl
+*.csv
+*.md.parcial
+
+# Credentials for the search API.
+.env
+.env.*
+*.pem
+*.key
+
+# Python caches and environments.
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Logs (retrieve_lusa.py writes one next to each output folder).
+*.log
+
+# OS files.
+.DS_Store
+._*
+__MACOSX/
+Thumbs.db

@@ -1,0 +1,56 @@
+name: facta-pt
+
+services:
+  web:
+    build:
+      context: ./web
+    image: facta-pt-web:1.5.0
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    environment:
+      INFERENCE_URL: ${INFERENCE_URL:-http://inference:8100}
+      INFERENCE_TIMEOUT: ${INFERENCE_TIMEOUT:-900}
+      ARTICLE_TIMEOUT: ${ARTICLE_TIMEOUT:-10800}
+      API_URL_LUSA: ${API_URL_LUSA:-}
+      USER_LUSA: ${USER_LUSA:-}
+      PASSWORD_LUSA: ${PASSWORD_LUSA:-}
+      LUSA_DATASET: ${LUSA_DATASET:-LUSA}
+      TOP_K_PER_QUESTION: ${TOP_K_PER_QUESTION:-5}
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      RUN_STORE_DIR: ${RUN_STORE_DIR:-/tmp/facta-pt/execucoes}
+      RUN_RETENTION: ${RUN_RETENTION:-64}
+      WEB_WORKERS: ${WEB_WORKERS:-2}
+      MAX_CONCURRENT_RUNS: ${MAX_CONCURRENT_RUNS:-4}
+      RUN_QUEUE_TIMEOUT: ${RUN_QUEUE_TIMEOUT:-20}
+    networks:
+      - facta-pt
+
+  inference:
+    build:
+      context: ./inference
+      args:
+        COM_GPU: ${COM_GPU:-false}
+    image: facta-pt-inference:1.5.0
+    restart: unless-stopped
+    environment:
+      QG_MODEL_PATH: ${QG_MODEL_PATH:-/checkpoints/qg}
+      QG_ADAPTER_PATH: ${QG_ADAPTER_PATH:-/checkpoints/qg_adapter}
+      RELEVANCE_MODEL_PATH: ${RELEVANCE_MODEL_PATH:-/checkpoints/relevance}
+      STANCE_MODEL_PATH: ${STANCE_MODEL_PATH:-/checkpoints/stance}
+      ARTICLE_MODEL_PATH: ${ARTICLE_MODEL_PATH:-google/gemma-4-E4B-it}
+      ARTICLE_MODEL_REVISION: ${ARTICLE_MODEL_REVISION-ee0ef6023621cff504d758262d4e04895a5af4a2}
+      ARTICLE_DEVICE: ${ARTICLE_DEVICE:-auto}
+      ARTICLE_MAX_PROMPT_TOKENS: ${ARTICLE_MAX_PROMPT_TOKENS:-16384}
+    volumes:
+      - ${CHECKPOINTS_DIR:-./checkpoints}:/checkpoints:ro
+      - modelos:/cache/huggingface
+    networks:
+      - facta-pt
+
+volumes:
+  modelos:
+
+networks:
+  facta-pt:
+    driver: bridge

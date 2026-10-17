@@ -1,0 +1,40 @@
+# Repository-wide safety net. Each stage folder has its own .gitignore for its data and outputs.
+
+# Credentials
+.env
+.env.*
+*.key
+*.pem
+id_*
+
+# Datasets: CLEVER and ClaimPT are downloaded into the root of the repository (see README.md)
+/CLEVER/
+/ClaimPT/
+
+# Data files: no dataset or derived file is versioned
+*.jsonl
+*.csv
+
+# Model weights
+*.safetensors
+*.bin
+*.pt
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Logs
+*.log
+*.out
+*.err
+
+# OS files
+.DS_Store
+._*
+__MACOSX/
+Thumbs.db

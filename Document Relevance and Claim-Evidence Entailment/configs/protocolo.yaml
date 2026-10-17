@@ -1,0 +1,42 @@
+# Training and evaluation protocol, the same for both tasks (relevance and entailment) and
+# for every model. The scripts read treino.lr, treino.batch, treino.max_len, estatistica.n_boot
+# and treino_final.seed; final.py also reads treino.weight_decay, and correr.py prints
+# treino.warmup. The other keys document constants fixed in the code (motor.py, folds.py,
+# final.py); the cross-validation runs take their weight decay (0.01) and warm-up (0.10) from
+# motor.py.
+
+treino:
+  optimizer: AdamW
+  weight_decay: 0.01
+  lr: 2.0e-5
+  batch: 8
+  max_len: 512
+  perda: cross_entropy
+  scheduler: linear_warmup_linear_decay
+  warmup: 0.10            # fraction of the MAXIMUM number of steps (20 epochs); built once
+  epocas_max: 20
+  paciencia: 5            # consecutive epochs without improvement on the inner development set
+  min_delta: 0            # any improvement of the unrounded value counts
+
+decisao:
+  taus: [0.0, 0.25, 0.5, 0.75, 1.0]
+  empate: menor_tau
+
+validacao:
+  k: 5
+  sementes: [42, 43, 44]
+  agrupamento: artigo          # folds grouped by the source article of the claim
+  dev_interno: 0.20            # fraction of the groups left after removing the excluded fold
+
+estatistica:
+  n_boot: 400                  # grouped bootstrap of the test Macro-F1 (seed 42)
+  unidade_bootstrap: claim_span
+
+treino_final:
+  epoca: mediana_dos_15_best_epoch
+  tau: moda_dos_15_tau          # ties -> lowest tau
+  seed: 42
+  instancia: nova_do_checkpoint_pre_treinado   # a fresh fine-tuning, not a fold checkpoint
+  dev_interno: false            # the whole training split is used
+  early_stopping: false
+  scheduler_horizonte: 20       # same 20-epoch schedule; only the first `epoca` epochs run

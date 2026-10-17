@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-PT" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FACTA-PT - verificação factual assistida</title>
+<meta name="description" content="Da claim ao artigo de verificação: perguntas, evidência da Lusa, classificação e texto com citações rastreáveis.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/assets/css/base.css">
+<link rel="stylesheet" href="/assets/css/app.css">
+</head>
+<body>
+<a class="skip" href="#raiz">Saltar para o conteúdo</a>
+
+<header class="barra">
+  <div class="barra__marca">
+    <span class="marca__nome">FACTA-PT</span>
+  </div>
+
+  <div class="barra__acoes">
+    <div class="lingua" id="lingua" role="group" aria-label="Idioma da interface">
+      <button class="lingua__opcao" type="button" data-lingua="pt" aria-pressed="true" lang="pt-PT" title="Português">
+        <span class="bandeira" aria-hidden="true">
+          <svg viewBox="0 0 30 20" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <rect width="30" height="20" fill="#da291c"/>
+            <rect width="12" height="20" fill="#046a38"/>
+            <circle cx="12" cy="10" r="4.6" fill="none" stroke="#ffd100" stroke-width="1.3"/>
+            <path d="M9.9 7.3h4.2v3.6c0 1.3-.9 2.2-2.1 2.6-1.2-.4-2.1-1.3-2.1-2.6z" fill="#da291c"/>
+            <path d="M10.7 8.1h2.6v2.7c0 .8-.5 1.4-1.3 1.7-.8-.3-1.3-.9-1.3-1.7z" fill="#fff"/>
+            <path d="M12 8.6v3.4M10.9 10.2h2.2" stroke="#002d72" stroke-width=".7"/>
+          </svg>
+        </span>
+        <span class="lingua__sigla">PT</span>
+      </button>
+      <button class="lingua__opcao" type="button" data-lingua="en" aria-pressed="false" lang="en-GB" title="English">
+        <span class="bandeira" aria-hidden="true">
+          <svg viewBox="0 0 60 30" preserveAspectRatio="xMidYMid slice" focusable="false">
+            <clipPath id="bandeira-uk"><path d="M30 15h30v15zv15H0zH0V0zV0h30z"/></clipPath>
+            <path d="M0 0h60v30H0z" fill="#012169"/>
+            <path d="M0 0l60 30m0-30L0 30" stroke="#fff" stroke-width="6"/>
+            <path d="M0 0l60 30m0-30L0 30" clip-path="url(#bandeira-uk)" stroke="#c8102e" stroke-width="4"/>
+            <path d="M30 0v30M0 15h60" stroke="#fff" stroke-width="10"/>
+            <path d="M30 0v30M0 15h60" stroke="#c8102e" stroke-width="6"/>
+          </svg>
+        </span>
+        <span class="lingua__sigla">EN</span>
+      </button>
+    </div>
+    <button class="botao botao--icone" id="tema" type="button" aria-label="Alternar tema">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="raiz" class="raiz"></main>
+
+<script type="module" src="/assets/js/app.js"></script>
+</body>
+</html>
