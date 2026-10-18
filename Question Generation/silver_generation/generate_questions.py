@@ -69,14 +69,14 @@ Etapas para a formulação:
 # each one and, when the demonstration shows only some of the annotated claimers, their positions
 # in the annotation.
 DEMONSTRACOES = [
-    ("eleições_202_c2", "Facto único e indivisível -> UMA pergunta (não paráfrasear)", (0, 1)),
-    ("eleições_006_c6", 'Resolução pronominal ("aquilo" -> teto às rendas) -> geral + específica',
+    ("clever_202_c2", "Facto único e indivisível -> UMA pergunta (não paráfrasear)", (0, 1)),
+    ("clever_006_c6", 'Resolução pronominal ("aquilo" -> teto às rendas) -> geral + específica',
      (0, 1)),
-    ("eleições_004_c1", "Dois subfactos (o facto + o seu conteúdo) -> polar + aberta", None),
-    ("eleições_008_c3", "Três subfactos (o quê, por quem, quando) -> TRÊS perguntas", (3, 0)),
-    ("eleições_020_c3", 'Resolução ("desse objetivo" -> erradicar barracas), três ângulos -> '
+    ("clever_004_c1", "Dois subfactos (o facto + o seu conteúdo) -> polar + aberta", None),
+    ("clever_008_c3", "Três subfactos (o quê, por quem, quando) -> TRÊS perguntas", (3, 0)),
+    ("clever_020_c3", 'Resolução ("desse objetivo" -> erradicar barracas), três ângulos -> '
                         "TRÊS perguntas", None),
-    ("eleições_157_c1", "Tópico local (Setúbal) x nacional, específico (ecografias) x geral -> "
+    ("clever_157_c1", "Tópico local (Setúbal) x nacional, específico (ecografias) x geral -> "
                         "QUATRO perguntas", None),
 ]
 
@@ -102,6 +102,7 @@ def exemplos_few_shot(caminho=CLEVER_JSON):
         claimers = _textos(item.get("claimer"))
         if posicoes:
             claimers = [claimers[i] for i in posicoes]
+        perguntas = [q["text"] for q in span["questions"]]
         blocos.append("\n".join([
             f"# EXEMPLO {n} — {comentario}",
             f"CLAIM SPAN: {_clean(span['text'])}",
@@ -110,7 +111,7 @@ def exemplos_few_shot(caminho=CLEVER_JSON):
             "CLAIMER(S):",
             *(f"- {c}" for c in claimers),
             f"DATA DE PUBLICAÇÃO: {parse_date(artigo['publication_time'])}",
-            f"SAÍDA: {json.dumps({'questions': span['questions']}, ensure_ascii=False)}",
+            f"SAÍDA: {json.dumps({'questions': perguntas}, ensure_ascii=False)}",
         ]))
     return "\n\n".join(blocos)
 

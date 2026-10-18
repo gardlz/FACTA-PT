@@ -75,10 +75,10 @@ def ler_gold(spans_do_export):
             continue
         for doc in span["retrieved_documents"]:
             if doc["relation"] in ("Supported", "Refuted"):
-                gold[span_id]["decisivo"].add(doc["doc_id"])
-                gold[span_id][doc["relation"]].add(doc["doc_id"])
+                gold[span_id]["decisivo"].add(doc["lusa_doc_id"])
+                gold[span_id][doc["relation"]].add(doc["lusa_doc_id"])
             if doc["relevant"]:
-                gold[span_id]["relevante"].add(doc["doc_id"])
+                gold[span_id]["relevante"].add(doc["lusa_doc_id"])
     return gold
 
 
@@ -266,7 +266,7 @@ def ler_relacoes(dataset, chave):
     for _documento, _item, span_id, span in sorted(iter_claim_spans(ler_clever(dataset)),
                                                    key=lambda x: x[2]):
         for doc in span["retrieved_documents"]:
-            doc_id = str(doc["doc_id"])
+            doc_id = doc["lusa_doc_id"]
             relacoes[(span_id, chave.get(doc_id, doc_id))] = doc["relation"] or "NEI"
     return relacoes
 

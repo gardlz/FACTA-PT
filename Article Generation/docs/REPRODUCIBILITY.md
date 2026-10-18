@@ -75,7 +75,7 @@ The holistic judge (`gemini-3.8-flash`) is called through the **Gemini API**, wi
 ../CLEVER/clean_files/<document>.txt
 ```
 
-`clever.json` lists the source articles (`document`, `publication_time`) with their claim items; each claim span has its `text` and its `retrieved_documents`, and the text of its source article is read from `clean_files/<document>`. Only documents with `relevant: true` supply evidence; from each, the code reads `doc_id`, `headline`, `published_at`, `content`, `relation`, and `evidence_excerpts` with `text`, `begin` and `end` offsets. The claim span must occur verbatim in its source article so the surrounding context can be constructed.
+`clever.json` lists the source articles (`document`, `publication_time`) with their claim items; each claim span has its `text` and its `retrieved_documents`, and the text of its source article is read from `clean_files/<document>`. Only documents with `relevant: true` supply evidence; from each, the code reads `lusa_doc_id` (the LUSA identifier, which names the evidence), `headline`, `published_at`, `content`, `relation`, and `evidence_excerpts` with `text`, `begin` and `end` offsets. The claim span must occur verbatim in its source article so the surrounding context can be constructed.
 
 The experimental **Writer input** includes: claim span, **±1-sentence context**, publication date, three-sentence evidence passages with their `Supported`/`Refuted`/`NEI` relations and source metadata, plus a **predetermined conclusion**. The Writer does **not** infer a verdict or retrieve further material. Local citation labels `[E1]`, `[E2]`, ... link evidence-grounded factual statements to the passages given to the Writer.
 

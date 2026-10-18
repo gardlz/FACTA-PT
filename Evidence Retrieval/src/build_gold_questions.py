@@ -54,7 +54,8 @@ def build_span_unit(document, item, span_id, span):
         "publication_time": parse_publication_time(document.get("publication_time")),
         "claim_span": span.get("text"),
         "text_segment": item.get("text_segment"),
-        "questions": [collapse_spaces(q) for q in span.get("questions") or [] if q and q.strip()],
+        "questions": [collapse_spaces(q["text"]) for q in span.get("questions") or []
+                      if q["text"] and q["text"].strip()],
     }
 
 

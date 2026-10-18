@@ -661,7 +661,7 @@ def carregar_dataset(caminho: Path = DATASET) -> List[dict]:
                     "source_article": texto,
                     "publication_time": data_clever(artigo["publication_time"]),
                     "candidate_documents": [{
-                        "doc_id": doc["doc_id"],
+                        "doc_id": doc["lusa_doc_id"],  # the LUSA id names the evidence
                         "headline": doc["headline"],
                         "published_at": doc["published_at"],
                         "content": doc["content"],

@@ -28,10 +28,10 @@ SEED = 0
 # clever_test.json hold the benchmark partition instead, so the articles with claims of the
 # release's test file are listed here.
 ARTIGOS_DO_TESTE_ORIGINAL = {
-    "eleições_014.txt", "eleições_016.txt", "eleições_036.txt", "eleições_086.txt",
-    "eleições_093.txt", "eleições_104.txt", "eleições_112.txt", "eleições_121.txt",
-    "eleições_122.txt", "eleições_135.txt", "eleições_136.txt", "eleições_141.txt",
-    "eleições_146.txt", "eleições_156.txt", "eleições_168.txt", "eleições_178.txt",
+    "clever_014.txt", "clever_016.txt", "clever_036.txt", "clever_086.txt",
+    "clever_093.txt", "clever_104.txt", "clever_112.txt", "clever_121.txt",
+    "clever_122.txt", "clever_135.txt", "clever_136.txt", "clever_141.txt",
+    "clever_146.txt", "clever_156.txt", "clever_168.txt", "clever_178.txt",
 }
 
 

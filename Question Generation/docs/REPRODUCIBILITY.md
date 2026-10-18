@@ -181,7 +181,7 @@ python -m spacy download pt_core_news_lg
 Figure 4.1 shows the context of the claim span used as the example in Sections 4.1 and 4.2.3, whose text the first command reads from the prepared CLEVER data; Figures 4.2 and 4.3 read the cross-validation results in `qg_kfold/runs/v3/results/`:
 
 ```bash
-CLAIM=$(python -c "import json; print(next(e['claim_span'] for e in map(json.loads, open('data/clever/clever_train_40.jsonl', encoding='utf-8')) if e['id'] == 'eleições_016_c7'))")
+CLAIM=$(python -c "import json; print(next(e['claim_span'] for e in map(json.loads, open('data/clever/clever_train_40.jsonl', encoding='utf-8')) if e['id'] == 'clever_016_c7'))")
 python figuras/fig_contexto.py --claim "$CLAIM" --ner
 python figuras/fig_hbert_epocas.py
 python figuras/fig_learning_rate.py

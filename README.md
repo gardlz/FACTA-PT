@@ -133,11 +133,13 @@ stage folders, where every stage reads them:
 ```
 CLEVER/
 ├── clever.json                          the 228 articles, with the claim spans, gold questions and
-│                                        veracity, and the LUSA news items retrieved for each claim
+│                                        verification, and the LUSA news items retrieved for each claim
 │                                        span, annotated for relevance, relation and evidence excerpts
 ├── clever_train.json                    training partition of the document relevance and
 ├── clever_test.json                     Claim-Evidence Entailment experiments
-└── clean_files/<document>.txt           the article texts
+├── clean_files/<document>.txt           the article texts
+├── ids/                                 the registries of the question, document and excerpt ids
+└── README.md                            the fields and identifiers of CLEVER
 ClaimPT/
 ├── claimpt_train.json                   the claim spans, with their silver questions
 ├── claimpt_test.json
