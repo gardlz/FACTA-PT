@@ -149,8 +149,7 @@ ClaimPT/
 ## Released models
 
 The models retained for question generation, document relevance and Claim-Evidence Entailment
-are available in the Hugging Face collection:
-[Gabriiel/facta-pt-models](https://hf.co/collections/Gabriiel/facta-pt-models)
+are available on Hugging Face:
 
 - **Verification question generation:**  
   [liaad/facta-pt-qg-amalia-9b-0626-dpo](https://huggingface.co/liaad/facta-pt-qg-amalia-9b-0626-dpo)
