@@ -4,16 +4,74 @@ This directory contains the code and the results of the evaluation of **question
 
 The experiments assess whether automatically generated verification questions improve the retrieval of relevant evidence relative to declarative queries. The LUSA search infrastructure is kept fixed; the experiment studies **query formulation**, not alternative retrieval models. Only news published **before the source claim's publication date** is eligible.
 
-## Key findings
+## Repository structure
 
-- **The claim span is a stronger baseline than the complete claim.** It retrieves more of the reference evidence in every configuration, although the paired bootstrap distinguishes the difference from zero only for Relevant and Decisive Micro Recall.
-- **Generated questions generally retrieve more of the reference evidence than the complete claim**, and most models also outperform the claim span in at least part of the evaluation.
-- **The clearest gains appear when all the documents retrieved by the questions of a model are kept** (Matched retrieval volume), especially in the number of claim spans for which at least one decisive (Supported or Refuted) document is found.
-- **AMALIA-9B-0626-DPO obtains the highest value in the five metrics under Matched retrieval volume** (Relevant and Decisive Macro and Micro Recall, and DCSC). For 32 of the 54 claim spans with a single Supported or Refuted reference status, its questions retrieve at least one decisive document with that status, against 22 for the claim span and 19 for the complete claim. Its advantage is distinguishable from zero in all five metrics against the complete claim, and in three of the five against the claim span.
+```text
+src/
+  build_gold_questions.py           Prepare CLEVER question/query inputs
+  retrieve_lusa.py                  Retrieve ranked LUSA results
+  lusa_api.py                       Restricted API client
+  dedup_versions.py                 Consolidate reissued LUSA articles
+  comparar_queries.py               Retrieval metrics of every query strategy and configuration
+  bootstrap_emparelhado_queries.py  Paired bootstrap confidence intervals of the differences
+  comum.py                          Shared data paths and utilities
+docs/REPRODUCIBILITY.md             Inputs, search protocol and commands in run order
+requirements.txt                    Pinned Python dependencies
+```
 
-Taking into account both intrinsic question quality, evaluated in the [Question Generation](../Question%20Generation/) stage, and downstream retrieval performance, **AMALIA-9B-0626-DPO** was selected for the FACT-PT pipeline. The fine-tuned model is available at [liaad/facta-pt-qg-amalia-9b-0626-dpo](https://huggingface.co/liaad/facta-pt-qg-amalia-9b-0626-dpo).
+Some file names and command-line values are in Portuguese: `frase` denotes the **complete claim**, and `--query claim` searches the **claim span**.
 
-The sections below explain how the evaluation works and give the complete [results](#results).
+## Data and access
+
+**Datasets and LUSA news content are not included in this repository.** Obtain CLEVER following the [main repository instructions](../README.md#data) and the applicable access conditions. Paths below are relative to `Evidence Retrieval/`:
+
+```text
+../CLEVER/clever.json                  # CLEVER, with the gold questions and the evidence annotations
+data/export_evidencias/evidencias.csv  # Top-5 results of every search of every condition
+outputs/lusa_top20_claim/              # Ranking of each claim span
+outputs/lusa_top20_frase/              # Ranking of each complete claim
+outputs/lusa_docs/                     # Cached LUSA documents
+```
+
+The stored retrieval files include restricted LUSA material and are **not redistributed**; they may be requested from the authors subject to the LUSA News Corpus access conditions.
+
+Accessing the search API requires an **institutional VPN** and an uncommitted `.env` file in this directory containing `API_URL_LUSA`, `USER_LUSA`, and `PASSWORD_LUSA`. Never commit credentials.
+
+## Installation
+
+Run from `Evidence Retrieval/`:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+The code runs on **CPU**; no GPU is required.
+
+## Running the experiments
+
+From `Evidence Retrieval/`, with CLEVER available, prepare the query inputs and retrieve the **gold-question**, **claim-span**, and **complete-claim** rankings:
+
+```bash
+python src/build_gold_questions.py
+
+# Requires LUSA API access (VPN and credentials)
+python src/retrieve_lusa.py
+python src/retrieve_lusa.py --query claim --output-dir outputs/lusa_top20_claim
+python src/retrieve_lusa.py --query frase --output-dir outputs/lusa_top20_frase
+```
+
+`build_gold_questions.py` writes `outputs/gold_questions.jsonl`, one query unit per CLEVER gold question, with its claim span, complete claim and publication date. The three `retrieve_lusa.py` calls search with the gold questions, the claim spans and the complete claims, and write one ranking file per search to `outputs/lusa_top20/`, `outputs/lusa_top20_claim/` and `outputs/lusa_top20_frase/`, respectively, caching the retrieved documents in `outputs/lusa_docs/`. The CLEVER reference documents were collected from the gold-question searches, so the gold questions are not an evaluated condition.
+
+With the **stored retrieval results** listed above available locally, compute the experiment tables and paired bootstrap analysis offline:
+
+```bash
+python src/comparar_queries.py
+python src/bootstrap_emparelhado_queries.py
+```
+
+The metric report is written to `outputs/comparacao_queries.md`, with the values of the two retrieval tables as percentages and their hit counts, and the paired bootstrap analysis to `outputs/bootstrap/`. The inputs of each step, the search protocol and the details of these commands are in [Reproducing the experiments](docs/REPRODUCIBILITY.md).
 
 ## How the evaluation works
 
@@ -170,71 +228,11 @@ Number of the 14 models whose questions obtain a higher value than the complete 
 
 All the results above are limited by the size of the CLEVER reference evidence (83 claim spans for Relevant Recall, 56 for Decisive Recall and 54 for DCSC) and should be read within the scope of these subsets.
 
-## Repository structure
+## Key findings
 
-```text
-src/
-  build_gold_questions.py           Prepare CLEVER question/query inputs
-  retrieve_lusa.py                  Retrieve ranked LUSA results
-  lusa_api.py                       Restricted API client
-  dedup_versions.py                 Consolidate reissued LUSA articles
-  comparar_queries.py               Retrieval metrics of every query strategy and configuration
-  bootstrap_emparelhado_queries.py  Paired bootstrap confidence intervals of the differences
-  comum.py                          Shared data paths and utilities
-docs/REPRODUCIBILITY.md             Inputs, search protocol and commands in run order
-requirements.txt                    Pinned Python dependencies
-```
+- **The claim span is a stronger baseline than the complete claim.** It retrieves more of the reference evidence in every configuration, although the paired bootstrap distinguishes the difference from zero only for Relevant and Decisive Micro Recall.
+- **Generated questions generally retrieve more of the reference evidence than the complete claim**, and most models also outperform the claim span in at least part of the evaluation.
+- **The clearest gains appear when all the documents retrieved by the questions of a model are kept** (Matched retrieval volume), especially in the number of claim spans for which at least one decisive (Supported or Refuted) document is found.
+- **AMALIA-9B-0626-DPO obtains the highest value in the five metrics under Matched retrieval volume** (Relevant and Decisive Macro and Micro Recall, and DCSC). For 32 of the 54 claim spans with a single Supported or Refuted reference status, its questions retrieve at least one decisive document with that status, against 22 for the claim span and 19 for the complete claim. Its advantage is distinguishable from zero in all five metrics against the complete claim, and in three of the five against the claim span.
 
-Some file names and command-line values are in Portuguese: `frase` denotes the **complete claim**, and `--query claim` searches the **claim span**.
-
-## Data and access
-
-**Datasets and LUSA news content are not included in this repository.** Obtain CLEVER following the [main repository instructions](../README.md#data) and the applicable access conditions. Paths below are relative to `Evidence Retrieval/`:
-
-```text
-../CLEVER/clever.json                  # CLEVER, with the gold questions and the evidence annotations
-data/export_evidencias/evidencias.csv  # Top-5 results of every search of every condition
-outputs/lusa_top20_claim/              # Ranking of each claim span
-outputs/lusa_top20_frase/              # Ranking of each complete claim
-outputs/lusa_docs/                     # Cached LUSA documents
-```
-
-The stored retrieval files include restricted LUSA material and are **not redistributed**; they may be requested from the authors subject to the LUSA News Corpus access conditions.
-
-Accessing the search API requires an **institutional VPN** and an uncommitted `.env` file in this directory containing `API_URL_LUSA`, `USER_LUSA`, and `PASSWORD_LUSA`. Never commit credentials.
-
-## Installation
-
-Run from `Evidence Retrieval/`:
-
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-The code runs on **CPU**; no GPU is required.
-
-## Running the experiments
-
-From `Evidence Retrieval/`, with CLEVER available, prepare the query inputs and retrieve the **gold-question**, **claim-span**, and **complete-claim** rankings:
-
-```bash
-python src/build_gold_questions.py
-
-# Requires LUSA API access (VPN and credentials)
-python src/retrieve_lusa.py
-python src/retrieve_lusa.py --query claim --output-dir outputs/lusa_top20_claim
-python src/retrieve_lusa.py --query frase --output-dir outputs/lusa_top20_frase
-```
-
-`build_gold_questions.py` writes `outputs/gold_questions.jsonl`, one query unit per CLEVER gold question, with its claim span, complete claim and publication date. The three `retrieve_lusa.py` calls search with the gold questions, the claim spans and the complete claims, and write one ranking file per search to `outputs/lusa_top20/`, `outputs/lusa_top20_claim/` and `outputs/lusa_top20_frase/`, respectively, caching the retrieved documents in `outputs/lusa_docs/`. The CLEVER reference documents were collected from the gold-question searches, so the gold questions are not an evaluated condition.
-
-With the **stored retrieval results** listed above available locally, compute the experiment tables and paired bootstrap analysis offline:
-
-```bash
-python src/comparar_queries.py
-python src/bootstrap_emparelhado_queries.py
-```
-
-The metric report is written to `outputs/comparacao_queries.md`, with the values of the two retrieval tables as percentages and their hit counts, and the paired bootstrap analysis to `outputs/bootstrap/`. The inputs of each step, the search protocol and the details of these commands are in [Reproducing the experiments](docs/REPRODUCIBILITY.md).
+Taking into account both intrinsic question quality, evaluated in the [Question Generation](../Question%20Generation/) stage, and downstream retrieval performance, **AMALIA-9B-0626-DPO** was selected for the FACT-PT pipeline. The fine-tuned model is available at [liaad/facta-pt-qg-amalia-9b-0626-dpo](https://huggingface.co/liaad/facta-pt-qg-amalia-9b-0626-dpo).
