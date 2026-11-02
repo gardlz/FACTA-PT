@@ -115,11 +115,6 @@ def main() -> None:
     registo = {
         "seed": args.seed,
         "split_unit": "document",
-        "regra": (f"sorteio uniforme por documento sobre os {len(artigos)} artigos do CLEVER: um "
-                  f"artigo vai inteiro para um dos lados. Os artigos com claims aterram em "
-                  f"{args.n_train}/{args.n_test} claim spans exatos; os sem claims são "
-                  f"repartidos na mesma proporção, por artigo."),
-        "frozen_test": True,
         "n_artigos": len(artigos),
         "n_claim_spans": total,
         "train_size": len(train_ids),
@@ -130,9 +125,6 @@ def main() -> None:
         "test_documents": sorted(a["document"] for a in teste),
         "train_ids": train_ids,
         "test_ids": test_ids,
-        "nota": ("O teste é held-out: não usar para escolher modelos, prompts nem "
-                 "hiperparâmetros. train_ids e test_ids estão pela ordem dos exemplos de "
-                 "data/clever/."),
     }
     destino = Path(args.output)
     destino.parent.mkdir(parents=True, exist_ok=True)

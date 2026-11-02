@@ -27,9 +27,14 @@ class Settings(BaseSettings):
     # volume, or a local path; and the revision that was evaluated.
     article_model_path: str = ""
     article_model_revision: str = ""
-    # cuda or cpu. auto: CUDA when the GPU can hold the model with the other three moved out to
-    # main memory (the four take turns on it, `gpu.py`), else the CPU, in the same precision.
+    # cuda or cpu. auto: CUDA when the GPU can hold the model with the other models moved out to
+    # main memory (they take turns on it, `gpu.py`), else the CPU, in the same precision.
     article_device: str = "auto"
+    # The second writer, AMALIA-9B-0626-DPO, prompted as Gemma is: a local path or a Hugging Face
+    # id, the revision that was evaluated, and its device (as `article_device`).
+    amalia_model_path: str = ""
+    amalia_model_revision: str = ""
+    amalia_device: str = "auto"
     # Tokens the article's prompt may take; the passages worth least leave until it fits
     # (`artigo/admissao.py`). Reading 16k tokens takes about 0.8 GB, growing with the prompt's
     # length on the GPU (read in pieces) and with its square on the CPU, where it takes minutes.

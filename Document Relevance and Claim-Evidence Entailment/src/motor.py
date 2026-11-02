@@ -1,7 +1,8 @@
 """Fine-tuning of one configuration-selection run (one fold of one seed).
 
 AdamW with linear warm-up/decay built once for 20 epochs, early stopping on the inner development
-set, then tau chosen on that same set. The excluded fold is never predicted.
+set, then tau chosen on that same set. The development set is one fold of the seed's partition and
+the other four folds are the training set, so every fold is the development set once.
 """
 
 import math
@@ -204,7 +205,7 @@ def _macro(verdade, previsto, classes):
     return sum(pc[c]["f1"] for c in classes) / len(classes)
 
 
-def treinar_fold(treino, dev, aval, tarefa, cfg):
+def treinar_fold(treino, dev, tarefa, cfg):
     """One run: early stopping and tau on the inner development set; returns its diary."""
     semear(cfg["seed"])
     classes = classes_de(tarefa)
@@ -301,7 +302,7 @@ def treinar_fold(treino, dev, aval, tarefa, cfg):
         "tau": melhor_tau,
         "cabeca_preservada": modelo.cabeca_preservada,
         "id2label_original": modelo.id2label_original,
-        "n_treino": len(treino), "n_dev": len(dev), "n_aval": len(aval),
+        "n_treino": len(treino), "n_dev": len(dev),
     }
     del modelo
     torch.cuda.empty_cache()
@@ -312,42 +313,35 @@ def treinar_fold(treino, dev, aval, tarefa, cfg):
 # One repetition, fold by fold, so that `correr.py` can save each fold as soon as it closes
 # --------------------------------------------------------------------------------------------- #
 
-def dividir_fold(exemplos, particao, i, grupo_de, cfg):
-    """(train, dev, excluded fold, dev groups) of fold `i`; None if that fold is empty."""
-    fora = set(particao[i])
-    aval = [p for p in exemplos if grupo_de[p["span_id"]] in fora]
-    if not aval:
-        return None
-    resto = sorted({grupo_de[p["span_id"]] for p in exemplos
-                    if grupo_de[p["span_id"]] not in fora})
-    rnd = random.Random(cfg["seed"] * 100 + i)
-    rnd.shuffle(resto)
-    n_dev = max(1, round(0.20 * len(resto)))
-    dev_grupos = set(resto[:n_dev])
-    treino = [p for p in exemplos if grupo_de[p["span_id"]] not in fora
-              and grupo_de[p["span_id"]] not in dev_grupos]
+def dividir_fold(exemplos, particao, i, grupo_de):
+    """(train, dev, dev groups) of fold `i`: fold i is the development set and the other folds
+    are the training set; None if fold i is empty."""
+    dev_grupos = set(particao[i])
     dev = [p for p in exemplos if grupo_de[p["span_id"]] in dev_grupos]
-    if not dev or not treino:
+    if not dev:
+        return None
+    treino = [p for p in exemplos if grupo_de[p["span_id"]] not in dev_grupos]
+    if not treino:
         raise SystemExit(f"fold {i}: treino {len(treino)} dev {len(dev)} — divisão inválida")
-    return treino, dev, aval, sorted(dev_grupos)
+    return treino, dev, sorted(dev_grupos)
 
 
 def imprimir_fold(diario, nota=""):
     print(f"    fold {diario['fold']}: treino {diario['n_treino']} · dev {diario['n_dev']} · "
-          f"aval {diario['n_aval']} · melhor época {diario['melhor_epoca']}/"
+          f"melhor época {diario['melhor_epoca']}/"
           f"{diario['epocas_executadas']} ({diario['motivo_paragem']}) · "
           f"dev {diario['melhor_macro_dev']:.4f} · tau {diario['tau']}{nota}", flush=True)
 
 
 def correr_fold(divisao, i, tarefa, cfg):
-    """Trains fold `i` and returns it as a record: the excluded-fold ids and the diary."""
-    treino, dev, aval, grupos_dev = divisao
-    diario = treinar_fold(treino, dev, aval, tarefa, cfg)
+    """Trains fold `i` and returns it as a record: the development-set ids and the diary."""
+    treino, dev, grupos_dev = divisao
+    diario = treinar_fold(treino, dev, tarefa, cfg)
     libertar_gpu()
     diario["fold"] = i
     diario["grupos_dev"] = grupos_dev
     imprimir_fold(diario)
-    return {"fold": i, "ids": [p["id"] for p in aval], "diario": diario}
+    return {"fold": i, "ids": [p["id"] for p in dev], "diario": diario}
 
 
 def juntar_folds(folds):
@@ -355,11 +349,12 @@ def juntar_folds(folds):
     return [f["diario"] for f in folds]
 
 
-def correr_cv(exemplos, particao, grupo_de, cfg, fazer):
-    """One repetition: every fold excluded once; `fazer(i, divisao)` returns fold i's record."""
+def correr_cv(exemplos, particao, grupo_de, fazer):
+    """One repetition: every fold is the development set once; `fazer(i, divisao)` returns fold
+    i's record."""
     folds = []
     for i in range(len(particao)):
-        divisao = dividir_fold(exemplos, particao, i, grupo_de, cfg)
+        divisao = dividir_fold(exemplos, particao, i, grupo_de)
         if divisao is not None:
             folds.append(fazer(i, divisao))
     return juntar_folds(folds)

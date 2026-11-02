@@ -5,7 +5,8 @@
 # different versions. Every line therefore carries a python_version marker: run
 #     pip install -r requirements.txt
 # inside each environment and pip installs only that environment's block. Building the
-# content plans and running the threshold audit need only the standard library.
+# content plans and running the threshold audit need only nltk, from the generation block, and
+# its Punkt data (python -m nltk.downloader punkt_tab).
 
 # ---------------------------------------------------------------------------
 # Generation: one NVIDIA A100 40 GB per run, Python 3.11.5
@@ -13,10 +14,14 @@
 vllm==0.19.1 ; python_version == "3.11"
 xgrammar==0.1.33 ; python_version == "3.11"
 codecarbon==3.3.0 ; python_version == "3.11"
-# torch 2.10.0 is the version vllm 0.19.1 requires; transformers 5.6.2 is the version declared for
-# the same GPU environment in Chapter 4 of the dissertation.
+# torch 2.10.0 is the version vllm 0.19.1 requires; transformers 5.6.2 is the version used in the
+# same GPU environment by the question-generation experiments.
 torch==2.10.0 ; python_version == "3.11"
 transformers==5.6.2 ; python_version == "3.11"
+# nltk splits the news text into the sentences of the evidence passages (Punkt model for
+# Portuguese); 3.10.0 is the version of the entailment classifier and FACT-PT. The reported runs
+# used a regular-expression splitter instead (see the README).
+nltk==3.10.0 ; python_version == "3.11"
 
 # ---------------------------------------------------------------------------
 # Evaluation: Python 3.14.4, plus the Gemini API

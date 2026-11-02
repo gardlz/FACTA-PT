@@ -1,4 +1,4 @@
-"""Aggregates the codecarbon summaries written by `carbon.py` (Table 4.7).
+"""Aggregates the codecarbon summaries written by `carbon.py`.
 
 Writes the totals per regime to `carbono_por_regime.csv` and prints runs, GPU-hours, kWh and
 kg CO2eq per regime. Each process uses one GPU, so process hours are GPU-hours.

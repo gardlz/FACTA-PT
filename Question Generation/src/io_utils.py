@@ -76,7 +76,7 @@ def normalize_example(raw: dict) -> dict:
     """Example in the normalised schema, with safe defaults."""
     reference = as_text_list(raw.get("reference_questions"))
     silver = as_text_list(raw.get("silver_questions"))
-    # Generic "questions" field (e.g. the silver generation output) as a fallback.
+    # Generic "questions" field as a fallback.
     generic = as_text_list(raw.get("questions"))
     questions = reference or silver or generic
 

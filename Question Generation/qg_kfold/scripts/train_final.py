@@ -152,7 +152,6 @@ def treina_um(model_cfg, train_examples, test_examples, args) -> None:
         "familia_adaptacao": args.familia_adaptacao,
         "early_stopping": False,
         "dev": None,
-        "best_epoch_origem": "mean H-BERT dos 4 folds gold",
     }
     if args.familia_adaptacao == "full_fine_tuning":
         training_meta["adaptation"] = "full fine-tuning"

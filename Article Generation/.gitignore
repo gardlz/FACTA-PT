@@ -11,7 +11,7 @@ dados/
 # ---------------------------------------------------------------------------
 # Evaluation outputs: judge caches, per-article results and aggregates. They
 # hold per-article judge decisions, with justifications that quote the
-# articles; metric values belong in the dissertation.
+# articles; the reported metric values are in docs/REPRODUCIBILITY.md.
 # ---------------------------------------------------------------------------
 evaluation/outputs/
 *.csv

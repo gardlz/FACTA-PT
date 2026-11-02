@@ -1,4 +1,4 @@
-"""Sharing one GPU between the four models.
+"""Sharing one GPU between the models.
 
 The models wait in main memory and take turns on the GPU: before one runs, the least recently used
 go back to main memory until there is room for its weights and its call.

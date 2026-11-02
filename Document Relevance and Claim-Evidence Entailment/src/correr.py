@@ -1,7 +1,8 @@
 """Configuration selection of one model on one task: 3 seeds x 5 folds on the training split.
 
-Appends a record with the 15 selected epochs and taus to outputs/resultados.jsonl; each fold is
-saved as it closes, so an interrupted run resumes.
+Each fold is in turn the development set (early stopping and tau) and the other four folds are
+the training set. Appends a record with the 15 selected epochs and taus to outputs/resultados.jsonl;
+each fold is saved as it closes, so an interrupted run resumes.
 """
 
 import argparse
@@ -125,7 +126,8 @@ def main():
           f"{d['n_grupos']} grupos · " + " ".join(f"{k}={v}" for k, v in sorted(c.items())))
     print(f"  protocolo: AdamW lr {cfg['lr']} · batch {cfg['batch']} · max_len {cfg['max_len']} · "
           f"linear warmup {prot['treino']['warmup']:.0%} + decay sobre {motor.EPOCAS_MAX} épocas · "
-          f"early stopping paciência {motor.PACIENCIA} no dev INTERNO\n")
+          f"early stopping paciência {motor.PACIENCIA} no dev interno (uma fold; as outras "
+          f"{d['k'] - 1} treinam)\n")
 
     diarios = []
     marca = f"{args.tarefa}__{args.modelo}"
@@ -146,10 +148,10 @@ def main():
         def fazer(k, divisao, s=s, cfg_s=cfg_s):
             f = guardadas.get((s, k))
             if f is not None:
-                if (f["ids"] != [x["id"] for x in divisao[2]]
-                        or f["diario"]["grupos_dev"] != divisao[3]):
+                if (f["ids"] != [x["id"] for x in divisao[1]]
+                        or f["diario"]["grupos_dev"] != divisao[2]):
                     raise SystemExit(f"semente {s}, fold {k}: a fold guardada em {parcial} não é "
-                                     f"a fold de agora (outra fold externa ou outro dev interno)")
+                                     f"a fold de agora (outro dev interno)")
                 motor.imprimir_fold(f["diario"], f" · RETOMADA (fechou a {f['gravada_em']})")
             else:
                 with carbono.medir(f"{bloco}|s{s}|f{k}") as m:
@@ -160,7 +162,7 @@ def main():
             feitas.append(f)
             return f
 
-        diarios += motor.correr_cv(exemplos, d["particoes"][i], grupo_de, cfg_s, fazer)
+        diarios += motor.correr_cv(exemplos, d["particoes"][i], grupo_de, fazer)
 
     registo = {
         "tarefa": args.tarefa, "modelo": args.modelo,

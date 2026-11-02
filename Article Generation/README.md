@@ -1,10 +1,10 @@
 # Article Generation
 
-This directory contains the code for **evidence-grounded fact-checking article generation in European Portuguese**. It addresses **RQ5** of the dissertation by studying how classified evidence can be organised into a readable article with traceable citations.
+This directory contains the code for **evidence-grounded fact-checking article generation in European Portuguese**. It studies how classified evidence can be organised into a readable article with traceable citations.
 
 The **Writer** receives a claim span, its context and publication date, evidence passages already labelled **Supported**, **Refuted** or **Not Enough Information (NEI)**, and a **predetermined factual conclusion**. It does **not** retrieve new evidence or decide the claim's veracity. Evidence-based factual statements are linked to their source passages using local citations such as `[E1]` and `[E2]`.
 
-The selected Writer is **Gemma 4 E4B IT**, also used by the [FACTA-PT prototype](https://factapt.inesctec.pt). It is an existing instruction-tuned model, **not a model fine-tuned or released by this repository**.
+The selected Writer is **Gemma 4 E4B IT**, also used by the [FACT-PT prototype](https://factapt.inesctec.pt). It is an existing instruction-tuned model, **not a model fine-tuned or released by this repository**.
 
 ## Experimental overview
 
@@ -31,7 +31,7 @@ geracao/                     Evidence preparation, planning, prompts and generat
 evaluation/                  NLI/Gemini judging, citation metrics and aggregation
   evaluate_articles.py       Run judges and assemble cached evaluations
   aggregate_results.py       Aggregate article-level metrics
-docs/REPRODUCIBILITY.md      Commands in run order and the complete Tables 7.4–7.6
+docs/REPRODUCIBILITY.md      Commands in run order and the complete result tables
 requirements.txt             Dependencies for both Python environments
 ```
 
@@ -46,7 +46,7 @@ Additional generation and evaluation modules implement citation markers, conclus
 ../CLEVER/clean_files/<document>.txt   # Source articles used to recover claim context
 ```
 
-The code uses **Relevant** documents and their annotated excerpts, relations, publication dates and source identifiers. The manual labels used to choose the deduplication threshold are not included; they are needed only to recompute the removal precision of Table 7.4, not to generate articles with the selected threshold. Generated plans, articles, judge caches and evaluations are written under `dados/` and `evaluation/outputs/`.
+The code uses **Relevant** documents and their annotated excerpts, relations, publication dates and source identifiers. Each annotated excerpt becomes a three-sentence passage of its news item, with the sentences found by **NLTK's Punkt model for Portuguese** (the same split as the entailment classifier and FACT-PT). The manual labels used to choose the deduplication threshold are not included; they are needed only to compute the removal precision of the threshold audit, not to generate articles with the selected threshold. Generated plans, articles, judge caches and evaluations are written under `dados/` and `evaluation/outputs/`.
 
 ## Installation
 
@@ -57,6 +57,7 @@ Generation and evaluation require **separate Python environments**, with version
 python3.11 -m venv .venv-geracao
 source .venv-geracao/bin/activate
 pip install -r requirements.txt
+python -m nltk.downloader punkt_tab   # Punkt sentence model for the evidence passages
 
 # Evaluation: Python 3.14, the NLI judge and the Gemini API
 # Run in a separate shell or deactivate the generation environment first.
@@ -72,10 +73,10 @@ The reported generation runs used **vLLM 0.19.1**, **bfloat16** and one **NVIDIA
 Run the following commands **from `Article Generation/`**, after obtaining CLEVER and preparing the generation environment and the selected model checkpoint:
 
 ```bash
-# 1. Construct the content plans (no GPU required)
+# 1. Build the content plans in dados/planos/ (no GPU required)
 python geracao/construir_planos.py --todas
 
-# 2. Generate articles with the selected Writer (CUDA GPU)
+# 2. Generate the full-condition articles in dados/artigos/ with the selected Writer (CUDA GPU)
 export HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1
 export TOKENIZERS_PARALLELISM=false VLLM_WORKER_MULTIPROC_METHOD=spawn
 python geracao/carbono.py --modelo google/gemma-4-E4B-it --condicao full
@@ -85,7 +86,7 @@ To **evaluate** the generated articles, activate `.venv-evaluation`, unset the t
 
 ## Main results
 
-**Writer comparison** - selected models on the **113 evidence-bearing claim spans** (dissertation **Table 7.5**):
+**Writer comparison** - selected models on the **113 evidence-bearing claim spans**:
 
 | Model | Citation Recall ↑ | Citation Precision ↑ | Evidence Coverage ↑ | Comprehensibility ↑ | Evidence Presentation ↑ |
 |---|---:|---:|---:|---:|---:|
@@ -93,7 +94,7 @@ To **evaluate** the generated articles, activate `.venv-evaluation`, unset the t
 | Qwen3.5-9B | 0.590 | **0.753** | **0.902** | 4.77 | 3.56 |
 | Qwen3.5-4B | 0.494 | 0.706 | 0.817 | 4.62 | 3.81 |
 
-**Ablation with Gemma 4 E4B IT** - selected metrics (dissertation **Table 7.6**):
+**Ablation with Gemma 4 E4B IT** - selected metrics:
 
 | Condition | Citation Recall ↑ | Evidence Coverage ↑ | Evidence Presentation ↑ |
 |---|---:|---:|---:|
@@ -105,12 +106,8 @@ To **evaluate** the generated articles, activate `.venv-evaluation`, unset the t
 
 The **content plan** has the clearest observed contribution to evidence grounding and integration. Gemma was selected for its **overall balance**, not because it leads every metric: Qwen3.5-9B achieves higher Citation Precision and Evidence Coverage. Grounding scores range from **0 to 1**, while article-quality scores range from **1 to 5**. **Citation Precision is calculated only for articles containing citations**, so its number of observations can vary by model.
 
-Complete eight-model results, deduplication calibration, all six metrics and reproduction details are in **Chapter 7, Tables 7.4–7.6** and [Reproducing the experiments](docs/REPRODUCIBILITY.md).
+The reported results were obtained with evidence passages cut by a **regular-expression sentence splitter**. The NLTK split used by this code changes the evidence passages of **13 of the 140** plans of the `full` condition: 481 of the 500 passages are unchanged, and the plans hold 501 passages instead of 500.
 
-## Dissertation reference
+Complete eight-model results, deduplication calibration, all six metrics and reproduction details are in [Reproducing the experiments](docs/REPRODUCIBILITY.md).
 
-- **Chapter 7:** Evidence-grounded article generation: experimental setup, results and ablation study.
-- **Appendix A.6:** Generation prompt, content plan, generated article structure and Article Quality evaluation prompt.
-- **Chapter 8:** Integration of the selected Writer into FACTA-PT.
-
-For the dissertation citation and the full pipeline, see the [main repository README](../README.md#citation).
+For the full pipeline, see the [main repository README](../README.md).

@@ -56,7 +56,7 @@ def medir(nome, saida=SAIDA, pais=PAIS, intervalo=15):
             allow_multiple_runs=True,
         )
         seguidor.start()
-    except Exception as e:                                  # noqa: BLE001 — never stops a run
+    except Exception as e:                                  # noqa: BLE001 (never stops a run)
         m.motivo = f"{type(e).__name__}: {e}"
         seguidor = None
 

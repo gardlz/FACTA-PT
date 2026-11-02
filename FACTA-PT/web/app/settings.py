@@ -2,8 +2,10 @@
 
 from functools import lru_cache
 
-from pydantic import Field
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from .schemas import TOP_K_OPCOES
 
 
 class Settings(BaseSettings):
@@ -26,7 +28,8 @@ class Settings(BaseSettings):
     # a margin, and sends back what it has written by then.
     article_timeout: float = 10800.0
 
-    # Distinct news items kept per question, once reissues are merged.
+    # Distinct news items kept per question, once reissues are merged, when a run does not
+    # choose: one of TOP_K_OPCOES, and the choice the page starts on.
     top_k_per_question: int = 5
     # Cap on the questions used, since each one is a search.
     max_questions: int = 6
@@ -36,6 +39,15 @@ class Settings(BaseSettings):
     max_concurrent_runs: int = 4
     run_queue_timeout: float = 20.0
     cors_origins: str = ""
+
+    @field_validator("top_k_per_question")
+    @classmethod
+    def _top_k_previsto(cls, v: int) -> int:
+        if v not in TOP_K_OPCOES:
+            raise ValueError(
+                f"TOP_K_PER_QUESTION must be one of {', '.join(map(str, TOP_K_OPCOES))}"
+            )
+        return v
 
     @property
     def lusa_configured(self) -> bool:

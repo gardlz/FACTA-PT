@@ -3,7 +3,7 @@
 
 import { el, botao } from "./core/dom.js";
 import { criarFormulario } from "./core/formulario.js";
-import { comCitacoes, comoData as dia, dataCurta, dataLonga, nomeRotulo } from "./core/formato.js";
+import { comCitacoes, comoData as dia, dataCurta, dataLonga, nomeRotulo, percentagem } from "./core/formato.js";
 import { aoMudarLingua, t } from "./core/i18n.js";
 
 /** The seven pipeline stages grouped into the four steps that mean something to a reader. A
@@ -118,13 +118,23 @@ export function montar(raiz, ctx) {
 
   let dataDaClaim = null;
   let exemploEscolhido = null;
+  // News items each question keeps in the next run: the server's default until the reader
+  // picks another. The example cards show their verdict for it.
+  let quantidade = ctx.quantidade ? ctx.quantidade.omissao : null;
+  const pintores = [];
   // Everything retrieved, and the part of it that counts as evidence (what the relevance stage
   // did not rule unrelated). The axis and the balance show only the evidence.
   let recuperados = [];
   let documentos = [];
+  // The relevance stage's counts (`notícias`, `relevantes`, `percentagem`), when it ran.
+  let relevancia = null;
   // What the balance and the article were last drawn from, so a language switch can redraw them.
   let classificacao = null;
+  // The article last drawn, so a language switch can redraw it; or, when the run wrote none, why
+  // (the article stage's `motivo`), and the model the run chose.
   let artigoDesenhado = null;
+  let semArtigo = null;
+  let redatorDaCorrida = null;
   let ultimoRevelado = null;
   let preparado = false;
 
@@ -260,7 +270,14 @@ export function montar(raiz, ctx) {
     aoSubmeter: (dados) => {
       dataDaClaim = dia(dados.claim_date);
       prepararProgresso();
+      redatorDaCorrida = dados.redator || null;
       ctx.executar({ ...dados, exemplo_id: exemploEscolhido });
+    },
+    quantidade: ctx.quantidade,
+    redatores: ctx.redatores,
+    aoMudarQuantidade: (numero) => {
+      quantidade = numero;
+      pintores.forEach((pintar) => pintar());
     },
   });
 
@@ -327,19 +344,36 @@ export function montar(raiz, ctx) {
     balao.hidden = true;
   }
 
+  /** An example's verdict with the chosen number of news items per question, as it was recorded
+      with that number; null when it was not recorded with it. */
+  function vereditoDe(exemplo) {
+    if (quantidade === null) return exemplo.veracity || null;
+    return (exemplo.veredictos || {})[String(quantidade)] || null;
+  }
+
   function cartaoExemplo(exemplo) {
     const cartao = botao("caso");
-    const veredito = exemplo.veracity || "nei";
-    cartao.dataset.veracity = veredito;
     const meta = el("span", "caso__meta");
     cartao.append(el("span", "caso__claim", exemplo.claim), meta);
     // The visible claim is clamped to two lines, so the label carries the full text and, as
-    // colour is not announced, the verdict. The tooltip shows the full text too.
-    traduzivel(() => {
+    // colour is not announced, the verdict. The tooltip shows the full text too. Redrawn when
+    // the language or the number of news items per question changes. An example not recorded
+    // with the chosen number cannot be picked with it: its run would be the models' instead.
+    const pintar = () => {
+      const veredito = vereditoDe(exemplo);
       const data = dataCurta(exemplo.claim_date);
       meta.textContent = data;
-      cartao.setAttribute("aria-label", `${exemplo.claim} - ${data} - ${t(`veredito.${veredito}`, {}, veredito)}`);
-    });
+      cartao.disabled = veredito === null;
+      if (veredito === null) {
+        delete cartao.dataset.veracity;
+        cartao.setAttribute("aria-label", `${exemplo.claim} - ${data} - ${t("casos.semGravacao", { n: quantidade })}`);
+      } else {
+        cartao.dataset.veracity = veredito;
+        cartao.setAttribute("aria-label", `${exemplo.claim} - ${data} - ${t(`veredito.${veredito}`, {}, veredito)}`);
+      }
+    };
+    traduzivel(pintar);
+    pintores.push(pintar);
     cartao.addEventListener("click", () => escolherExemplo(exemplo));
     cartao.addEventListener("mouseenter", () => mostrarBalao(cartao, exemplo.claim));
     cartao.addEventListener("focus", () => mostrarBalao(cartao, exemplo.claim));
@@ -595,18 +629,17 @@ export function montar(raiz, ctx) {
     return caixa;
   }
 
-  const topicos = (ctx.topicos || []).filter((topico) => topico.exemplos && topico.exemplos.length);
-  if (topicos.length) {
+  const exemplos = ctx.exemplos || [];
+  if (exemplos.length) {
     const casos = el("div", "casos");
     // Cards wear their verdict as a tinted background; the CSS keys on this.
     casos.dataset.marca = "fundo";
     const cabecaCasos = el("div", "casos__cabeca");
     const tituloCasos = el("span", "casos__titulo");
     const notaCasos = el("span", "casos__nota");
-    const total = topicos.reduce((n, topico) => n + topico.exemplos.length, 0);
     traduzivel(() => {
       tituloCasos.textContent = t("casos.titulo");
-      notaCasos.textContent = t("casos.conta", { n: total });
+      notaCasos.textContent = t("casos.conta", { n: exemplos.length });
     });
     cabecaCasos.append(tituloCasos, notaCasos);
     casos.append(cabecaCasos);
@@ -626,24 +659,10 @@ export function montar(raiz, ctx) {
       item.append(el("span", "legenda__marca"), nome, explicacao);
       legenda.append(item);
     });
-    casos.append(legenda);
-
-    topicos.forEach((topico) => {
-      const grupo = el("div", "topico");
-      const cabeca = el("div", "topico__cabeca");
-      const nome = el("h2", "topico__nome");
-      // Named by its id; a topic without a translation keeps the name it came with.
-      traduzivel(() => {
-        nome.textContent = t(`topico.${topico.id}`, {}, topico.nome);
-      });
-      cabeca.append(nome);
-      cabeca.append(el("span", "topico__conta", String(topico.exemplos.length)));
-      grupo.append(cabeca, criarCarrossel(topico.exemplos));
-      casos.append(grupo);
-    });
+    casos.append(legenda, criarCarrossel(exemplos));
 
     entrada.append(casos);
-    const primeiro = topicos[0].exemplos[0];
+    const primeiro = exemplos[0];
     formulario.preencher(primeiro);
     exemploEscolhido = primeiro.id;
     entrada.dataset.exemplo = primeiro.id;
@@ -694,7 +713,10 @@ export function montar(raiz, ctx) {
   eixo.hidden = true;
   const eixoTopo = el("div", "bloco__topo");
   const tituloEixo = el("h2", "bloco__titulo");
-  eixoTopo.append(tituloEixo);
+  // How many of the news items retrieved are relevant, beside the title.
+  const notaEixo = el("p", "bloco__nota");
+  notaEixo.hidden = true;
+  eixoTopo.append(tituloEixo, notaEixo);
   const pista = el("div", "pista");
   const regua = el("div", "regua");
   const leitura = el("p", "leitura");
@@ -728,8 +750,10 @@ export function montar(raiz, ctx) {
     preparado = true;
     recuperados = [];
     documentos = [];
+    relevancia = null;
     classificacao = null;
     artigoDesenhado = null;
+    semArtigo = null;
     estados.clear();
     motivos.clear();
     ultimoRevelado = null;
@@ -818,18 +842,36 @@ export function montar(raiz, ctx) {
     pista.append(linha);
   }
 
+  /** The share of the retrieved news items the relevance stage kept, as it was stored with the
+      run; hidden when that stage did not run or nothing was retrieved. */
+  function escreverRelevancia() {
+    const total = relevancia ? relevancia["notícias"] : 0;
+    notaEixo.hidden = !total;
+    if (!total) return;
+    const parte = relevancia.percentagem ?? (100 * relevancia.relevantes) / total;
+    notaEixo.textContent = t("eixo.relevantes", { r: relevancia.relevantes, n: total, p: percentagem(parte) });
+  }
+
   function desenharEixo(lista) {
     pista.replaceChildren();
     marcadores.clear();
     escala = null;
     regua.replaceChildren();
+    escreverRelevancia();
+    pista.hidden = false;
+    regua.hidden = false;
 
     const comData = lista
       .map((documento) => ({ documento, data: dia(documento.published_at) }))
       .filter((registo) => registo.data !== null)
       .sort((a, b) => a.data - b.data);
     if (!comData.length) {
-      eixo.hidden = true;
+      // Nothing relevant to place: the block stays, to say none of the retrieved items was.
+      const semRelevantes = !lista.length && !notaEixo.hidden;
+      pista.hidden = semRelevantes;
+      regua.hidden = semRelevantes;
+      if (semRelevantes) leitura.textContent = t("eixo.semRelevantes");
+      eixo.hidden = !semRelevantes;
       return;
     }
 
@@ -947,10 +989,36 @@ export function montar(raiz, ctx) {
     if (marcador) marcador.dataset.aceso = String(activo);
   }
 
-  function desenharArtigo(dados) {
+  /** The name of the model the run chose to write the article. */
+  function nomeDoRedator() {
+    const opcoes = (ctx.redatores && ctx.redatores.opcoes) || [];
+    const escolhido = opcoes.find((opcao) => opcao.id === redatorDaCorrida);
+    return escolhido ? escolhido.nome : redatorDaCorrida || "";
+  }
+
+  /** In place of the article, when the run wrote none: which model, and why. */
+  function desenharSemArtigo() {
     artigo.replaceChildren();
     const cabecalho = el("div", "artigo__cabecalho");
-    cabecalho.append(el("span", "selo", t("artigo.selo")));
+    const topo = el("div", "artigo__topo");
+    topo.append(el("span", "selo", t("artigo.selo")));
+    cabecalho.append(topo);
+    const valores = { modelo: nomeDoRedator() };
+    const aviso = t(`artigo.semArtigo.${semArtigo}`, valores, t("artigo.semArtigo", valores));
+    cabecalho.append(el("p", "artigo__aviso", aviso));
+    artigo.append(cabecalho);
+    artigo.hidden = false;
+  }
+
+  function desenharArtigo(dados) {
+    artigoDesenhado = dados;
+    artigo.replaceChildren();
+    const cabecalho = el("div", "artigo__cabecalho");
+    // The seal, and the model that wrote the article.
+    const topo = el("div", "artigo__topo");
+    topo.append(el("span", "selo", t("artigo.selo")));
+    if (dados.model) topo.append(el("span", "artigo__autor", t("artigo.escritoPor", { modelo: dados.model })));
+    cabecalho.append(topo);
     cabecalho.append(el("h2", "artigo__titulo", dados.title));
     // The lead carries citation markers too, like the body.
     const lead = el("p", "artigo__lead");
@@ -983,6 +1051,9 @@ export function montar(raiz, ctx) {
       const meta = el("div", "fonte__meta");
       meta.append(el("span", null, dataCurta(citacao.published_at)));
       meta.append(el("span", `rotulo rotulo--${citacao.label}`, nomeRotulo(citacao.label)));
+      // A passage that joins several classified windows says how many: the drawer lists them.
+      const janelas = (citacao.excerpts || []).length;
+      if (janelas > 1) meta.append(el("span", null, t("artigo.janelas", { n: janelas })));
       conteudo.append(meta);
       alvo.append(conteudo);
       alvo.addEventListener("click", () => ctx.abrirCitacao(citacao, alvo));
@@ -1024,6 +1095,7 @@ export function montar(raiz, ctx) {
       cartao.estado.textContent =
         estado === "error" ? motivos.get(passo.id) || t("passo.falhou")
         : estado === "running" ? t("passo.emCurso")
+        : estado === "skipped" ? t("passo.saltado")
         : "";
       if (estado === "running" && emCurso === null) emCurso = passo;
     });
@@ -1043,6 +1115,7 @@ export function montar(raiz, ctx) {
     }
     if (!balanco.hidden && classificacao) desenharBalanco(classificacao.stances, classificacao.decisivos);
     if (!artigo.hidden && artigoDesenhado) desenharArtigo(artigoDesenhado);
+    if (!artigo.hidden && semArtigo !== null) desenharSemArtigo();
   });
 
   /* --- Run events ---------------------------------------------------------------- */
@@ -1075,10 +1148,13 @@ export function montar(raiz, ctx) {
       // ruled unrelated. If that stage was skipped or failed, nothing is left out.
       if (etapa.name === "relevance" && ["done", "skipped", "error"].includes(etapa.status)) {
         documentos = recuperados.filter((documento) => documento.relevant !== false);
-        if (documentos.length) {
+        relevancia = etapa.status === "done" && etapa.stats ? etapa.stats : null;
+        if (documentos.length || relevancia) {
           desenharEixo(documentos);
-          resultado.hidden = false;
-          revelar(eixo);
+          if (!eixo.hidden) {
+            resultado.hidden = false;
+            revelar(eixo);
+          }
         }
       }
       if (evento.stances) {
@@ -1088,9 +1164,13 @@ export function montar(raiz, ctx) {
         resultado.hidden = false;
         revelar(balanco);
       }
-      if (evento.article) {
-        artigoDesenhado = evento.article;
-        desenharArtigo(evento.article);
+      // A run writes the article with the model it chose: one article, or a word on why none.
+      if (evento.articles && evento.articles.length) {
+        desenharArtigo(evento.articles[0]);
+        revelar(artigo);
+      } else if (etapa.name === "article" && etapa.status === "skipped") {
+        semArtigo = (etapa.stats && etapa.stats.motivo) || "";
+        desenharSemArtigo();
         revelar(artigo);
       }
     },

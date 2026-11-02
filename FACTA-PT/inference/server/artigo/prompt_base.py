@@ -81,3 +81,13 @@ def mensagens(conteudo: str) -> list[dict]:
     """The base prompt as the system message, the article data and plan as the user's."""
     return [{"role": "system", "content": PROMPT_BASE},
             {"role": "user", "content": conteudo}]
+
+
+def prompt_final(tokenizer, conteudo: str) -> list[int]:
+    """The token ids the model reads, as vLLM fed them in the evaluation: the messages in the
+    checkpoint's chat template, tokenized as text with the tokenizer's own special tokens.
+    Gemma's adds none (its template writes the BOS); AMALIA's adds a BOS before the one its
+    template opens with, as in the evaluated run."""
+    texto = tokenizer.apply_chat_template(mensagens(conteudo), tokenize=False,
+                                          add_generation_prompt=True)
+    return tokenizer(texto)["input_ids"]

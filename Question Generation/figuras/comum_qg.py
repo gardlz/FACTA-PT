@@ -42,7 +42,7 @@ GRELHA = "#e1e0d9"
 EIXO = "#c3c2b7"
 SUPERFICIE = "#ffffff"
 
-LARGURA = 6.3            # inches, the text width of the dissertation
+LARGURA = 6.3            # inches (~16 cm), the common width of every figure
 
 # Display names (the manifest short names are file identifiers).
 NOMES = {
@@ -62,7 +62,7 @@ NOMES = {
     "mt0_xxl": "mT0 XXL",
 }
 
-# Supervision configurations, in the order of the dissertation, and their names there.
+# Supervision configurations, in the order of the result tables, and their display names.
 CONFIGS = {
     "human40":           "Gold91",
     "human40_silver25":  "Gold91+Silver266",

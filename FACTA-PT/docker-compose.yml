@@ -4,7 +4,7 @@ services:
   web:
     build:
       context: ./web
-    image: facta-pt-web:1.5.0
+    image: facta-pt-web:1.7.0
     restart: unless-stopped
     ports:
       - "${WEB_PORT:-8000}:8000"
@@ -31,7 +31,7 @@ services:
       context: ./inference
       args:
         COM_GPU: ${COM_GPU:-false}
-    image: facta-pt-inference:1.5.0
+    image: facta-pt-inference:1.6.0
     restart: unless-stopped
     environment:
       QG_MODEL_PATH: ${QG_MODEL_PATH:-/checkpoints/qg}
@@ -41,6 +41,9 @@ services:
       ARTICLE_MODEL_PATH: ${ARTICLE_MODEL_PATH:-google/gemma-4-E4B-it}
       ARTICLE_MODEL_REVISION: ${ARTICLE_MODEL_REVISION-ee0ef6023621cff504d758262d4e04895a5af4a2}
       ARTICLE_DEVICE: ${ARTICLE_DEVICE:-auto}
+      AMALIA_MODEL_PATH: ${AMALIA_MODEL_PATH:-/checkpoints/qg}
+      AMALIA_MODEL_REVISION: ${AMALIA_MODEL_REVISION-c4614b9b5c7b4fe303fa20902e692fc7dface640}
+      AMALIA_DEVICE: ${AMALIA_DEVICE:-auto}
       ARTICLE_MAX_PROMPT_TOKENS: ${ARTICLE_MAX_PROMPT_TOKENS:-16384}
     volumes:
       - ${CHECKPOINTS_DIR:-./checkpoints}:/checkpoints:ro

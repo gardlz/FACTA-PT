@@ -12,6 +12,9 @@ web/app/demo/exemplos*.json
 # Stored runs, which carry the same text.
 execucoes/
 
+# NLTK's Punkt data for running the website outside Docker, downloaded as the README describes.
+web/nltk_data/
+
 # Python
 __pycache__/
 *.py[cod]

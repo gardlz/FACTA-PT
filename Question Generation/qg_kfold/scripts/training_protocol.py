@@ -30,7 +30,7 @@ def _create_fixed_horizon_scheduler(trainer, num_training_steps: int, optimizer=
     """Linear schedule over the reference horizon, which may be longer than the actual run.
 
     In the final training the run stops at the selected epoch while the schedule keeps the
-    cross-validation horizon, so the learning-rate trajectory is the one that was validated.
+    cross-validation horizon.
     """
     from transformers import get_scheduler
 

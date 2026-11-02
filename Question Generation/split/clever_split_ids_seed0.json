@@ -1,8 +1,6 @@
 {
   "seed": 0,
   "split_unit": "document",
-  "regra": "sorteio uniforme por documento sobre os 228 artigos do CLEVER: um artigo vai inteiro para um dos lados. Os artigos com claims aterram em 40/100 claim spans exatos; os sem claims são repartidos na mesma proporção, por artigo.",
-  "frozen_test": true,
   "n_artigos": 228,
   "n_claim_spans": 140,
   "train_size": 40,
@@ -384,6 +382,5 @@
     "clever_168_c1",
     "clever_168_c5",
     "clever_168_c6"
-  ],
-  "nota": "O teste é held-out: não usar para escolher modelos, prompts nem hiperparâmetros. train_ids e test_ids estão pela ordem dos exemplos de data/clever/."
+  ]
 }

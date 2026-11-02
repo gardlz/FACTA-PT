@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Figure 4.2: validation H-BERT per epoch (mean and ±1 s.d. over the 4 folds) and the
-selected epoch, for four models under Gold91+Silver1073.
+"""Validation H-BERT per epoch (mean and ±1 s.d. over the 4 folds) and the selected epoch,
+for four models under Gold91+Silver1073.
 
     python figuras/fig_hbert_epocas.py
 """

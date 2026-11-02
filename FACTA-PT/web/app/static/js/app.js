@@ -74,7 +74,8 @@ async function abrirDocumento(docId, excerto, origem) {
 
 function abrirCitacao(citacao, origem) {
   if (!citacao) return;
-  abrirDocumento(citacao.doc_id, { begin: citacao.begin, end: citacao.end, label: citacao.label }, origem).catch(
+  const excerto = { begin: citacao.begin, end: citacao.end, label: citacao.label, partes: citacao.excerpts || [] };
+  abrirDocumento(citacao.doc_id, excerto, origem).catch(
     (e) => vista && vista.aoErro(() => t("erro.noticia", { erro: e.message }))
   );
 }
@@ -121,16 +122,21 @@ function falhaDeArranque(erro) {
 async function iniciar() {
   aplicarTema(temaGuardado());
   textosDaPagina();
-  let topicos = [];
+  let exemplos = [];
+  // What a run can choose, and the defaults: news items per question, the article's writer.
+  let quantidade = null;
+  let redatores = null;
   try {
     const resposta = await api.exemplos();
-    topicos = resposta.topicos || [];
+    exemplos = resposta.exemplos || [];
+    quantidade = resposta.top_k || null;
+    redatores = resposta.redatores || null;
   } catch (e) {
-    // Not fatal: without examples, new claims can still be verified.
+    // Not fatal: without examples, new claims can still be verified, with the server's default.
     void e;
   }
   raiz.replaceChildren();
-  vista = montar(raiz, { topicos, executar, abrirCitacao, abrirDocumento });
+  vista = montar(raiz, { exemplos, quantidade, redatores, executar, abrirCitacao, abrirDocumento });
 }
 
 iniciar().catch(falhaDeArranque);

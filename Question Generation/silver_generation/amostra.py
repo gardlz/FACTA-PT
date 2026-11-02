@@ -22,7 +22,7 @@ FICHEIROS_SILVER = [CLAIMPT_JSON["train"], CLAIMPT_JSON["test"]]
 CONTEXT_DIR = CLAIMPT_ARTIGOS
 CRITERIOS_FILE = SCRIPT_DIR / "CRITERIOS.md"
 CRITERIOS_CLEVER_FILE = SCRIPT_DIR / "CRITERIOS_CLEVER.md"
-# The manual evaluation behind Tables 3.8 and 3.9, written by app.py.
+# The manual evaluation of the two dimensions, written by app.py.
 AVALIACAO = SCRIPT_DIR / "avaliacao"
 RATINGS_FILE = AVALIACAO / "ratings.json"
 RATINGS_CLEVER_FILE = AVALIACAO / "ratings_clever.json"

@@ -8,8 +8,10 @@ sentencepiece==0.2.1
 accelerate==1.13.0
 huggingface_hub==1.19.0
 numpy==2.2.6
+scipy==1.18.0
 PyYAML==6.0.3
 protobuf==6.33.6
 codecarbon==3.3.0
 matplotlib==3.10.3
+nltk==3.10.0
 pillow==12.3.0

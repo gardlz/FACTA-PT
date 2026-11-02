@@ -106,15 +106,16 @@ class InferenceClient:
         return results
 
     async def write_article(
-        self, claim: str, claim_date: str, context: str, evidence: list[dict]
+        self, claim: str, claim_date: str, context: str, evidence: list[dict], redator: str
     ) -> dict:
         # The service is told how long it has, so that an article always comes back before this
         # client gives up: past the deadline it stops writing and completes what it has.
+        # `redator` names the model that writes it, a key of `schemas.REDATORES`.
         prazo = max(60.0, self._settings.article_timeout - MARGEM_DO_ARTIGO)
         data = await self._post(
             "/v1/article",
             {"claim": claim, "claim_date": claim_date, "context": context, "evidence": evidence,
-             "deadline_s": prazo},
+             "redator": redator, "deadline_s": prazo},
             timeout=self._settings.article_timeout,
         )
         if not isinstance(data.get("article"), dict) or not isinstance(data.get("evidence"), list):

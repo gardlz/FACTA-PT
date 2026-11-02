@@ -3,7 +3,7 @@
 Critérios **complementares** aos do `CRITERIOS.md`. Aqueles perguntam *isto é uma boa
 pergunta?*; estes perguntam *isto foi escrito como as anotadoras do CLEVER o teriam escrito?* —
 ou seja, se o conjunto de perguntas de um claim span segue o protocolo de anotação que produziu
-as perguntas **gold** (as guidelines do CLEVER, no Apêndice A.1 da dissertação).
+as perguntas **gold** (as guidelines do CLEVER).
 São coisas diferentes: uma pergunta pode ser relevante, fiel, clara e ancorada e mesmo assim
 não ser a pergunta que a guideline mandava escrever.
 

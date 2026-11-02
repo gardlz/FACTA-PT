@@ -1,11 +1,45 @@
-/** Input form: claim, date and optional context, with validation. Returns the element and the
-    operations the view uses on it. */
+/** Input form: claim, date, optional context, how many news items each question keeps and the
+    model that writes the article, with validation. Returns the element and the operations the
+    view uses on it. */
 
-import { el } from "./dom.js";
+import { botao, el } from "./dom.js";
 import { criarCalendario } from "./calendario.js";
 import { aoMudarLingua, t } from "./i18n.js";
 
-export function criarFormulario({ aoSubmeter }) {
+/** A choice the run makes, as a segmented control over the options the server offers
+    (`{valor, texto}`). Buttons, which fire no input event: one inside the form reads as the
+    claim being edited and turns a picked example into a new claim. */
+function criarEscolha(nome, opcoes, omissao, aoMudar = () => {}) {
+  const grupo = el("div", `escolha escolha--${nome}`);
+  const rotulo = el("span", "escolha__rotulo");
+  rotulo.id = `escolha-${nome}`;
+  const botoes = el("div", "segmentos");
+  botoes.setAttribute("role", "group");
+  botoes.setAttribute("aria-labelledby", rotulo.id);
+  grupo.append(rotulo, botoes);
+
+  let valor = opcoes.some((o) => o.valor === omissao) ? omissao : opcoes[0].valor;
+  const opcoesBotoes = opcoes.map(({ valor: deste, texto }) => {
+    const opcao = botao("segmentos__opcao", texto);
+    opcao.addEventListener("click", () => {
+      if (deste === valor) return;
+      valor = deste;
+      marcar();
+      aoMudar(deste);
+    });
+    botoes.append(opcao);
+    return { deste, opcao };
+  });
+
+  function marcar() {
+    opcoesBotoes.forEach(({ deste, opcao }) => opcao.setAttribute("aria-pressed", String(deste === valor)));
+  }
+  marcar();
+
+  return { elemento: grupo, rotulo, valor: () => valor };
+}
+
+export function criarFormulario({ aoSubmeter, quantidade = null, redatores = null, aoMudarQuantidade = () => {} }) {
   const forma = el("form", "forma");
   forma.noValidate = true;
 
@@ -47,11 +81,26 @@ export function criarFormulario({ aoSubmeter }) {
   limpar.type = "button";
   accao.append(submeter, limpar);
 
+  // What the run chooses: how many news items each question keeps, and the model that writes the
+  // article. The options come from the server.
+  const escolhaQuantidade = quantidade && quantidade.opcoes && quantidade.opcoes.length
+    ? criarEscolha("quantidade", quantidade.opcoes.map((n) => ({ valor: n, texto: String(n) })),
+                   quantidade.omissao, aoMudarQuantidade)
+    : null;
+  const escolhaRedator = redatores && redatores.opcoes && redatores.opcoes.length
+    ? criarEscolha("redator", redatores.opcoes.map((r) => ({ valor: r.id, texto: r.nome })),
+                   redatores.omissao)
+    : null;
+  const escolhas = el("div", "forma__opcoes");
+  [escolhaQuantidade, escolhaRedator].filter(Boolean).forEach((escolha) => escolhas.append(escolha.elemento));
+
   const erro = el("p", "erro");
   erro.hidden = true;
   erro.setAttribute("role", "alert");
 
-  forma.append(campoClaim, campoData, campoContexto, accao, erro);
+  forma.append(campoClaim, campoData, campoContexto);
+  if (escolhas.children.length) forma.append(escolhas);
+  forma.append(accao, erro);
 
   let ocupado = false;
   // The message shown: a text, or a function giving it in the current language.
@@ -79,6 +128,8 @@ export function criarFormulario({ aoSubmeter }) {
     contexto.placeholder = t("form.contextoPista");
     texto.textContent = ocupado ? t("form.aVerificar") : t("form.verificar");
     limpar.textContent = t("form.limpar");
+    if (escolhaQuantidade) escolhaQuantidade.rotulo.textContent = t("form.quantidade");
+    if (escolhaRedator) escolhaRedator.rotulo.textContent = t("form.redator");
     escreverErro();
   }
 
@@ -92,6 +143,8 @@ export function criarFormulario({ aoSubmeter }) {
       claim_date: selector.campo.value,
       context: contexto.value.trim(),
     };
+    if (escolhaQuantidade) entrada.top_k = escolhaQuantidade.valor();
+    if (escolhaRedator) entrada.redator = escolhaRedator.valor();
     if (entrada.claim.length < 8) {
       mostrarErro(() => t("form.erroClaim"));
       claim.focus();

@@ -1,7 +1,7 @@
-# The eleven encoders of Table 6.1, keyed by the name used on the command line.
+# The eleven encoders compared in both tasks, keyed by the name used on the command line.
 #
-# The descriptive fields (grupo, base, lingua, supervisao, nli, rte, similaridade) come from the
-# model cards; src/inventario.py measures the parameter count of each checkpoint (Table 6.1).
+# src/inventario.py prints the descriptive fields (grupo, base, lingua, supervisao, nli, rte,
+# similaridade) and measures the parameter count of each checkpoint.
 # `cabeca_original_classes` is the size of the checkpoint's own classification head (0: none);
 # a 3-class NLI head is reused in entailment (see src/grelhas.py).
 #

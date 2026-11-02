@@ -2,7 +2,7 @@
 
 Whole source documents stay in one fold, every fold has exactly 10 claim spans, and among
 the valid partitions found by a seeded random search the one with the most balanced number
-of reference questions per fold is kept. The 100 test claim spans are not read.
+of reference questions per fold is kept.
 
     python qg_kfold/scripts/build_folds.py
 """
@@ -32,7 +32,7 @@ def le_gold(caminho: Path) -> list:
 
 
 def agrupa_por_documento(claims: list) -> list:
-    """[(document, [claim_ids], n_questions)] — the indivisible unit of the partition."""
+    """[(document, [claim_ids], n_questions)]: the indivisible unit of the partition."""
     grupos = defaultdict(list)
     for c in claims:
         grupos[documento_de(c["id"])].append(c)

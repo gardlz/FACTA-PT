@@ -280,6 +280,18 @@ button { font: inherit; color: inherit; }
 .gaveta__corpo { flex: 1; overflow-y: auto; padding: clamp(18px, 3vw, 28px); font-family: var(--serif); font-size: 15.6px; line-height: 1.74; color: var(--tinta-700); white-space: pre-wrap; word-break: break-word; }
 .gaveta__corpo:focus-visible { outline: none; }
 
+/* The classified windows of a passage that joins several, between the header and the text. */
+.gaveta__janelas { padding: 12px clamp(18px, 3vw, 28px) 14px; border-bottom: 1px solid var(--linha); background: var(--papel); }
+.gaveta__janelas-titulo { font-size: 12.4px; font-weight: 700; color: var(--tinta-700); }
+.gaveta__janelas-nota { margin-top: 2px; font-size: 11.8px; color: var(--tinta-400); }
+.gaveta__janelas-lista { margin-top: 10px; display: grid; gap: 6px; max-height: 28vh; overflow-y: auto; padding-right: 4px; }
+.gaveta__janela { display: grid; gap: 4px; text-align: left; padding: 8px 10px; border: 1px solid var(--linha); border-radius: 8px; background: var(--papel-alto); color: inherit; font: inherit; cursor: pointer; }
+.gaveta__janela:hover { border-color: color-mix(in oklab, var(--acento) 40%, var(--linha)); }
+.gaveta__janela:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+.gaveta__janela[aria-pressed="true"] { border-color: var(--acento); box-shadow: inset 0 0 0 1px var(--acento); }
+.gaveta__janela-cabeca { display: flex; align-items: center; gap: 8px; font-size: 11.8px; font-weight: 600; color: var(--tinta-700); }
+.gaveta__janela-texto { font-family: var(--serif); font-size: 13.4px; line-height: 1.5; color: var(--tinta-700); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
 mark.realce {
   background: color-mix(in oklab, var(--acento) 26%, transparent);
   color: var(--tinta-900); border-radius: 3px; padding: 2px 1px;

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Figure 4.1: the ±1-sentence context of a claim span inside its article.
+"""The ±1-sentence context of a claim span inside its article.
 
-Finds the claim span in the prepared CLEVER data, marks the ±1-sentence window the models
-receive (the window of `model_utils.claim_context`, from the same sentence splitter) and draws
-the article excerpt; with --ner the spaCy entities (PER/ORG/LOC/MISC, pt_core_news_lg) are
-coloured and underlined.
+Finds the claim span in the prepared CLEVER data, by its id (--id) or its text (--claim), marks
+the ±1-sentence window the models receive (the window of `model_utils.claim_context`, from the
+same sentence splitter) and draws the article excerpt; with --ner the spaCy entities
+(PER/ORG/LOC/MISC, pt_core_news_lg) are coloured and underlined.
 
-    python figuras/fig_contexto.py --claim "<claim span>" --ner
+    python figuras/fig_contexto.py --id clever_016_c7 --ner
 """
 import argparse
 import json
@@ -28,7 +28,7 @@ RAIZ = achar_raiz(Path(__file__).resolve().parent)
 sys.path.insert(0, str(RAIZ / "src"))
 from model_utils import split_sentences, _find_span   # noqa: E402
 
-# spaCy labels counted as named entities (PER, ORG, LOC, MISC; Section 4.2.3).
+# spaCy labels counted as named entities (PER, ORG, LOC, MISC).
 ETIQUETAS = {"PER", "ORG", "LOC", "MISC"}
 
 FICHEIROS = ["data/clever/clever_all.jsonl",
@@ -52,8 +52,10 @@ NOME_NER = {"PER": "PER — person", "ORG": "ORG — organisation",
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--claim", required=True,
-                   help="Claim span text. Exact match, or a substring of one.")
+    alvo = p.add_mutually_exclusive_group(required=True)
+    alvo.add_argument("--id",
+                      help="Claim span id in the prepared CLEVER data, e.g. clever_016_c7.")
+    alvo.add_argument("--claim", help="Claim span text. Exact match, or a substring of one.")
     p.add_argument("--output", default="figuras/contexto.pdf",
                    help="Output image (.pdf for LaTeX, .png to preview). Default: %(default)s")
     p.add_argument("--padding", type=int, default=2,
@@ -86,6 +88,20 @@ def entidades_por_caractere(artigo, modelo):
     return por_char, spans
 
 
+def por_id(span_id):
+    """The prepared example with this claim span id, or None."""
+    for nome in FICHEIROS:
+        caminho = RAIZ / nome
+        if not caminho.exists():
+            continue
+        for linha in caminho.read_text(encoding="utf-8").splitlines():
+            if linha.strip():
+                ex = json.loads(linha)
+                if ex.get("id") == span_id and ex.get("claim_span") and ex.get("context"):
+                    return ex
+    return None
+
+
 def procurar(claim):
     """Find the example whose claim_span matches. Exact match wins over substring."""
     alvo = " ".join(claim.split()).casefold()
@@ -111,14 +127,19 @@ def procurar(claim):
 
 def main():
     args = parse_args()
-    achados = procurar(args.claim)
-    if not achados:
-        sys.exit(f"No claim span matching {args.claim!r} was found in {', '.join(FICHEIROS)}.")
-    if len(achados) > 1:
-        print(f"[warning] {len(achados)} matches; using the first:")
-        for ex in achados:
-            print(f"          {ex['id']}: {ex['claim_span']}")
-    ex = achados[0]
+    if args.id:
+        ex = por_id(args.id)
+        if ex is None:
+            sys.exit(f"No claim span with id {args.id!r} was found in {', '.join(FICHEIROS)}.")
+    else:
+        achados = procurar(args.claim)
+        if not achados:
+            sys.exit(f"No claim span matching {args.claim!r} was found in {', '.join(FICHEIROS)}.")
+        if len(achados) > 1:
+            print(f"[warning] {len(achados)} matches; using the first:")
+            for ex in achados:
+                print(f"          {ex['id']}: {ex['claim_span']}")
+        ex = achados[0]
 
     artigo = ex["context"]
     frases = split_sentences(artigo)

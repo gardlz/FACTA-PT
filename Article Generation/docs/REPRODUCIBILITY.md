@@ -1,6 +1,6 @@
 # Reproducing the article-generation experiments
 
-This document supplements the [Article Generation README](../README.md) with the model revisions, input structure, full generation and evaluation commands and the complete result tables (Tables 7.4–7.6, copied from the dissertation with its bold marks) for **Chapter 7** of the dissertation. **Run every command from `Article Generation/`, not from `docs/`.**
+This document supplements the [Article Generation README](../README.md) with the model revisions, input structure, full generation and evaluation commands and the complete result tables. **Run every command from `Article Generation/`, not from `docs/`.**
 
 ## 1. Environments, model weights and access
 
@@ -11,6 +11,7 @@ The stage uses two separate environments; the `python_version` markers in `requi
 python3.11 -m venv .venv-geracao
 source .venv-geracao/bin/activate
 pip install -r requirements.txt
+python -m nltk.downloader punkt_tab   # Punkt sentence model for the evidence passages
 
 # Evaluation: Python 3.14, the NLI judge and the Gemini API
 # Deactivate the first environment (or open another shell) before creating/using this one.
@@ -19,7 +20,7 @@ source .venv-evaluation/bin/activate
 pip install -r requirements.txt
 ```
 
-The dissertation reports one **NVIDIA A100-SXM4 40 GB** GPU per generation run on the Deucalion supercomputer, **vLLM 0.19.1** and **bfloat16**. CodeCarbon records the energy consumption and estimated emissions of each generation run. The content-plan builder and deduplication audit need only standard Python libraries.
+The reported generation runs used one **NVIDIA A100-SXM4 40 GB** GPU per run on the Deucalion supercomputer, **vLLM 0.19.1** and **bfloat16**. CodeCarbon records the energy consumption and estimated emissions of each generation run. The content-plan builder and the deduplication audit run on the CPU and need only NLTK and its `punkt_tab` data from the generation environment.
 
 Generation loads pretrained model weights **offline** from the local Hugging Face cache. Some checkpoints require acceptance of their licences and authentication before downloading. The model revisions of the reported runs and the prompt formats they require are:
 
@@ -79,25 +80,29 @@ The holistic judge (`gemini-3.8-flash`) is called through the **Gemini API**, wi
 
 The experimental **Writer input** includes: claim span, **±1-sentence context**, publication date, three-sentence evidence passages with their `Supported`/`Refuted`/`NEI` relations and source metadata, plus a **predetermined conclusion**. The Writer does **not** infer a verdict or retrieve further material. Local citation labels `[E1]`, `[E2]`, ... link evidence-grounded factual statements to the passages given to the Writer.
 
-The verdict aggregation in the dissertation is: **Supported** if Supported evidence exists without Refuted evidence; **Refuted** if Refuted evidence exists without Supported evidence; **NEI** if evidence is only NEI, no Relevant evidence exists, or Supported and Refuted evidence coexist. This decision precedes article generation.
+The three-sentence passages are cut from the news text with the sentences that **NLTK's Punkt model for Portuguese** finds (`nltk.sent_tokenize(text, language="portuguese")`, NLTK 3.10.0), the same split as the entailment classifier and FACT-PT. The ±1-sentence claim context (`geracao/janela.py`) and the sentence units of the citation metrics (`evaluation/segmentacao.py`) use their own rule-based splitters.
 
-Across **140 claim spans**, CLEVER provides **527 annotated evidence excerpts**, each represented by one three-sentence passage. Deduplication compares **5-word shingles** within the same claim span **and the same evidence-relation class**, and removes the shorter of two passages when its containment in the longer one is at least **0.90**. This removes **27** redundant passages, leaving **500** for article generation.
+The verdict aggregation is: **Supported** if Supported evidence exists without Refuted evidence; **Refuted** if Refuted evidence exists without Supported evidence; **NEI** if evidence is only NEI, no Relevant evidence exists, or Supported and Refuted evidence coexist. This decision precedes article generation.
 
-The threshold was selected by manually labelling the candidate removals (Table 7.4). The audit lists every pair of passages of the same claim span and relation with containment of at least 0.80 and, for each threshold, the candidate removals and the removal precision:
+Across **140 claim spans**, CLEVER provides **527 annotated evidence excerpts**, each represented by one three-sentence passage. Deduplication compares **5-word shingles** within the same claim span **and the same evidence-relation class**, and removes the shorter of two passages when its containment in the longer one is at least **0.90**. This removes **26** redundant passages, leaving **501** for article generation.
+
+The threshold was selected by manually labelling the candidate removals. The audit lists every pair of passages of the same claim span and relation with containment of at least 0.80 and, for each threshold, the candidate removals and the removal precision (the share of candidate removals labelled redundant):
 
 ```bash
 python geracao/auditoria_dedup.py
 ```
 
-The script labels the 23 identical pairs as redundant and reads the other labels from `dados/dedup/anotacao_dedup.json`, which maps `<claim_span_id>|<shorter passage id>|<longer passage id>` to a `rotulo` of `REDUNDANT` or `NON_REDUNDANT`. These manual labels are not included in this repository. Without them, the script still lists the 27, 31 and 33 candidate removals at 0.90, 0.85 and 0.80, but **cannot compute the removal precision**.
+The script labels the 23 identical pairs as redundant and reads the other labels from `dados/dedup/anotacao_dedup.json`, which maps `<claim_span_id>|<shorter passage id>|<longer passage id>` to a `rotulo` of `REDUNDANT` or `NON_REDUNDANT`. These manual labels are not included in this repository. Without them, the script still lists the candidate removals at 0.90, 0.85 and 0.80, but **cannot compute the removal precision**.
 
-Table 7.4: Manual validation of candidate evidence-passage removals under the evaluated containment thresholds.
+Manual validation of candidate evidence-passage removals under the evaluated containment thresholds; the selected threshold and its removal precision are in bold.
 
 | Threshold | Candidate removals | Redundant | Non-redundant | Removal precision |
 |---|---:|---:|---:|---:|
 | **0.90** | 27 | 27 | 0 | **1.00** |
 | 0.85 | 31 | 30 | 1 | 0.97 |
 | 0.80 | 33 | 32 | 1 | 0.97 |
+
+**Sentence split of the reported results.** The reported results, including the three result tables of this document, were obtained with evidence passages cut by a regular-expression sentence splitter. The NLTK split changes the evidence passages of 13 of the 140 `full` plans: 481 of the 500 passages are unchanged, and the plans hold 501 passages instead of 500. With the NLTK split, `geracao/auditoria_dedup.py` lists 26, 29 and 31 candidate removals at 0.90, 0.85 and 0.80, the 23 identical pairs included, all of them among the 33 candidate removals at 0.80 in the table above.
 
 Of the 140 instances, **27 have no Relevant evidence passage**. The code generates an article for all 140, including no-evidence cases, but the **quantitative model comparison uses only the 113 evidence-bearing instances** (79 with at least one decisive passage and 34 with exclusively NEI evidence). Citation Precision additionally requires the generated article to contain at least one citation.
 
@@ -111,7 +116,7 @@ With the generation environment active, construct plans first:
 python geracao/construir_planos.py --todas
 ```
 
-The builder writes one `dados/planos/<condition>/<claim_span_id>.json` per claim span for each of the four plan conditions (`full`, `sem_dedup`, `sem_plano`, `direct`). For each condition it prints the number of plans and evidence passages (500 with deduplication, 527 without), the passages removed by deduplication (27 in `full` and `sem_plano`) and the number of claim spans in each plan case, including 27 `no_evidence` and 34 `non_decisive`. Before loading the model, `gerar_artigos.py` checks that every prompt leaves the full `--max_tokens` within `--max_model_len`; it skips claim spans whose article already exists in the output folder.
+The builder writes one `dados/planos/<condition>/<claim_span_id>.json` per claim span for each of the four plan conditions (`full`, `sem_dedup`, `sem_plano`, `direct`). For each condition it prints the number of plans and evidence passages (501 with deduplication, 527 without), the passages removed by deduplication (26 in `full` and `sem_plano`) and the number of claim spans in each plan case, including 27 `no_evidence` and 34 `non_decisive`. Before loading the model, `gerar_artigos.py` checks that every prompt leaves the full `--max_tokens` within `--max_model_len`; it skips claim spans whose article already exists in the output folder.
 
 Then generate the **eight-model comparison** in the `full` condition. Each line starts a separate monitored generation run:
 
@@ -139,7 +144,7 @@ python geracao/carbono.py --modelo google/gemma-4-E4B-it --condicao direct --sem
 
 The five ablation conditions are: `full`; without deduplication (`--condicao sem_dedup`); without grammar (`--condicao full --sem_gramatica`); without plan (`--condicao sem_plano`); and direct generation (`--condicao direct --sem_gramatica`: without plan **and** grammar, with non-deduplicated evidence). Other input information, including the predetermined conclusion, remains available. `geracao/carbono.py` invokes `geracao/gerar_artigos.py` while monitoring energy and emissions; `geracao/gerar_artigos.py` can be used directly without that monitoring.
 
-Articles are written to `dados/artigos/<condition>/<model>/<claim_span_id>.json`, where `<model>` is the short model name (for example `gemma4_e4b`), with the suffix `_sem_gramatica` for runs without the grammar. Each `carbono.py` run appends one row to `dados/carbono/emissoes.csv`; Table 7.2 of the dissertation reports the energy and emissions of the twelve runs.
+Articles are written to `dados/artigos/<condition>/<model>/<claim_span_id>.json`, where `<model>` is the short model name (for example `gemma4_e4b`), with the suffix `_sem_gramatica` for runs without the grammar. Each `carbono.py` run appends one row to `dados/carbono/emissoes.csv` with the energy consumption and estimated emissions of the run, under the project name `<model>__<condition>`.
 
 ## 4. Evaluate the generated articles
 
@@ -151,12 +156,11 @@ unset HF_HUB_OFFLINE TRANSFORMERS_OFFLINE
 
 The **NLI judge** (`MoritzLaurer/bge-m3-zeroshot-v2.0`) evaluates evidence support for **Citation Recall**, **Citation Precision**, and **Evidence Coverage**. **`gemini-3.8-flash`** evaluates **Relevance**, **Comprehensibility**, and **Evidence Presentation** on a **1–5** scale. The grounding metrics use **0–1**. Articles without input evidence are left out, so each model and condition is evaluated on the 113 evidence-bearing claim spans.
 
-Evaluate the **eight-model comparison**. `--executar` runs the judges (`--componentes citacoes` is the NLI judge and `holistico` the Gemini judge; both by default), and `--montar` assembles their cached results:
+Evaluate the **eight-model comparison**. Each `--executar` run calls the selected judges (`--componentes citacoes` is the NLI judge and `holistico` the Gemini judge; both by default), adds their decisions to the caches in `--saida` and then rewrites `resultados.jsonl` from those caches; `aggregate_results` averages each metric by model and condition:
 
 ```bash
 python -m evaluation.evaluate_articles --condicoes full --executar --componentes citacoes --saida evaluation/outputs/full
 python -m evaluation.evaluate_articles --condicoes full --executar --componentes holistico --saida evaluation/outputs/full
-python -m evaluation.evaluate_articles --condicoes full --montar --saida evaluation/outputs/full
 python -m evaluation.aggregate_results --resultados evaluation/outputs/full/resultados.jsonl --saida evaluation/outputs/full/agregado
 ```
 
@@ -166,15 +170,14 @@ Evaluate the **Gemma ablation**, reusing cached judge decisions from the `full` 
 mkdir -p evaluation/outputs/ablacao
 cp -n evaluation/outputs/full/cache_*.jsonl evaluation/outputs/ablacao/
 python -m evaluation.evaluate_articles --modelos gemma4_e4b --condicoes full sem_dedup sem_plano full+sem_gramatica direct+sem_gramatica --executar --saida evaluation/outputs/ablacao
-python -m evaluation.evaluate_articles --modelos gemma4_e4b --condicoes full sem_dedup sem_plano full+sem_gramatica direct+sem_gramatica --montar --saida evaluation/outputs/ablacao
 python -m evaluation.aggregate_results --resultados evaluation/outputs/ablacao/resultados.jsonl --saida evaluation/outputs/ablacao/agregado
 ```
 
-The judge runs are cached as JSONL files and can resume after interruption. Output plans, generated articles and CodeCarbon records are written under `dados/`; judge caches, article-level scores and aggregated reports are written under `evaluation/outputs/`. Each `--saida` folder holds the two judge caches (`cache_citacoes.jsonl` and `cache_holistico_gemini-3.8-flash.jsonl`), `resultados.jsonl` with the six metrics of each article, and `agregado.csv`/`agregado.json` with one row per model, condition and metric: `n_articles`, `n` (articles with a value), `n_null`, `mean` and `null_status` (the reason for each missing value). An article without citations has no Citation Precision and is counted under `null_status` as `no_citations`.
+The judge runs are cached as JSONL files and can resume after interruption. With `--montar` in place of `--executar`, `evaluate_articles` only rewrites `resultados.jsonl` from the caches, without calling a judge. Output plans, generated articles and CodeCarbon records are written under `dados/`; judge caches, article-level scores and aggregated reports are written under `evaluation/outputs/`. Each `--saida` folder holds the two judge caches (`cache_citacoes.jsonl` and `cache_holistico_gemini-3.8-flash.jsonl`), `resultados.jsonl` with the six metrics of each article, and `agregado.csv`/`agregado.json` with one row per model, condition and metric: `n_articles`, `n` (articles with a value), `n_null`, `mean` and `null_status` (the reason for each missing value). An article without citations has no Citation Precision and is counted under `null_status` as `no_citations`.
 
 ### Model comparison results
 
-Table 7.5: Article-generation results for the eight evaluated models.
+Article-generation results for the eight evaluated models; bold marks the best value of each metric.
 
 | Model | Citation Recall | Citation Precision | Evidence Coverage | Relevance | Comprehensibility | Evidence Presentation |
 |---|---:|---:|---:|---:|---:|---:|
@@ -191,7 +194,7 @@ Citation Precision is **conditional on an article containing a citation**, so th
 
 ### Ablation results
 
-Table 7.6: Results of the ablation study with Gemma 4 E4B IT.
+Results of the ablation study with Gemma 4 E4B IT; bold marks the best value of each metric.
 
 | Condition | Citation Recall | Citation Precision | Evidence Coverage | Relevance | Comprehensibility | Evidence Presentation |
 |---|---:|---:|---:|---:|---:|---:|
@@ -200,7 +203,3 @@ Table 7.6: Results of the ablation study with Gemma 4 E4B IT.
 | Without grammar | **0.644** | 0.663 | 0.833 | 4.80 | 4.58 | 3.92 |
 | Without plan | 0.395 | 0.435 | 0.537 | 4.87 | 4.65 | 2.49 |
 | Direct generation | 0.461 | 0.611 | 0.644 | 4.35 | 4.23 | 2.01 |
-
-## 5. Dissertation reference
-
-See **Chapter 7** for experimental design and interpretation (**Tables 7.1–7.6**), **Appendix A.6** for the generation prompt, content plan, article structure and Article Quality evaluation prompt, and **Chapter 8** for FACTA-PT integration. For citation details, consult the [root README](../../README.md#citation).

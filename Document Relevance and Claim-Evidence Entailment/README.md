@@ -5,9 +5,9 @@ This directory contains the code for **evidence characterization** in European P
 1. **Document relevance:** classify a claim span–document pair as **Relevant** or **Irrelevant**.
 2. **Claim-Evidence Entailment:** classify a three-sentence passage from a Relevant document as **Supported**, **Refuted**, or **Not Enough Information (NEI)** with respect to the claim span. The passage is the premise and the claim span is the hypothesis.
 
-The experiments address **RQ4** of the dissertation, comparing **11 pretrained encoders** with and without prior specialization in textual inference. Both tasks use CLEVER annotations, but each model is fine-tuned separately for each task.
+The experiments compare **11 pretrained encoders** with and without prior specialization in textual inference: four multilingual checkpoints fine-tuned for three-class natural language inference (NLI), two fine-tuned for binary textual inference on the Portuguese ASSIN2 dataset, and five Portuguese encoders without prior inference specialization. Both tasks use CLEVER annotations, but each model is fine-tuned separately for each task.
 
-**Released models**, also used by [FACTA-PT](https://factapt.inesctec.pt):
+**Released models**, also used by [FACT-PT](https://factapt.inesctec.pt):
 - **Document relevance:** [BERTimbau-base](https://huggingface.co/liaad/facta-pt-relevance-bertimbau-base)
 - **Claim-Evidence Entailment:** [XLM-R-large-XNLI](https://huggingface.co/liaad/facta-pt-cee-xlm-roberta-large-xnli)
 
@@ -17,12 +17,15 @@ The experiments address **RQ4** of the dissertation, comparing **11 pretrained e
 |---|---|
 | Dataset | CLEVER: **1,269** annotated claim span–document pairs (**312 Relevant**, **957 Irrelevant**), with **527** manually annotated evidence excerpts in Relevant documents. |
 | Fixed evaluation split | **114 training / 26 test claim spans**, grouped to prevent retrieved LUSA documents from appearing in both partitions. This is **different from the 40/100 split** used for question generation. |
-| Document relevance | Binary classification of claim span–document pairs; the test partition contains **254 pairs**. |
-| Claim-Evidence Entailment | Three-class classification on deduplicated **three-sentence passages** anchored to manually annotated excerpts; **425 training / 82 test** passages. |
-| Model selection | For each model and task: **3 seeds × 5 grouped partitions** for selecting training epochs and a post-hoc logit-adjustment strength; final evaluation on the held-out test partition. |
-| Metrics | **Macro-F1** (primary), class-wise F1, Relevant Recall and decisive-evidence Recall; grouped-bootstrap confidence intervals for Macro-F1. |
+| Document relevance | Binary classification of claim span–document pairs: **1,015 training pairs** from 114 claim spans and **254 test pairs** from 26 claim spans. |
+| Claim-Evidence Entailment | Three-class classification on deduplicated **three-sentence passages** anchored to manually annotated excerpts, with sentences split by NLTK's Punkt model for Portuguese: **426 training passages** from 90 claim spans and **82 test passages** from 23 claim spans. |
+| Model selection | For each model and task: **3 seeds × 5 grouped folds**. Each fold is in turn the development set, which selects the number of training epochs and a post-hoc logit-adjustment strength, while the other four folds train. The final model is trained on the whole training partition and evaluated on the held-out test partition. |
+| Baselines | Majority class and stratified random prediction for document relevance; XLM-R-large-XNLI without fine-tuning and stratified random prediction for Claim-Evidence Entailment. |
+| Metrics | **Macro-F1** (primary), class-wise F1, Relevant Recall and decisive-evidence Recall; 95% confidence intervals for Macro-F1 by grouped bootstrap over the test claim spans (10,000 resamples). |
 
-The entailment **test results use passages constructed around known reference evidence locations**. In the FACTA-PT pipeline, where these locations are unknown, the classifier operates on overlapping three-sentence windows of documents predicted Relevant.
+Decisive-evidence Recall is the share of test pairs annotated Supported or Refuted that are predicted Relevant.
+
+The entailment **test results use passages constructed around known reference evidence locations**. In the FACT-PT pipeline, where these locations are unknown, the classifier operates on overlapping three-sentence windows of documents predicted Relevant.
 
 The complete selection protocol, commands and required inputs are in [Reproducing the experiments](docs/REPRODUCIBILITY.md).
 
@@ -37,15 +40,16 @@ src/                   Data preparation, folds, model training and evaluation
   inventario.py         Model table of the eleven encoders, with parameter counts
   correr.py             Select epochs and logit adjustment for one model/task
   final.py              Final fine-tuning and held-out test evaluation
+  baselines.py          Majority-class, stratified-random and unfine-tuned baselines
   metricas.py           Evaluation metrics and grouped bootstrap
   figura_matriz_confusao.py  Create the entailment confusion matrix
   resumo_carbono.py     Summarise execution cost and emissions
   motor.py              Model, classification head and one configuration-selection run
-  entradas.py           Premise and hypothesis texts
+  entradas.py           Premise and hypothesis texts, and the NLTK sentence split
   conjuntos.py          Read the pairs of a partition
   grelhas.py            Read the configuration files and the folds
   carbono.py            CodeCarbon measurement
-docs/REPRODUCIBILITY.md  Data, protocol, commands in run order and the complete Tables 6.5–6.6
+docs/REPRODUCIBILITY.md  Data, protocol, commands in run order and the complete result tables
 requirements.txt        Pinned Python dependencies
 ```
 
@@ -61,7 +65,7 @@ The model keys, checkpoints, adaptation settings and training configuration are 
 ../CLEVER/clever_test.json           # Fixed test partition
 ```
 
-Running the data-preparation scripts creates `data/pares.jsonl`, `data/folds_relevance.json` and `data/folds_entailment.json`. The code **reads the predefined train/test partition** (Section 3.2.4) from `clever_train.json` and `clever_test.json`.
+Running the data-preparation scripts creates `data/pares.jsonl`, `data/folds_relevance.json` and `data/folds_entailment.json`. The code **reads the predefined train/test partition** from `clever_train.json` and `clever_test.json`.
 
 ## Installation
 
@@ -72,9 +76,10 @@ python -m venv .venv
 source .venv/bin/activate
 pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cu128
 pip install -r requirements.txt
+python -m nltk.downloader punkt_tab
 ```
 
-Training (`correr.py` and `final.py`) requires a CUDA GPU; the other scripts run on CPU. The experiments were run on the Deucalion supercomputer, on NVIDIA A100-SXM4 GPUs with **40 GB and 80 GB** of memory. Model checkpoints are loaded from Hugging Face (see `configs/modelos.yaml`); offline execution requires them to be cached first. Two ASSIN2 checkpoints need a one-off fix of their cached `config.json` to load with the `transformers` release pinned in `requirements.txt`; the procedure is in [Reproducing the experiments](docs/REPRODUCIBILITY.md#model-loading-compatibility).
+The last command downloads the Punkt data that splits the news text into sentences for the entailment passages. Training (`correr.py` and `final.py`) requires a CUDA GPU; the other scripts run on CPU. The reported runs used one **NVIDIA GeForce RTX 5070 (12 GB)**, with the memory-saving options that `configs/modelos.yaml` declares per model and `src/motor.py` implements. Model checkpoints are loaded from Hugging Face (see `configs/modelos.yaml`); offline execution requires them to be cached first. Two ASSIN2 checkpoints need a one-off fix of their cached `config.json` to load with the `transformers` release pinned in `requirements.txt`; the procedure is in [Reproducing the experiments](docs/REPRODUCIBILITY.md#model-loading-compatibility).
 
 ## Quick start
 
@@ -97,36 +102,38 @@ python src/correr.py --tarefa entailment --modelo xlmr_large_xnli
 python src/final.py --tarefa entailment --modelo xlmr_large_xnli --guardar-checkpoint checkpoints
 ```
 
-Each `final.py` run writes `outputs/final/<task>__<model>_resultado.json` and, with `--guardar-checkpoint`, saves the model under `checkpoints/<task>_<model>/`. For all 11 encoders, configuration-selection details, figure generation and resource accounting, see [Reproducing the experiments](docs/REPRODUCIBILITY.md).
+Each `final.py` run writes the test results to `outputs/final/<task>__<model>_resultado.json` and one line per test example to `outputs/final/<task>__<model>_previsoes.jsonl`; with `--guardar-checkpoint`, it also saves the model under `checkpoints/<task>_<model>/`. With both final runs done, compute the baselines of the two tasks:
+
+```bash
+python src/baselines.py
+```
+
+For all 11 encoders, configuration-selection details, the baselines, figure generation and resource accounting, see [Reproducing the experiments](docs/REPRODUCIBILITY.md).
 
 ## Main results
 
-**Document relevance** - selected comparisons on the test partition (dissertation **Table 6.5**):
+Test results of the two fine-tuned models used by FACT-PT, next to the baselines of each task. Stratified random prediction assigns each class at random with its proportion in the training partition; its value is the expected Macro-F1.
 
-| Model | Macro-F1 ↑ | F1 Relevant ↑ | Relevant Recall ↑ | Decisive Recall ↑ |
-|---|---:|---:|---:|---:|
-| BERTimbau-base | **0.7098** | **0.549** | **0.500** | **0.500** |
-| Serafim-335M-ptpt | 0.7016 | 0.524 | 0.435 | 0.294 |
-| BERTimbau-large | 0.6907 | 0.495 | 0.371 | 0.324 |
-| mDeBERTa-v3-XNLI | 0.6253 | 0.414 | 0.371 | 0.382 |
+**Document relevance**, on the **254 test pairs** (62 Relevant, 192 Irrelevant):
 
-**Passage-level Claim-Evidence Entailment** - selected comparisons on **82 test passages** (dissertation **Table 6.6**):
+| Model | Macro-F1 ↑ |
+|---|---:|
+| BERTimbau-base, fine-tuned | **0.684** |
+| Majority class | 0.431 |
+| Stratified random | 0.500 |
 
-| Model | Macro-F1 ↑ | 95% CI | F1 Supported ↑ | F1 Refuted ↑ | F1 NEI ↑ |
-|---|---:|---|---:|---:|---:|
-| XLM-R-large-XNLI | **0.5212** | [**0.3160**, **0.6637**] | 0.462 | 0.429 | **0.673** |
-| mDeBERTa-v3-XNLI | 0.4741 | [0.3093, 0.6285] | 0.448 | 0.364 | 0.611 |
-| Albertina-100M | 0.4180 | [0.1890, 0.5526] | 0.295 | **0.471** | 0.488 |
-| BERTimbau-base | 0.3434 | [0.2235, 0.4887] | 0.441 | 0.000 | 0.589 |
+The fine-tuned BERTimbau-base identifies 32 of the 62 Relevant test pairs.
 
-Bold values are those marked in the dissertation tables. BERTimbau-base and XLM-R-large-XNLI obtain the **highest observed test Macro-F1** in their respective tasks and were retained for FACTA-PT.
+**Passage-level Claim-Evidence Entailment**, on the **82 test passages** (32 Supported, 9 Refuted, 41 NEI):
 
-The complete Tables 6.5 and 6.6, with all 11 encoders, are in [Reproducing the experiments](docs/REPRODUCIBILITY.md#7-results).
+| Model | Macro-F1 ↑ |
+|---|---:|
+| XLM-R-large-XNLI, fine-tuned | **0.482** |
+| XLM-R-large-XNLI, without fine-tuning | 0.478 |
+| Stratified random | 0.330 |
 
-## Dissertation reference
+The Macro-F1 of the fine-tuned XLM-R-large-XNLI has a 95% confidence interval of [0.318, 0.602], and its Macro-F1 difference with stratified random prediction has a 95% confidence interval of [-0.004, 0.277], which includes zero. It identifies 3 of the 9 Refuted test passages.
 
-- **Sections 3.2.2–3.2.4:** CLEVER evidence annotations and fixed benchmark split.
-- **Chapter 6:** Task formulation, experimental protocol, results and discussion.
-- **Figures 6.1–6.3:** Passage construction, pipeline and entailment confusion matrix.
+The confidence intervals come from a grouped bootstrap over the test claim spans. The complete tables, with the 11 encoders of each task, and the baselines with four decimals are in [Reproducing the experiments](docs/REPRODUCIBILITY.md#7-results).
 
-For the dissertation citation and the full FACTA-PT workflow, see the [main repository README](../README.md#citation).
+For the full FACT-PT workflow, see the [main repository README](../README.md).

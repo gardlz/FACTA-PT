@@ -26,10 +26,10 @@ validacao:
   k: 5
   sementes: [42, 43, 44]
   agrupamento: artigo          # folds grouped by the source article of the claim
-  dev_interno: 0.20            # fraction of the groups left after removing the excluded fold
+  dev_interno: fold            # each fold in turn; the other four folds are the training set
 
 estatistica:
-  n_boot: 400                  # grouped bootstrap of the test Macro-F1 (seed 42)
+  n_boot: 10000                # grouped bootstrap of the test Macro-F1 (seed 42)
   unidade_bootstrap: claim_span
 
 treino_final:

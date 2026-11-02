@@ -1,8 +1,7 @@
 """Fine-tuning of decoder-only models on one cross-validation fold (LoRA or QLoRA).
 
 Trains for the whole horizon without early stopping and evaluates the gold dev fold at
-the end of every epoch. Only the `qlora` family loads the backbone in 4-bit NF4; the CLEVER
-test set is never read here.
+the end of every epoch. Only the `qlora` family loads the backbone in 4-bit NF4.
 """
 
 import argparse

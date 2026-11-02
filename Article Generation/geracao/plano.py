@@ -11,6 +11,8 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+from nltk.tokenize import sent_tokenize
+
 AQUI = Path(__file__).resolve().parent
 RAIZ = AQUI.parent                                            # this stage's folder
 SAIDAS = RAIZ / "dados"                                       # plans and articles
@@ -200,29 +202,35 @@ def tipografia(texto: str) -> str:
 
 
 # --------------------------------------------------------------------------- 3-sentence windows
-# Each evidence item is a 3-sentence window around an annotated excerpt (dissertation, Section
-# 6.2.3). An excerpt longer than three sentences, which CLEVER does not have, would get several
-# windows overlapping by SOBREPOSICAO sentences. Two excerpts in the same place give identical
-# windows; only deduplication removes the copy.
+# Each evidence item is a 3-sentence window around an annotated excerpt. An excerpt longer than
+# three sentences, which CLEVER does not have, would get several windows overlapping by
+# SOBREPOSICAO sentences. Two excerpts in the same place give identical windows; only
+# deduplication removes the copy.
 FRASES_POR_EXCERTO = 3
 SOBREPOSICAO = 1
-# Sentence splitter of the evidence passages (no abbreviation guard). The claim context uses the
-# question-generation splitter instead (`janela.sentence_window`).
-_FIM_DE_FRASE = re.compile(r"(?<=[.!?])\s+(?=[A-ZÀ-Ý«\"])")
 # A window can cross paragraphs; line breaks become spaces so each evidence item is one paragraph.
 _QUEBRA = re.compile(r"\s*\n\s*")
 
 
 def frases_da_noticia(texto: str) -> List[Tuple[int, int]]:
-    """(start, end) character offsets of each sentence of an article."""
-    spans, inicio = [], 0
-    for m in _FIM_DE_FRASE.finditer(texto):
-        if m.start() > inicio:
-            spans.append((inicio, m.start()))
-            inicio = m.end()
-    if inicio < len(texto):
-        spans.append((inicio, len(texto)))
-    return [(a, b) for a, b in spans if texto[a:b].strip()]
+    """(start, end) character offsets of each sentence of an article.
+
+    The sentences are the ones NLTK's Punkt model for Portuguese finds, the same split as the
+    claim-evidence entailment classifier and FACT-PT. Each one is located in the text right after
+    the previous one, so the windows are cut from the news text itself. The claim context uses the
+    question-generation splitter instead (`janela.sentence_window`).
+    """
+    spans, pos = [], 0
+    for frase in sent_tokenize(texto, language="portuguese"):
+        frase = frase.strip()
+        if not frase:
+            continue
+        inicio = texto.find(frase, pos)
+        if inicio < 0:
+            raise ValueError(f"frase do NLTK que não se localiza no texto: {frase[:80]!r}")
+        spans.append((inicio, inicio + len(frase)))
+        pos = inicio + len(frase)
+    return spans
 
 
 def janelas_do_excerto(n_frases: int, primeira: int, ultima: int) -> List[Tuple[int, int]]:

@@ -1,4 +1,4 @@
-"""Model/tokenizer loading (offline), the ±1-sentence context window and decoding settings.
+"""Model/tokenizer loading, the ±1-sentence context window and decoding settings.
 
 torch and transformers are imported inside the functions, so the data and metric modules
 do not depend on them.

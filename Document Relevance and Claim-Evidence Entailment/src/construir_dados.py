@@ -56,13 +56,13 @@ def construir(clever):
     linhas = []
     for artigo, item, sid, span in spans:
         for doc in span["retrieved_documents"]:
-            doc_id = doc["lusa_doc_id"]  # the LUSA id; CLEVER's own doc_id is a number
+            lusa_doc_id = doc["lusa_doc_id"]
             rotulo = ROTULOS[doc["relation"]]
             relevancia = "relevante" if doc.get("relevant") else "irrelevante"
             linhas.append({
-                "par_id": f"{sid}::{doc_id}",
+                "par_id": f"{sid}::{lusa_doc_id}",
                 "span_id": sid,
-                "doc_id": doc_id,
+                "lusa_doc_id": lusa_doc_id,
                 "claim_id": item["id"],
                 "particao": particao[sid],
                 "rotulo4": rotulo if rotulo != "nei" else f"nei_{relevancia}",

@@ -11,6 +11,13 @@ RUN adduser --system --group --no-create-home aplicacao
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
+# NLTK's Punkt model for Portuguese (punkt_tab), the sentence split of the entailment classifier's
+# training windows; `app/pipeline/excerpts.py` looks for it here first. Loading it once makes the
+# build fail if the download did not succeed.
+ENV NLTK_DATA=/srv/nltk_data
+RUN python -m nltk.downloader -q -d /srv/nltk_data punkt_tab \
+    && python -c "from nltk.tokenize.punkt import PunktTokenizer; PunktTokenizer('portuguese')"
+
 COPY app ./app
 
 RUN chown -R aplicacao:aplicacao /srv

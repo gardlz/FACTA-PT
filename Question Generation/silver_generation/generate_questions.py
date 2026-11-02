@@ -65,7 +65,7 @@ Etapas para a formulação:
 """.strip()
 
 
-# The six CLEVER claim spans of the few-shot block (Appendix A.3.3): the comment that introduces
+# The six CLEVER claim spans of the few-shot block: the comment that introduces
 # each one and, when the demonstration shows only some of the annotated claimers, their positions
 # in the annotation.
 DEMONSTRACOES = [

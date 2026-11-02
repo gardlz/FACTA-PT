@@ -1,16 +1,17 @@
 # Reproducing document relevance and Claim-Evidence Entailment experiments
 
-This document complements the [stage README](../README.md) with the data requirements, model-selection protocol and commands underlying **Chapter 6** of the dissertation. **Run all commands from `Document Relevance and Claim-Evidence Entailment/`, not from `docs/`.**
+This document complements the [stage README](../README.md) with the data requirements, configuration-selection protocol, commands and the complete results of this code for the two evidence-characterization tasks. **Run all commands from `Document Relevance and Claim-Evidence Entailment/`, not from `docs/`.**
 
 ## 1. Environment and prerequisites
 
-The experiments were run on the Deucalion supercomputer, on **NVIDIA A100-SXM4 GPUs (40 GB and 80 GB)**, and their resource consumption was recorded with CodeCarbon. The training entry points (`correr.py` and `final.py`) require CUDA; data preparation and analysis scripts run on CPU.
+The reported runs used one **NVIDIA GeForce RTX 5070 (12 GB)**, with torch 2.10.0 (CUDA 12.8 build) and transformers 5.6.2 as pinned in `requirements.txt`, and their resource consumption was recorded with CodeCarbon. `configs/modelos.yaml` declares, per model, the memory-saving options implemented in `src/motor.py`: gradient checkpointing and, for Albertina-900M, AdamW with its master weights and moments on the CPU. The training entry points (`correr.py` and `final.py`) require CUDA; data preparation and analysis scripts run on CPU.
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cu128
 pip install -r requirements.txt
+python -m nltk.downloader punkt_tab   # Punkt data for the sentence split of the entailment passages
 ```
 
 The eleven pretrained encoders are identified in `configs/modelos.yaml` and are downloaded from Hugging Face on first use. If they are already cached, `HF_HUB_OFFLINE=1` can prevent network requests. Check model licences and access requirements before downloading. The experiment implementation uses **float32**.
@@ -38,7 +39,7 @@ for repo in (
 PY
 ```
 
-**Do not modify the upstream model repositories.** Both tasks give these two checkpoints new classification heads (Section 6.2.1), so the replacement label names are not used as task labels.
+Only three-class natural language inference (NLI) heads are reused, and only for Claim-Evidence Entailment, so both tasks give these two checkpoints new classification heads and the replacement label names are not used as task labels.
 
 ## 2. CLEVER data and fixed partitions
 
@@ -50,9 +51,9 @@ The code expects the following inputs relative to this stage directory:
 ../CLEVER/clever_test.json
 ```
 
-`python src/construir_dados.py --clever <folder>` reads them from another folder. **CLEVER and LUSA content are not redistributed** in this code repository; obtain them according to the dataset's access conditions and the [root README](../../README.md#data). In `clever.json`, each claim span has its `retrieved_documents`, and each retrieved document has `doc_id`, `headline`, `content`, `relevant`, `relation` and `evidence_excerpts`; the code uses the text of each excerpt.
+`python src/construir_dados.py --clever <folder>` reads them from another folder. **CLEVER and LUSA content are not redistributed** in this code repository; obtain them according to the dataset's access conditions and the [root README](../../README.md#data). In `clever.json`, each claim span has its `retrieved_documents`, and the code reads `lusa_doc_id`, `headline`, `content`, `relevant`, `relation` and `evidence_excerpts` from each retrieved document, using the `text` of each excerpt.
 
-The **predefined evidence-characterization benchmark split** (Section 3.2.4 and Table 3.5) is distinct from the 40/100 claim-span split used in Question Generation:
+The **predefined evidence-characterization benchmark split** is distinct from the 40/100 claim-span split used in Question Generation:
 
 | Input unit | Training | Test | Total |
 |---|---:|---:|---:|
@@ -60,11 +61,12 @@ The **predefined evidence-characterization benchmark split** (Section 3.2.4 and 
 | Claim span–document pairs | 1,015 | 254 | 1,269 |
 | Relevant pairs | 250 | 62 | 312 |
 | Irrelevant pairs | 765 | 192 | 957 |
-| Deduplicated three-sentence evidence passages | 425 | 82 | 507 |
+| Deduplicated three-sentence evidence passages | 426 | 82 | 508 |
+| Claim spans with evidence passages | 90 | 23 | 113 |
 
 The partition was constructed to approximate an **80/20** split, grouping source articles that share retrieved LUSA documents so that **no retrieved LUSA document appears in both training and test**. The code reads it from `clever_train.json` and `clever_test.json`.
 
-CLEVER contains **527 manually annotated evidence excerpts**, 444 in training and 83 in test. Passage construction around those excerpts followed by within-pair deduplication removes **20** duplicates, leaving **507** passages (Table 6.4): **145 Supported, 42 Refuted and 238 NEI** in training, and **32 Supported, 9 Refuted and 41 NEI** in test.
+CLEVER contains **527 manually annotated evidence excerpts**, 444 in training and 83 in test. Passage construction around those excerpts followed by within-pair deduplication removes **19** duplicates (18 in training, 1 in test), leaving **508** passages: **145 Supported, 42 Refuted and 239 NEI** in training, and **32 Supported, 9 Refuted and 41 NEI** in test.
 
 ## 3. Prepare the data
 
@@ -72,26 +74,26 @@ CLEVER contains **527 manually annotated evidence excerpts**, 444 in training an
 python src/construir_dados.py      # claim span–document pairs of both partitions
 python src/folds.py                # task examples and grouped folds (3 seeds × 5 folds)
 python src/diagnostico_janelas.py  # coverage of the training excerpts by sentence windows
-python src/inventario.py           # model table of the eleven encoders (Table 6.1)
+python src/inventario.py           # model table of the eleven encoders, with parameter counts
 ```
 
 Main generated files:
 
 ```text
 data/pares.jsonl                # Claim span–document classification pairs, with their partition
-data/folds_relevance.json       # Grouped relevance-selection partitions
-data/folds_entailment.json      # Grouped entailment-selection partitions
+data/folds_relevance.json       # Grouped relevance-selection folds
+data/folds_entailment.json      # Grouped entailment-selection folds
 ```
 
-`construir_dados.py` prints, for each partition, the number of claims, claim spans, pairs per label and annotated excerpts per label (Section 3.2.4). `folds.py` builds the examples of both tasks from the training partition, every pair for relevance and one three-sentence window per annotated excerpt for entailment, and assigns whole source-article groups to five folds for each seed. `diagnostico_janelas.py` prints the share of the 444 training excerpts contained in a window of one, two and three consecutive sentences (84.7%, 97.3% and 100%; Section 6.2.3). `inventario.py` counts the parameters of each checkpoint, loaded on the CPU, and takes the other columns from `configs/modelos.yaml`; every checkpoint must load, including the two ASSIN2 checkpoints (see [Model-loading compatibility](#model-loading-compatibility)).
+`construir_dados.py` prints, for each partition, the number of claims, claim spans, pairs per label and annotated excerpts per label. `folds.py` builds the examples of both tasks from the training partition (every pair for relevance; for entailment, one three-sentence window per annotated excerpt, deduplicated within each pair), assigns whole source-article groups to five folds for each seed, balancing fold size and class counts, and prints the size and class counts of every fold. `diagnostico_janelas.py` prints how many of the 444 training excerpts are contained in some window of one, two and three consecutive sentences: 372 (83.8%), 430 (96.8%) and 443 (99.8%). The remaining excerpt spans three sentences, and Punkt splits it between a question mark and the closing quotation mark that follows it; the window joins those sentences with one space, so it differs from the excerpt only by that space. `inventario.py` counts the parameters of each checkpoint, loaded on the CPU, and takes the other columns from `configs/modelos.yaml`; every checkpoint must load, including the two ASSIN2 checkpoints (see [Model-loading compatibility](#model-loading-compatibility)).
 
 ## 4. Tasks and passage construction
 
-**Document relevance** is binary classification of `(claim span, retrieved LUSA document)` into `Relevant` or `Irrelevant`. A Relevant document is pertinent to the factual situation, but need not support or refute the claim. An Irrelevant document does not address that situation, which is what separates it from NEI evidence: pertinent, but insufficient to support or refute the claim (Section 6.1).
+**Document relevance** is binary classification of `(claim span, retrieved LUSA document)` into `Relevant` or `Irrelevant`. A Relevant document is pertinent to the factual situation, but need not support or refute the claim. An Irrelevant document does not address that situation, which is what separates it from NEI evidence: pertinent, but insufficient to support or refute the claim. The premise is the news headline followed by the first 380 words of the body.
 
-**Claim-Evidence Entailment** is three-class classification of `(passage, claim span)` into `Supported`, `Refuted` or `NEI`. The passage is the **premise** and the claim span the **hypothesis**. A **three-sentence window** is the smallest fixed sentence window that contains every annotated training excerpt (Section 6.2.3). In the supervised experiments, each annotated excerpt determines the location of its passage and gives it its label; duplicate windows from the same pair are removed.
+**Claim-Evidence Entailment** is three-class classification of `(passage, claim span)` into `Supported`, `Refuted` or `NEI`. The passage is the **premise** and the claim span the **hypothesis**. The news text is split into sentences with NLTK's Punkt model for Portuguese (`sent_tokenize(text, language="portuguese")`, `nltk==3.10.0`), and a passage is three consecutive sentences, each with its whitespace collapsed, joined by one space, without the news headline. In the supervised experiments, each annotated excerpt determines the location of its passage and gives it its label: the window holds the sentences the excerpt touches, centred on them where possible and shifted inward at document boundaries, and a document of three sentences or fewer gives a single passage with all of them. Duplicate windows from the same pair are removed. Three sentences is the smallest window that holds the sentences of every annotated training excerpt: 372 of the 444 excerpts lie within one sentence, 430 within two consecutive sentences and all 444 within three. Every test excerpt also touches at most three sentences. Both tasks give the encoder the pair `(premise, claim span)`, truncated to 512 tokens.
 
-Without manually identified excerpt locations, as in the FACTA-PT prototype, the classifier is instead applied to every three-sentence passage of each document predicted Relevant, with a stride of one sentence (Section 6.1). The subsequent consolidation retains the predicted decisive passages; if all passages of a document are predicted NEI, it retains one representative NEI passage using an adjusted-logit margin heuristic (Section 6.2.2). This consolidation is implemented in [`FACTA-PT/`](../../FACTA-PT/).
+Without manually identified excerpt locations, as in the FACT-PT prototype, the classifier is instead applied to every three-sentence passage of each document predicted Relevant, with a stride of one sentence; these passages must be built from the same Punkt sentence split as the training passages. The subsequent consolidation retains the passages predicted Supported or Refuted; if all passages of a document are predicted NEI, it retains the one whose NEI logit exceeds the larger of its Supported and Refuted logits by the smallest margin, after the logit adjustment of [section 5](#5-model-configuration-selection). This consolidation is implemented in [`FACTA-PT/`](../../FACTA-PT/).
 
 ## 5. Model configuration selection
 
@@ -104,15 +106,17 @@ albertina_100m        albertina_900m     bertimbau_base
 bertimbau_large       serafim_335m
 ```
 
-For **each model and each task** (Section 6.2.2):
+`mdeberta_xnli`, `minilm_xnli`, `xlmr_large_xnli` and `xlmr_large_xnli_anli` are multilingual checkpoints fine-tuned for three-class NLI; `assin2_mdeberta` and `assin2_bertimbau` were fine-tuned for binary textual inference on the Portuguese ASSIN2 dataset; the other five are Portuguese encoders without prior inference specialization, `serafim_335m` being a sentence encoder trained for semantic similarity. Document relevance gives every encoder a new two-class output layer. Claim-Evidence Entailment keeps the output layer of the four NLI checkpoints, with entailment, contradiction and neutral mapped to Supported, Refuted and NEI, and gives the other encoders a new three-class layer. In both tasks the whole encoder is fine-tuned.
 
-1. Create **five grouped partitions** for each of **seeds 42, 43 and 44** (15 configuration-selection runs). Groups are based on the CLEVER source article.
-2. In each run, one fold is excluded to change the remaining group composition. A **20% internal development subset** is formed from the remaining groups; the excluded fold is **not used as an outer evaluation set**. The purpose is configuration selection, **not estimation of held-out generalization**.
+For **each model and each task**:
+
+1. Create **five grouped folds** for each of **seeds 42, 43 and 44** (15 configuration-selection runs). Groups are based on the CLEVER source article of the claim.
+2. In each run, one fold is the **internal development set** and the other four folds are the training set, so every fold is the development set once per seed. Each run therefore trains on about 80% of the training partition (805 to 818 pairs for relevance, 335 to 344 passages for entailment) and uses the remaining 20% for development. The purpose is configuration selection, **not estimation of held-out generalization**: the development Macro-F1 is measured on the same fold that chooses the epoch and τ.
 3. Fine-tune the encoder and evaluate **development Macro-F1 after each epoch**. Early stopping uses patience 5, with a maximum of 20 epochs; the earliest epoch wins ties.
-4. At the selected checkpoint, test the post-hoc logit adjustment `z'_c = z_c - τ log π_c`, where `π_c` is the proportion of class `c` in the training portion of the run, on the internal development set for **τ ∈ {0, 0.25, 0.5, 0.75, 1.0}**. Choose the best development Macro-F1 (lower τ wins ties).
+4. At the selected checkpoint, test the post-hoc logit adjustment `z'_c = z_c - τ log π_c`, where `π_c` is the proportion of class `c` in the training folds of the run, on the internal development set for **τ ∈ {0, 0.25, 0.5, 0.75, 1.0}**. Choose the best development Macro-F1 (lower τ wins ties).
 5. Consolidate the 15 runs into the **median chosen epoch** and the **mode chosen τ** (lower value breaks mode ties). Fresh final fine-tuning then uses the **full training split** and **seed 42**, without early stopping, with the class proportions of the full training split; the resulting model is evaluated on the held-out test partition.
 
-The shared configuration (Table **6.2**) is **AdamW**, learning rate **2e-5**, weight decay **0.01**, batch size **8**, maximum sequence length **512**, warm-up ratio **0.1**, linear learning-rate scheduler, cross-entropy loss, float32, and gradient clipping at norm **1.0**. For final training, the scheduler keeps a **20-epoch theoretical horizon**, even if fewer epochs are executed.
+The shared training configuration is **AdamW**, learning rate **2e-5**, weight decay **0.01**, batch size **8**, maximum sequence length **512**, warm-up ratio **0.1**, linear learning-rate scheduler, cross-entropy loss, float32, and gradient clipping at norm **1.0**. For final training, the scheduler keeps a **20-epoch theoretical horizon**, even if fewer epochs are executed.
 
 Run configuration selection for a single model/task pair, followed by final fine-tuning and test evaluation:
 
@@ -132,16 +136,25 @@ The runs write:
 outputs/resultados.jsonl                       # correr.py: one record per task and model, with the 15 selected epochs and τ values
 outputs/parciais/<task>__<model>.jsonl         # correr.py: the folds closed so far, deleted once the record is written
 outputs/final/<task>__<model>_resultado.json   # final.py: test results, confusion matrix and measured cost
+outputs/final/<task>__<model>_previsoes.jsonl  # final.py: one line per test example, with its gold label, predicted label and logits
 checkpoints/<task>_<model>/                    # final.py --guardar-checkpoint: weights, tokenizer, configuration and COMO_USAR.json
 ```
 
 `final.py` takes the epochs and τ from the `correr.py` record of the same task and model, and does nothing if its result file already exists (delete it to run again).
 
-## 6. Metrics, figures and execution cost
+## 6. Metrics, baselines, figures and execution cost
 
-**Macro-F1** is the primary task comparison metric, because the labels are imbalanced. The relevance task also reports `F1 Relevant`, `F1 Irrelevant`, `Relevant Recall`, and **decisive-evidence Recall** (the share of test pairs annotated Supported or Refuted that are predicted Relevant). The entailment task reports the three per-class F1 values.
+**Macro-F1**, the unweighted mean of the per-class F1 values, is the primary task comparison metric, because the labels are imbalanced. The relevance task also reports `F1 Relevant`, `F1 Irrelevant`, `Relevant Recall`, and **decisive-evidence Recall** (the share of test pairs annotated Supported or Refuted that are predicted Relevant). The entailment task reports the three per-class F1 values.
 
-For Macro-F1 uncertainty, the dissertation uses **400 grouped bootstrap samples at claim-span level**, with **95% percentile confidence intervals**; the intervals are reported for Claim-Evidence Entailment (Table 6.6).
+For Macro-F1 uncertainty, `final.py` stores a **95% percentile confidence interval** computed with `scipy.stats.bootstrap`: **10,000 resamples** of the test claim spans with replacement (seed 42), each drawn claim span contributing all its test examples. The [results](#7-results) report it for both tasks.
+
+The [baselines](#baselines) need the final runs of BERTimbau-base for relevance and XLM-R-large-XNLI for entailment:
+
+```bash
+python src/baselines.py
+```
+
+`baselines.py` reads the test predictions of these two models and writes `outputs/baselines.json`. Document relevance is compared with the majority class of the training partition (Irrelevant) and with stratified random prediction. Claim-Evidence Entailment is compared with the `joeddav/xlm-roberta-large-xnli` checkpoint without fine-tuning, which keeps its own NLI head (entailment → Supported, contradiction → Refuted, neutral → NEI) and receives the same premises, hypotheses and tokenization as the fine-tuned model, and with stratified random prediction. Stratified random prediction assigns each class at random with its proportion in the training partition (Relevant: 250 of 1,015 pairs; Supported, Refuted and NEI: 145, 42 and 239 of 426 passages), and its Macro-F1 is the exact expected value over such predictions. Every system uses the same bootstrap resamples, so the confidence interval of the Macro-F1 difference between the fine-tuned XLM-R-large-XNLI and stratified random prediction is paired. The checkpoint without fine-tuning runs on the GPU when one is available.
 
 After the final runs, generate the entailment confusion matrix and the resource report:
 
@@ -150,54 +163,77 @@ python src/figura_matriz_confusao.py
 python src/resumo_carbono.py
 ```
 
-`figura_matriz_confusao.py` draws **Figure 6.3** from the matrix stored in `outputs/final/entailment__xlmr_large_xnli_resultado.json` and writes `outputs/figuras/matriz_confusao_entailment_xlmr_large_xnli.png` and `.pdf`. `resumo_carbono.py` sums the CodeCarbon measurements stored in `outputs/resultados.jsonl` and `outputs/final/*_resultado.json` for each phase (configuration selection, and final training + test), as in the computational-cost analysis of **Table 6.3**. The dissertation reports **27.68 total execution hours**, **12.416 kWh** and an estimated **2.056 kg CO2 eq** for the experimental campaign of the 22 model–task combinations. CodeCarbon also writes one row per measured block to `outputs/emissoes/emissions.csv`. Figures **6.1 and 6.2** illustrate passage construction and the characterization pipeline and are not generated by the code.
+`figura_matriz_confusao.py` draws the confusion matrix of the XLM-R-large-XNLI entailment test predictions, stored in `outputs/final/entailment__xlmr_large_xnli_resultado.json`, and writes `outputs/figuras/matriz_confusao_entailment_xlmr_large_xnli.png` and `.pdf`. `resumo_carbono.py` sums the CodeCarbon measurements stored in `outputs/resultados.jsonl` and `outputs/final/*_resultado.json` for each phase: configuration selection, and final training + test. CodeCarbon runs in offline mode with the carbon intensity of Portugal and also writes one row per measured block to `outputs/emissoes/emissions.csv`. For the 22 model–task combinations of the [results](#7-results), on the GPU of [section 1](#1-environment-and-prerequisites):
+
+| Phase | Training runs | Execution hours | kWh | % energy | kg CO2eq |
+|---|---:|---:|---:|---:|---:|
+| Configuration selection | 330 | 56.61 | 13.643 | 96.42 | 2.259 |
+| Final training + test | 22 | 2.13 | 0.506 | 3.58 | 0.084 |
+| Total | 352 | 58.74 | 14.150 | 100.00 | 2.343 |
+
+The table printed by `resumo_carbono.py` counts records rather than training runs: one per model–task combination in each phase (22, 22 and 44 in all), each configuration-selection record covering its 15 training runs.
 
 ## 7. Results
 
-The tables are copied from the dissertation, with its bold values. In Table 6.5, F1 Rel. and F1 Irr. are the F1 of the Relevant and Irrelevant classes, R Rel. the Recall of the Relevant class and Decisive R the decisive-evidence Recall; in Table 6.6, F1 S, F1 R and F1 NEI are the F1 of Supported, Refuted and NEI.
+Test results of the final model of each encoder and task, configured with the protocol of [section 5](#5-model-configuration-selection). The 95% confidence intervals for Macro-F1 are estimated by grouped bootstrap at claim-span level ([section 6](#6-metrics-baselines-figures-and-execution-cost)). In each metric column, bold marks the best value over the 11 encoders (ties: all); the confidence intervals are not marked. F1 Rel. and F1 Irr. are the F1 of the Relevant and Irrelevant classes, R Rel. the Recall of the Relevant class and Decisive R the decisive-evidence Recall; F1 S, F1 R and F1 NEI are the F1 of Supported, Refuted and NEI.
 
-### Document relevance (Section 6.3.1)
+### Document relevance
 
-Table 6.5: Final results for document relevance classification.
+Test partition: 254 claim span–document pairs from 26 claim spans, 62 of them Relevant.
 
-| Model | Macro-F1 | F1 Rel. | F1 Irr. | R Rel. | Decisive R |
-|---|:---:|:---:|:---:|:---:|:---:|
-| *Three-class NLI* | | | | | |
-| mDeBERTa-v3-XNLI | 0.6253 | 0.414 | 0.836 | 0.371 | 0.382 |
-| MiniLM-v2-XNLI | 0.5436 | 0.247 | 0.840 | 0.177 | 0.147 |
-| XLM-R-large-XNLI | 0.5753 | 0.304 | 0.846 | 0.226 | 0.206 |
-| XLM-R-large-XNLI-ANLI | 0.5864 | 0.309 | 0.863 | 0.210 | 0.147 |
-| *Binary textual inference* | | | | | |
-| BERTimbau-large-ASSIN2 | 0.6254 | 0.382 | 0.869 | 0.274 | 0.176 |
-| mDeBERTa-v3-ASSIN2 | 0.5707 | 0.327 | 0.814 | 0.290 | 0.265 |
-| *Without prior inference specialization* | | | | | |
-| Albertina-100M | 0.5549 | 0.259 | 0.851 | 0.177 | 0.147 |
-| Albertina-900M | 0.5548 | 0.325 | 0.784 | 0.323 | 0.324 |
-| BERTimbau-base | **0.7098** | **0.549** | 0.871 | **0.500** | **0.500** |
-| BERTimbau-large | 0.6907 | 0.495 | **0.887** | 0.371 | 0.324 |
-| Serafim-335M-ptpt | 0.7016 | 0.524 | 0.879 | 0.435 | 0.294 |
+| Model | Macro-F1 | 95% CI | F1 Rel. | F1 Irr. | R Rel. | Decisive R |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| *Three-class NLI* | | | | | | |
+| mDeBERTa-v3-XNLI | 0.6042 | [0.5280, 0.6742] | 0.369 | 0.840 | 0.306 | 0.324 |
+| MiniLM-v2-XNLI | 0.6034 | [0.5138, 0.6803] | 0.374 | 0.833 | 0.323 | 0.353 |
+| XLM-R-large-XNLI | 0.5978 | [0.5310, 0.6608] | 0.362 | 0.834 | 0.306 | 0.324 |
+| XLM-R-large-XNLI-ANLI | 0.4829 | [0.4183, 0.5531] | 0.127 | 0.839 | 0.081 | 0.088 |
+| *Binary textual inference* | | | | | | |
+| BERTimbau-large-ASSIN2 | 0.7060 | [0.5959, 0.8091] | 0.541 | 0.872 | 0.484 | 0.471 |
+| mDeBERTa-v3-ASSIN2 | 0.4698 | [0.4121, 0.5407] | 0.086 | 0.854 | 0.048 | 0.059 |
+| *Without prior inference specialization* | | | | | | |
+| Albertina-100M | 0.6213 | [0.5282, 0.6931] | 0.359 | 0.884 | 0.226 | 0.265 |
+| Albertina-900M | 0.4458 | [0.4006, 0.5040] | 0.031 | 0.860 | 0.016 | 0.029 |
+| BERTimbau-base | 0.6835 | [0.5856, 0.7649] | 0.520 | 0.847 | **0.516** | **0.529** |
+| BERTimbau-large | **0.7174** | [0.6322, 0.7853] | **0.542** | **0.893** | 0.419 | 0.441 |
+| Serafim-335M-ptpt | 0.6569 | [0.5882, 0.7244] | 0.442 | 0.872 | 0.339 | 0.353 |
 
-### Passage-level Claim-Evidence Entailment (Section 6.3.2)
+The final Albertina-900M model predicts Irrelevant for 252 of the 254 test pairs: in 5 of its 15 configuration-selection runs the development Macro-F1 never rose above that of predicting Irrelevant for every pair, and its 2 selected epochs (the median of the 15 best epochs) end with the warm-up, so the final model trains only while the learning rate is still rising.
 
-Table 6.6: Final results for Claim-Evidence Entailment on the three-sentence passages constructed from the annotated CLEVER evidence excerpts. The 95% confidence intervals for Macro-F1 are estimated by grouped bootstrap at claim-span level.
+### Passage-level Claim-Evidence Entailment
+
+Test partition: 82 three-sentence passages from 23 claim spans (32 Supported, 9 Refuted, 41 NEI).
 
 | Model | Macro-F1 | 95% CI | F1 S | F1 R | F1 NEI |
 |---|:---:|:---:|:---:|:---:|:---:|
 | *Three-class NLI* | | | | | |
-| mDeBERTa-v3-XNLI | 0.4741 | [0.3093, 0.6285] | 0.448 | 0.364 | 0.611 |
-| MiniLM-v2-XNLI | 0.3787 | [0.2225, 0.5718] | 0.400 | 0.118 | 0.619 |
-| XLM-R-large-XNLI | **0.5212** | [**0.3160**, **0.6637**] | 0.462 | 0.429 | **0.673** |
-| XLM-R-large-XNLI-ANLI | 0.4217 | [0.2758, 0.5628] | 0.449 | 0.143 | **0.673** |
+| mDeBERTa-v3-XNLI | 0.4550 | [0.3040, 0.5947] | 0.421 | 0.333 | 0.611 |
+| MiniLM-v2-XNLI | 0.3258 | [0.2043, 0.4487] | 0.400 | 0.000 | 0.577 |
+| XLM-R-large-XNLI | **0.4815** | [0.3179, 0.6021] | 0.451 | **0.500** | 0.494 |
+| XLM-R-large-XNLI-ANLI | 0.4748 | [0.3320, 0.6062] | 0.462 | 0.444 | 0.519 |
 | *Binary textual inference* | | | | | |
-| BERTimbau-large-ASSIN2 | 0.3492 | [0.2298, 0.4616] | 0.393 | 0.083 | 0.571 |
-| mDeBERTa-v3-ASSIN2 | 0.3439 | [0.2618, 0.4287] | **0.492** | 0.000 | 0.539 |
+| BERTimbau-large-ASSIN2 | 0.3183 | [0.1965, 0.4404] | 0.353 | 0.000 | 0.602 |
+| mDeBERTa-v3-ASSIN2 | 0.3223 | [0.1788, 0.4584] | 0.491 | 0.000 | 0.476 |
 | *Without prior inference specialization* | | | | | |
-| Albertina-100M | 0.4180 | [0.1890, 0.5526] | 0.295 | **0.471** | 0.488 |
-| Albertina-900M | 0.3808 | [0.2520, 0.5211] | 0.441 | 0.133 | 0.568 |
-| BERTimbau-base | 0.3434 | [0.2235, 0.4887] | 0.441 | 0.000 | 0.589 |
-| BERTimbau-large | 0.2534 | [0.1778, 0.3331] | 0.437 | 0.000 | 0.324 |
-| Serafim-335M-ptpt | 0.3567 | [0.2273, 0.4945] | **0.492** | 0.000 | 0.578 |
+| Albertina-100M | 0.3026 | [0.1997, 0.4016] | 0.444 | 0.000 | 0.463 |
+| Albertina-900M | 0.3469 | [0.2223, 0.4533] | 0.466 | 0.000 | 0.575 |
+| BERTimbau-base | 0.3208 | [0.1750, 0.4213] | **0.596** | 0.000 | 0.367 |
+| BERTimbau-large | 0.3641 | [0.2263, 0.5093] | 0.426 | 0.000 | 0.667 |
+| Serafim-335M-ptpt | 0.3934 | [0.2175, 0.5525] | 0.326 | 0.182 | **0.673** |
 
-## Dissertation reference
+Every selected configuration has τ = 0, so no final model adjusts its logits; the selected numbers of epochs range from 2 to 9 for relevance and from 3 to 6 for entailment. GPU training is not bit-for-bit reproducible, so a rerun with the same seed and configuration can give different test scores.
 
-For the training protocol, passage-construction examples and discussion, see **Chapter 6**, particularly **Sections 6.1–6.4**, **Tables 6.1–6.6** and **Figures 6.1–6.3**. The CLEVER evidence benchmark is described in **Sections 3.2.2–3.2.4**. See the [main repository README](../../README.md#citation) for citation details.
+### Baselines
+
+Results of `baselines.py` ([section 6](#6-metrics-baselines-figures-and-execution-cost)) on the same test partitions; the rows of the fine-tuned models repeat the tables above.
+
+| Task | Model | Macro-F1 | 95% CI |
+|---|---|:---:|:---:|
+| Document relevance | BERTimbau-base, fine-tuned | 0.6835 | [0.5856, 0.7649] |
+| | Majority class | 0.4305 | [0.3975, 0.4555] |
+| | Stratified random | 0.4995 | [0.4928, 0.4995] |
+| Claim-Evidence Entailment | XLM-R-large-XNLI, fine-tuned | 0.4815 | [0.3179, 0.6021] |
+| | XLM-R-large-XNLI, without fine-tuning | 0.4784 | [0.3210, 0.6311] |
+| | Stratified random | 0.3300 | [0.3070, 0.3311] |
+
+The Macro-F1 difference between the fine-tuned XLM-R-large-XNLI and stratified random prediction is 0.1516, with a paired 95% confidence interval of [-0.0042, 0.2774]. For stratified random prediction, each resample recomputes the expected Macro-F1 on the resampled claim spans. That expected value is highest when the class proportions of the test examples equal those of the training partition, so the resamples raise it at most slightly and its value lies near the upper end of its interval.

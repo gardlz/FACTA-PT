@@ -1,4 +1,4 @@
-"""Selects one learning rate per adaptation family from cross-validation only, never the test set.
+"""Selects one learning rate per adaptation family from the cross-validation results.
 
 Best macro-average, over the family's learning-rate-selection models, of the 4-fold mean H-BERT
 on human40_silver100 at the selected epoch (earliest within 0.05 of the maximum; ties: smaller

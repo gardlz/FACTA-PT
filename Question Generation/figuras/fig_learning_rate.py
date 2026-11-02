@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Figure 4.3: the linear learning-rate schedule (warm-up 0.1) for 20, 30 and 40-epoch horizons.
+"""The linear learning-rate schedule (warm-up 0.1) for 20, 30 and 40-epoch horizons.
 
 The 20 and 30-epoch curves are read from the per-step logs of a combination whose
 cross-validation was rerun with a 30-epoch horizon; the 40-epoch curve is computed with the
@@ -33,8 +33,8 @@ def parse_args():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--modelo", default=None,
-                   help="Model to draw, with --config. Default: the first configuration (in "
-                        "the order of Table 4.8) and, within it, the first model of "
+                   help="Model to draw, with --config. Default: the first configuration (from "
+                        "human40 to silver100) and, within it, the first model of "
                         "models_manifest.json with per-step logs for both measured horizons "
                         "in --fold.")
     p.add_argument("--config", default=None, help="Supervision configuration to draw.")

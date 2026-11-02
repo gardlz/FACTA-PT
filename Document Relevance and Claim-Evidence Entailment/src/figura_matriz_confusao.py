@@ -1,4 +1,4 @@
-"""Confusion matrix of the XLM-R-large-XNLI entailment final run (Figure 6.3 of the dissertation).
+"""Confusion matrix of the XLM-R-large-XNLI entailment final run.
 
 Counts in the cells, colour by share of the gold class. Reads the matrix stored in
 outputs/final/entailment__xlmr_large_xnli_resultado.json and writes

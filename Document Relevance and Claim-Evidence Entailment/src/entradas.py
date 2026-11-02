@@ -1,18 +1,19 @@
 """The (premise, hypothesis) texts the encoder sees; the hypothesis is always the claim span.
 
 Relevance premise: news title + '. ' + body cut at 380 words. Entailment premise: the
-three-sentence window built by `folds.exemplos_entailment`.
+three-sentence window built by `folds.exemplos_entailment` from the sentences that NLTK's Punkt
+model for Portuguese finds in the news text.
 """
 
-import re
+from nltk.tokenize import sent_tokenize
 
 MAX_PALAVRAS = 380
 
 
 def frases_do(texto):
-    """Rough sentence split, used to build the entailment windows and measure their coverage."""
-    return [f.strip() for f in re.split(r"(?<=[.!?])\s+(?=[A-ZÁÀÂÃÉÊÍÓÔÕÚ«\"])", texto or "")
-            if f.strip()]
+    """Sentences of a text (NLTK Punkt, Portuguese), used to build the entailment windows and
+    measure their coverage."""
+    return [f.strip() for f in sent_tokenize(texto or "", language="portuguese") if f.strip()]
 
 
 def premissa(par):

@@ -1,12 +1,12 @@
 """Runs the pipeline stages, emitting one event per stage.
 
-Two exclusive paths. A picked example is a recorded run of the models on that claim, replayed as
-it happened. A new claim runs the models; a stage that cannot run is reported as skipped.
+Two exclusive paths. A picked example is served from the stored data: what a recorded run of the
+models on that claim produced, with the number of news items per question the run chose
+(`demo/corrida.py`). A new claim runs the models; a stage that cannot run is reported as skipped.
 """
 
 from __future__ import annotations
 
-import copy
 import logging
 import uuid
 from collections.abc import AsyncIterator
@@ -14,9 +14,11 @@ from typing import Any
 
 from pydantic import ValidationError
 
+from ..demo import corrida
 from ..demo.store import ExemploStore
 from ..mensagens import Texto, traduzir
 from ..schemas import (
+    REDATORES,
     STAGE_ORDER,
     ClaimInput,
     EvidenceDocument,
@@ -57,6 +59,15 @@ class StageFailure(RuntimeError):
         self.stage = stage
 
 
+def _contagem_de_relevancia(documentos: list[EvidenceDocument]) -> dict:
+    """How many of the news items retrieved count as evidence, also as a whole percentage,
+    rounded half up once, from the counts."""
+    total = len(documentos)
+    relevantes = sum(1 for d in documentos if d.relevant)
+    return {"notícias": total, "relevantes": relevantes,
+            "percentagem": (200 * relevantes + total) // (2 * total) if total else 0}
+
+
 class PipelineRunner:
     def __init__(
         self,
@@ -73,21 +84,16 @@ class PipelineRunner:
         # Language of the failure messages the page shows: "pt" or "en".
         self._lingua = lingua
 
-    # --- Example path -------------------------------------------------------- #
+    def top_k(self, data: ClaimInput) -> int:
+        """Distinct news items each question keeps: the run's choice, else the default."""
+        return data.top_k or self._settings.top_k_per_question
 
-    @staticmethod
-    def _repetir(eventos: list[dict], run_id: str, data: ClaimInput) -> list[dict]:
-        """A recorded run of the models on this claim, replayed as it happened: the same events,
-        under this run's id."""
-        repetidos = copy.deepcopy(eventos)
-        for evento in repetidos:
-            if evento["type"] == "start":
-                evento["run_id"] = run_id
-            resultado = evento.get("result")
-            if isinstance(resultado, dict):
-                resultado["run_id"] = run_id
-                resultado["input"] = data.model_dump(mode="json")
-        return repetidos
+    def exemplo(self, data: ClaimInput) -> dict | None:
+        """The stored example this run serves (the picked claim, recorded with the run's number
+        of news items per question), or None, and the models run."""
+        if not data.exemplo_id:
+            return None
+        return self._exemplos.get(data.exemplo_id, self.top_k(data))
 
     # --- Model path ---------------------------------------------------------- #
 
@@ -148,8 +154,9 @@ class PipelineRunner:
             raise StageFailure("stance", Texto("classificador_invalido", erro=erro)) from erro
 
     async def _artigo_do_modelo(self, data: ClaimInput, resultado: RunResult) -> dict:
-        """The article written from the consolidated evidence, with what it needs to know of
-        each passage: its relation, its offsets, and the news item's headline and date."""
+        """The article the chosen model writes from the consolidated evidence, with what it needs
+        to know of each passage: its relation, its offsets, and the news item's headline and
+        date."""
         por_doc = {documento.doc_id: documento for documento in resultado.documents}
         posicoes = {
             excerto.id: posicao
@@ -168,7 +175,7 @@ class PipelineRunner:
             })
         try:
             return await self._inference.write_article(
-                data.claim, data.claim_date.isoformat(), data.context, passagens
+                data.claim, data.claim_date.isoformat(), data.context, passagens, data.redator
             )
         except InferenceUnavailable as erro:
             raise StageSkipped() from erro
@@ -179,9 +186,12 @@ class PipelineRunner:
 
     async def run(self, data: ClaimInput) -> AsyncIterator[dict]:
         run_id = uuid.uuid4().hex[:12]
-        exemplo = self._exemplos.get(data.exemplo_id) if data.exemplo_id else None
+        # The run records the number of news items per question it used, chosen or not.
+        top_k = self.top_k(data)
+        data = data.model_copy(update={"top_k": top_k})
+        exemplo = self.exemplo(data)
         if exemplo is not None:
-            for evento in self._repetir(exemplo["eventos"], run_id, data):
+            for evento in corrida.eventos(exemplo, run_id, data):
                 yield evento
             return
 
@@ -199,6 +209,8 @@ class PipelineRunner:
             for nome in STAGE_ORDER:
                 if not self._settings.lusa_configured and nome in DEPENDEM_DO_CORPUS:
                     relatorios[nome].status = "skipped"
+                    # Why, as a code the page puts in its own language.
+                    relatorios[nome].stats = {"motivo": "sem_corpus"}
                     yield {"type": "stage", "stage": relatorios[nome].model_dump()}
                     continue
 
@@ -214,21 +226,20 @@ class PipelineRunner:
                     try:
                         documentos = await retrieval_stage.retrieve(
                             self._lusa, resultado.questions, data.claim_date,
-                            self._settings.top_k_per_question, self._settings.lusa_concurrency,
+                            top_k, self._settings.lusa_concurrency,
                         )
                     except LusaError as erro:
                         raise StageFailure("retrieval", erro) from erro
 
                 elif nome == "dedup":
                     # The search over-fetched; the cut applies here, after merging.
-                    resultado.documents = retrieval_stage.deduplicate(
-                        documentos, self._settings.top_k_per_question
-                    )
-                    dados = {"documents": [self._resumo(d) for d in resultado.documents]}
+                    resultado.documents = retrieval_stage.deduplicate(documentos, top_k)
+                    dados = {"documents": [d.resumo() for d in resultado.documents]}
 
                 elif nome == "relevance":
                     await self._relevancia_do_modelo(data.claim, resultado.documents)
-                    dados = {"documents": [self._resumo(d) for d in resultado.documents]}
+                    relatorios[nome].stats = _contagem_de_relevancia(resultado.documents)
+                    dados = {"documents": [d.resumo() for d in resultado.documents]}
 
                 elif nome == "excerpts":
                     for documento in resultado.documents:
@@ -243,6 +254,7 @@ class PipelineRunner:
                     resultado.stances = stances
                     resultado.decisive_excerpt_ids = consolidacao.decisivos
                     resultado.evidence_passages = consolidacao.evidencia
+                    resultado.repeated_passages = consolidacao.repetidas
                     dados = {
                         "stances": [s.model_dump() for s in stances],
                         "decisive": consolidacao.decisivos,
@@ -253,10 +265,15 @@ class PipelineRunner:
                         resposta = await self._artigo_do_modelo(data, resultado)
                     except StageSkipped:
                         relatorios[nome].status = "skipped"
+                        relatorios[nome].stats = {"motivo": "indisponivel"}
                         yield {"type": "stage", "stage": relatorios[nome].model_dump()}
                         continue
-                    resultado.article = article_stage.do_modelo(resposta, resultado.documents)
-                    dados = {"article": resultado.article.model_dump()}
+                    rotulos = {s.excerpt_id: s.label for s in resultado.stances}
+                    resultado.articles = [article_stage.do_modelo(
+                        resposta, resultado.documents, REDATORES[data.redator],
+                        resultado.repeated_passages, rotulos,
+                    )]
+                    dados = {"articles": [a.model_dump() for a in resultado.articles]}
 
                 relatorios[nome].status = "done"
                 yield {"type": "stage", "stage": relatorios[nome].model_dump(), **dados}
@@ -282,13 +299,3 @@ class PipelineRunner:
             resultado.error = mensagem
             yield {"type": "error", "message": mensagem,
                    "result": resultado.model_dump(mode="json")}
-
-    @staticmethod
-    def _resumo(documento: EvidenceDocument) -> dict:
-        """What the page's timeline needs of a news item."""
-        return {
-            "doc_id": documento.doc_id,
-            "headline": documento.headline,
-            "published_at": documento.published_at,
-            "relevant": documento.relevant,
-        }

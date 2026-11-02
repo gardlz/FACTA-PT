@@ -2,7 +2,6 @@
 
 Trains for the whole horizon without early stopping and evaluates the gold dev fold at
 the end of every epoch; the epoch is chosen later from the mean H-BERT of the four folds.
-The CLEVER test set is never read here.
 """
 
 import argparse

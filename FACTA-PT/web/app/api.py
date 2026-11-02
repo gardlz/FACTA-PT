@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from .demo.store import get_exemplos
 from .mensagens import lingua_do_pedido, texto
 from .pipeline.orchestrator import PipelineRunner
-from .schemas import ClaimInput, HealthReport, RunResult
+from .schemas import REDATORES, TOP_K_OPCOES, ClaimInput, HealthReport, RunResult
 from .settings import get_settings
 
 logger = logging.getLogger(__name__)
@@ -43,10 +43,19 @@ async def health(request: Request) -> HealthReport:
 
 @router.get("/exemplos")
 async def exemplos() -> JSONResponse:
-    """Example catalogue, without the news text. Sent with `no-cache`: it changes whenever the
-    examples file is rebuilt."""
+    """Example catalogue, without the news text, and what a run can choose: the number of news
+    items per question and the model that writes the article. Sent with `no-cache`: it changes
+    whenever the examples files are rebuilt."""
     return JSONResponse(
-        {"topicos": get_exemplos().catalogo()}, headers={"Cache-Control": "no-cache"}
+        {
+            "exemplos": get_exemplos().catalogo(),
+            "top_k": {"opcoes": list(TOP_K_OPCOES), "omissao": get_settings().top_k_per_question},
+            "redatores": {
+                "opcoes": [{"id": chave, "nome": nome} for chave, nome in REDATORES.items()],
+                "omissao": ClaimInput.model_fields["redator"].default,
+            },
+        },
+        headers={"Cache-Control": "no-cache"},
     )
 
 
@@ -64,7 +73,7 @@ async def run(payload: ClaimInput, request: Request) -> StreamingResponse:
     # A run holds the inference service and the LUSA API from start to end, so runs are capped:
     # a request that cannot start within `run_queue_timeout` gets a 503. A stored example runs
     # no model, so it is never held back.
-    com_modelos = not (payload.exemplo_id and get_exemplos().get(payload.exemplo_id))
+    com_modelos = runner.exemplo(payload) is None
     if com_modelos:
         try:
             await asyncio.wait_for(limitador.acquire(), timeout=definicoes.run_queue_timeout)

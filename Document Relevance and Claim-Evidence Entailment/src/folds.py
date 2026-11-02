@@ -35,8 +35,7 @@ FRASES_POR_EXCERTO = 3
 def _frases_com_posicao(texto):
     """[(sentence, start, end)] over the whitespace-normalised text, plus that text.
 
-    The normalised text is the normalised sentences joined by single spaces, so each sentence
-    is found right after the previous one.
+    Each sentence is searched in the normalised text right after the previous one.
     """
     doc = " ".join((texto or "").split())
     saida, pos = [], 0

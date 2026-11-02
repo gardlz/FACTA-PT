@@ -1,5 +1,5 @@
 """Inference service: question generation, news-item relevance, claim-passage entailment and the
-article."""
+article, written by the model the request chooses."""
 
 from __future__ import annotations
 
@@ -73,6 +73,9 @@ class PassageIn(BaseModel):
 
 class ArticleRequest(BaseModel):
     claim: str = Field(min_length=1)
+    # The model that writes it, the service's `article_<redator>`: gemma (Gemma 4 E4B) or amalia
+    # (AMALIA-9B-0626-DPO).
+    redator: str = "gemma"
     claim_date: date
     context: str = ""
     evidence: list[PassageIn] = Field(default_factory=list)
@@ -83,7 +86,7 @@ class ArticleRequest(BaseModel):
 
 async def _carregar(app: FastAPI) -> None:
     """Loads the models off the startup path: the service answers /health meanwhile. The
-    encoders go first, since the decoder takes minutes. On a GPU only the question generator
+    encoders go first, since the decoders take minutes. On a GPU only the question generator
     loads onto it; the others wait in main memory and go there when first asked for."""
     for nome, modelo in app.state.modelos.items():
         try:
@@ -101,7 +104,13 @@ async def lifespan(app: FastAPI):
         "relevance": RelevanceClassifier(definicoes),
         "stance": StanceClassifier(definicoes),
         "questions": QuestionGenerator(definicoes),
-        "article": ArticleWriter(definicoes),
+        "article_gemma": ArticleWriter(definicoes, "Gemma 4 E4B", definicoes.article_model_path,
+                                       definicoes.article_model_revision,
+                                       definicoes.article_device),
+        "article_amalia": ArticleWriter(definicoes, "AMALIA-9B-0626-DPO",
+                                        definicoes.amalia_model_path,
+                                        definicoes.amalia_model_revision,
+                                        definicoes.amalia_device),
     }
     app.state.falhas = {}
     app.state.pronto = False
@@ -165,7 +174,7 @@ async def _carregar_a_pedido(nome: str, fila: asyncio.Lock) -> None:
 
 def _fila(nome: str) -> asyncio.Lock:
     """The GPU's queue, or the article's own when the article runs on the CPU."""
-    if nome == "article" and not app.state.modelos[nome].movel:
+    if nome.startswith("article_") and not app.state.modelos[nome].movel:
         return app.state.redacao
     return app.state.gpu
 
@@ -244,10 +253,14 @@ async def stance(pedido: StanceRequest, request: Request) -> dict:
 @app.post("/v1/article")
 async def article(pedido: ArticleRequest, request: Request) -> dict:
     """The article and its [En] -> passage map. No evidence is a case of its own
-    (`no_evidence`), not an error."""
+    (`no_evidence`), not an error; a writer the service does not have is a 503."""
     prazo = time.monotonic() + pedido.deadline_s if pedido.deadline_s else None
-    await _carregar_a_pedido("article", app.state.redacao)
-    modelo = _modelo("article")
+    nome = f"article_{pedido.redator}"
+    if nome not in app.state.modelos:
+        raise HTTPException(status_code=503,
+                            detail=f"este serviço não tem o modelo de redação «{pedido.redator}»")
+    await _carregar_a_pedido(nome, app.state.redacao)
+    modelo = _modelo(nome)
     cancelado = threading.Event()
 
     async def vigiar() -> None:
@@ -264,7 +277,7 @@ async def article(pedido: ArticleRequest, request: Request) -> dict:
     vigia = asyncio.create_task(vigiar())
     try:
         return await _correr(
-            "article", request, modelo.write, pedido.claim, pedido.claim_date.isoformat(),
+            nome, request, modelo.write, pedido.claim, pedido.claim_date.isoformat(),
             pedido.context, [p.model_dump() for p in pedido.evidence], cancelado, prazo,
         )
     finally:

@@ -1,4 +1,4 @@
-"""Model table of the eleven encoders (Table 6.1 of the dissertation).
+"""Model table of the eleven encoders, with parameter counts.
 
 The parameter count is measured from each checkpoint; the other columns come from
 configs/modelos.yaml. CPU only.

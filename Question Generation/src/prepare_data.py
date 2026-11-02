@@ -3,8 +3,8 @@
 CLEVER: one example per claim span, with the full article in `context` (windowed later by
 `model_utils.claim_context`), in the order of the split record. ClaimPT silver: the claim spans
 of claimpt_train.json and claimpt_test.json with their silver questions, concatenated,
-de-duplicated and sampled into nested 25/50/75/100% subsets (seed 42). Prints the counts of
-Tables 3.7 and 4.8.
+de-duplicated and sampled into nested 25/50/75/100% subsets (seed 42). Prints the claim span
+and question counts of the split and of the silver subsets.
 
     python src/prepare_data.py
 """
@@ -165,7 +165,7 @@ def prepare_claimpt(args) -> None:
 
     print(f"[claimpt] {n_before} brutos -> {n_after} após dedup; nested sizes={sizes}")
 
-    # Question counts of the silver set and of its nested subsets (Tables 3.7 and 4.8).
+    # Question counts of the silver set and of its nested subsets.
     perguntas = {p: sum(len(e["questions"]) for e in samples[p]) for p in (25, 50, 75, 100)}
     por_span = Counter(len(e["questions"]) for e in samples[100])
     distribuicao = {n: por_span[n] for n in range(1, max(por_span) + 1)}

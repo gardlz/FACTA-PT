@@ -1,7 +1,7 @@
 """Training/dev files for each fold and for the final training, per supervision configuration.
 
 Dev is always the fold's 10 gold claim spans; the silver part is the fixed nested subset
-(25/50/75/100%). The 100 test claim spans are not read.
+(25/50/75/100%).
 """
 
 import argparse

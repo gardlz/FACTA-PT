@@ -1,4 +1,4 @@
-"""Computational cost per phase (Table 6.3), summed from the CodeCarbon fields of the records.
+"""Computational cost per phase, summed from the CodeCarbon fields of the records.
 
 Cross-validation: latest record per (task, model) in outputs/resultados.jsonl; final phase: every
 *_resultado.json in outputs/final. Unmeasured blocks are left out of the sums.

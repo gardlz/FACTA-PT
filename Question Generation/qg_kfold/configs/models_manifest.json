@@ -1,5 +1,5 @@
 {
-  "protocolo": "4-fold cross-validation on the 40 CLEVER training claim spans; the 100 test claim spans are not used during development; initial horizon 20 epochs; no early stopping; epoch selected by the mean H-BERT of the 4 folds.",
+  "protocolo": "4-fold cross-validation on the 40 CLEVER training claim spans; initial horizon 20 epochs; no early stopping; epoch selected by the mean H-BERT of the 4 folds.",
   "seed": 42,
   "modelos": [
     {

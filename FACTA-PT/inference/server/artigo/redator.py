@@ -1,4 +1,5 @@
-"""Writing the article with Gemma 4 E4B: the `full` condition of `Article Generation/geracao/`.
+"""Writing the article with Gemma 4 E4B or AMALIA-9B-0626-DPO, two of the models compared in
+`Article Generation/geracao/`: its `full` condition, the same prompt for both.
 
 Unlike that stage: transformers instead of vLLM, 8192 new tokens instead of 4096, a prompt cap,
 a brake on stuck attempts, a third attempt with half the passages, and completion from the plan.
@@ -53,7 +54,7 @@ TOKENS_MEDIANOS = 2818 + 668
 # Room is made on the GPU for an article this long from a prompt at the cap. A longer one runs
 # slower where the driver lends system memory, and can run out of GPU memory where it does not.
 ARTIGO_PREVISTO = 2048
-# Modules of the checkpoint idle for text: left out when the model goes to the GPU.
+# Modules of Gemma's checkpoint idle for text: left out when the model goes to the GPU.
 TORRES = ("vision_tower", "audio_tower", "embed_vision", "embed_audio")
 # The weights go to the GPU through a pinned buffer of this many bytes (see `_enviar`), read from
 # the checkpoint file in blocks aligned to BLOCO, as O_DIRECT requires.
@@ -244,10 +245,17 @@ class _NaRAM(torch.nn.Module):
 
 
 class ArticleWriter(gpu.ModeloMovel):
-    descricao = "o modelo de redação"
+    """One article writer: its name, its checkpoint (a local path or a Hugging Face id), the
+    revision that was evaluated, and the device asked for (auto, cuda or cpu)."""
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(self, settings: Settings, nome: str, caminho: str, revisao: str,
+                 dispositivo: str) -> None:
         self._settings = settings
+        self.nome = nome
+        self.descricao = f"o modelo de redação {nome}"
+        self._caminho = caminho
+        self._revisao_pedida = revisao
+        self._pedido = dispositivo
         self._model = None
         self._tokenizer = None
         self._compilador = None
@@ -312,17 +320,17 @@ class ArticleWriter(gpu.ModeloMovel):
 
     def _recusar(self, motivo: str) -> None:
         self.motivo = motivo
-        logger.error("modelo de redação não carregado: %s", motivo)
+        logger.error("modelo de redação %s não carregado: %s", self.nome, motivo)
 
     def _pasta(self) -> Path:
         """The checkpoint folder: a local path as given, or the pinned revision of a Hugging
         Face id, from the cache when it is there and downloaded (once) when it is not."""
-        caminho = self._settings.article_model_path
+        caminho = self._caminho
         if Path(caminho).is_dir():
             return Path(caminho)
         from huggingface_hub import snapshot_download
 
-        revisao = self._settings.article_model_revision or None
+        revisao = self._revisao_pedida or None
         try:
             return Path(snapshot_download(caminho, revision=revisao, local_files_only=True))
         except Exception:  # noqa: BLE001 - not in the cache yet, whatever the hub says
@@ -331,15 +339,17 @@ class ArticleWriter(gpu.ModeloMovel):
 
     def _colocar(self, modelo, pedido: str, pasta: Path) -> str | None:
         """The GPU when asked for, or on auto if it holds the weights and a median article with the
-        others moved out; else the CPU (None if a GPU asked for is too small). On the GPU the idle
-        towers are dropped and the per-layer embedding table (5.6 GB) stays in main memory."""
+        others moved out; else the CPU (None if a GPU asked for is too small). On the GPU Gemma's
+        idle towers are dropped and its per-layer embedding table (5.6 GB) stays in main memory;
+        AMALIA has neither and goes whole."""
         if pedido == "cpu" or not torch.cuda.is_available():
             return "cpu"
         interno = modelo.model
-        torres = [getattr(interno, nome) for nome in TORRES
-                  if getattr(interno, nome, None) is not None]
-        tabela = modelo.get_per_layer_input_embeddings()
-        ocupa = gpu.bytes_de(modelo) - gpu.bytes_de(tabela) - sum(map(gpu.bytes_de, torres))
+        torres = [nome for nome in TORRES if getattr(interno, nome, None) is not None]
+        tabela = (modelo.get_per_layer_input_embeddings()
+                  if hasattr(modelo, "get_per_layer_input_embeddings") else None)
+        ocupa = (gpu.bytes_de(modelo) - (gpu.bytes_de(tabela) if tabela is not None else 0)
+                 - sum(gpu.bytes_de(getattr(interno, nome)) for nome in torres))
         capacidade = gpu.capacidade()
         minimo = ocupa + _memoria_de_trabalho(TOKENS_MEDIANOS)
         if pedido == "cuda" and capacidade < ocupa:
@@ -350,9 +360,10 @@ class ArticleWriter(gpu.ModeloMovel):
             logger.info("o modelo de redação precisa de %s na GPU e esta só tem %s: fica no CPU",
                         gpu.gb(minimo), gpu.gb(capacidade))
             return "cpu"
-        for nome in TORRES:
+        for nome in torres:
             setattr(interno, nome, None)
-        modelo.set_per_layer_input_embeddings(_NaRAM(tabela))
+        if tabela is not None:
+            modelo.set_per_layer_input_embeddings(_NaRAM(tabela))
         self._na_ram = {nome: parametro.data for nome, parametro in modelo.named_parameters()}
         locais = _no_ficheiro(pasta, modelo)
         descritores = {ficheiro: _abrir(ficheiro) for ficheiro, _ in locais.values()}
@@ -363,13 +374,13 @@ class ArticleWriter(gpu.ModeloMovel):
         return "cuda"
 
     def load(self) -> None:
-        if not self._settings.article_model_path:
-            return self._recusar("ARTICLE_MODEL_PATH por definir")
-        pedido = (self._settings.article_device or "auto").lower()
+        if not self._caminho:
+            return self._recusar("o caminho do modelo está por definir")
+        pedido = (self._pedido or "auto").lower()
         if pedido not in ("auto", "cuda", "cpu"):
-            return self._recusar(f"ARTICLE_DEVICE desconhecido: {pedido!r} (auto, cuda ou cpu)")
+            return self._recusar(f"dispositivo desconhecido: {pedido!r} (auto, cuda ou cpu)")
         if pedido == "cuda" and not torch.cuda.is_available():
-            return self._recusar("ARTICLE_DEVICE=cuda, mas este contentor não tem CUDA")
+            return self._recusar("pediu-se a GPU, mas este contentor não tem CUDA")
         pasta = self._pasta()
         tamanho = _tamanho_dos_pesos(pasta)
         if not tamanho:
@@ -379,16 +390,17 @@ class ArticleWriter(gpu.ModeloMovel):
         from transformers import AutoModelForCausalLM, AutoTokenizer, GenerationConfig
 
         tokenizer = AutoTokenizer.from_pretrained(pasta)
-        # The whole model, as in the evaluated run (the towers are idle for text), mapped from the
-        # checkpoint into main memory; `_colocar` decides where it runs.
+        # The whole model, as in the evaluated run (Gemma's towers are idle for text), mapped from
+        # the checkpoint into main memory; `_colocar` decides where it runs.
         modelo = AutoModelForCausalLM.from_pretrained(pasta, dtype=DTYPE, device_map="cpu").eval()
         dispositivo = self._colocar(modelo, pedido, pasta)
         if dispositivo is None:
             return
         if dispositivo == "cpu":
             # On the CPU the whole checkpoint is read, and the margin also covers the attention
-            # cache (about 16 kB per token) and the sliding-window mask, which grows with the
-            # square of the prompt (0.8 GB at 16k tokens).
+            # cache (about 16 kB per token in Gemma's checkpoint) and the attention mask, which
+            # grows with the square of the prompt (Gemma's sliding-window mask: 0.8 GB at 16k
+            # tokens).
             livre = memoria_disponivel()
             if livre is not None and livre < tamanho * MARGEM_RAM:
                 return self._recusar(
@@ -407,8 +419,8 @@ class ArticleWriter(gpu.ModeloMovel):
         self._model = modelo
         self._dispositivo = dispositivo
         self.motivo = ""
-        logger.info("modelo de redação carregado: %s em %s (%.1f GB, contexto %d, paragem %s)",
-                    pasta, dispositivo, tamanho / 1e9, self._contexto, self._paragem)
+        logger.info("modelo de redação %s carregado: %s em %s (%.1f GB, contexto %d, paragem %s)",
+                    self.nome, pasta, dispositivo, tamanho / 1e9, self._contexto, self._paragem)
 
     def _gerar(self, ids: torch.Tensor, gramatica, penalizacao: float,
                cancelado: threading.Event, prazo: float | None = None) -> dict:
@@ -459,13 +471,8 @@ class ArticleWriter(gpu.ModeloMovel):
     def _versao(self, claim: str, claim_date: str, janela: str, passagens: list[dict]) -> dict:
         """The plan of a set of passages, and the prompt the model reads for it."""
         plano = pv.construir(claim, claim_date, janela, passagens)
-        mensagem = render.mensagem(plano)
-        prompt = self._tokenizer.apply_chat_template(
-            pb.mensagens(mensagem), tokenize=False, add_generation_prompt=True
-        )
-        # The template already writes the BOS: adding special tokens would put a second one.
-        ids = self._tokenizer(prompt, add_special_tokens=False, return_tensors="pt")["input_ids"]
-        return {"plano": plano, "ids": ids}
+        ids = pb.prompt_final(self._tokenizer, render.mensagem(plano))
+        return {"plano": plano, "ids": torch.tensor([ids])}
 
     def _tentar(self, versao: dict, penalizacao: float, cancelado: threading.Event,
                 prazo: float | None) -> dict:
@@ -500,7 +507,7 @@ class ArticleWriter(gpu.ModeloMovel):
         deadline. An unclean attempt is retried with the heavier penalty; if neither finishes, a
         third reads half the passages, and failing that the fullest attempt is completed."""
         if not self.loaded:
-            raise ArticleError("modelo de redação não carregado")
+            raise ArticleError(f"modelo de redação {self.nome} não carregado")
         cancelado = cancelado or threading.Event()
         if cancelado.is_set():
             raise ArticleCancelled("o pedido foi abandonado antes de o artigo começar")

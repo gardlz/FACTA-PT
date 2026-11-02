@@ -7,9 +7,9 @@
 This repository contains the code and software developed for the Master's dissertation, submitted at the Universidade da Beira Interior in 2026 for the Master's degree in
 Engenharia Informática.
 
-The dissertation investigates how a question-driven approach can support fact-checking in a
+This work investigates how a question-driven approach can support fact-checking in a
 European Portuguese journalistic setting. The main research tasks are studied and evaluated
-separately, and the selected components are subsequently integrated into FACTA-PT, an
+separately, and the selected components are subsequently integrated into FACT-PT, an
 interactive end-to-end prototype. The objective is to support professional fact-checkers in
 retrieving, analysing, organising and inspecting external evidence rather than to replace human
 editorial judgement.
@@ -30,12 +30,12 @@ editorial judgement.
 The experimental code is organised by stage. Each included stage has its own README and
 `requirements.txt`.
 
-| Stage | Folder | Dissertation | Research question(s) |
-|---|---|---|---|
-| Verification question generation, including silver-standard supervision from ClaimPT | [`Question Generation/`](Question%20Generation/) | Section 3.3, Chapter 4, Appendices A.3 and A.5 | RQ1, RQ2 |
-| Evidence retrieval | [`Evidence Retrieval/`](Evidence%20Retrieval/) | Chapter 5 | RQ3 |
-| Document relevance and Claim-Evidence Entailment | [`Document Relevance and Claim-Evidence Entailment/`](Document%20Relevance%20and%20Claim-Evidence%20Entailment/) | Chapter 6 | RQ4 |
-| Structured fact-checking article generation | [`Article Generation/`](Article%20Generation/) | Chapter 7, Appendix A.6 | RQ5 |
+| Stage | Folder |
+|---|---|
+| Verification question generation, including silver-standard supervision from ClaimPT | [`Question Generation/`](Question%20Generation/) |
+| Evidence retrieval | [`Evidence Retrieval/`](Evidence%20Retrieval/) |
+| Document relevance and Claim-Evidence Entailment | [`Document Relevance and Claim-Evidence Entailment/`](Document%20Relevance%20and%20Claim-Evidence%20Entailment/) |
+| Structured fact-checking article generation | [`Article Generation/`](Article%20Generation/) |
 
 ## How the stages connect
 
@@ -69,20 +69,20 @@ The experimental code is organised by stage. Each included stage has its own REA
 The article-generation experiments use the manually annotated CLEVER evidence in a controlled
 setting so that the Writer can be evaluated independently of errors introduced by the preceding
 retrieval and classification stages. For previously unseen information, these inputs are produced
-automatically by the preceding components in the FACTA-PT prototype.
+automatically by the preceding components in the FACT-PT prototype.
 
-## FACTA-PT prototype
+## FACT-PT prototype
 
-The components selected in the experimental chapters are integrated into
-[FACTA-PT](https://factapt.inesctec.pt), the interactive end-to-end prototype described in
-Chapter 8 of the dissertation.
+The components selected in the experiments are integrated into
+[FACT-PT](https://factapt.inesctec.pt), the interactive end-to-end prototype.
 
-For a new verification, FACTA-PT receives a claim span, its publication date and its context.
+For a new verification, FACT-PT receives a claim span, its publication date and its context.
 The system then:
 
 1. uses the fine-tuned **AMALIA-9B-0626-DPO** model to generate verification questions;
 2. submits each question independently to the LUSA retrieval infrastructure, considering only
-   news published before the claim date;
+   news published before the claim date and keeping five, ten or fifteen distinct news items per
+   question, as chosen on the page;
 3. uses the fine-tuned **BERTimbau-base** model to classify retrieved claim span-document pairs
    as Relevant or Irrelevant;
 4. constructs overlapping three-sentence passages from documents predicted as Relevant and uses
@@ -90,8 +90,8 @@ The system then:
    NEI;
 5. consolidates the resulting passage-level predictions and prepares the evidence for article
    generation;
-6. uses **Gemma 4 E4B IT** to generate a structured fact-checking article from the prepared
-   evidence and the predetermined conclusion.
+6. uses **Gemma 4 E4B IT** or **AMALIA-9B-0626-DPO**, as chosen on the page, to generate a
+   structured fact-checking article from the prepared evidence and the predetermined conclusion.
 
 The interface exposes selected intermediate verification information, including the generated
 questions, the temporal distribution of the retrieved evidence and a summary of the resulting
@@ -105,7 +105,7 @@ The code of the prototype, with the instructions to run it, is in [`FACTA-PT/`](
 
 **No datasets or third-party news content are included in this repository.**
 
-The dissertation relies on three main resources:
+This work relies on three main resources:
 
 - **CLEVER** provides the claim spans, manually formulated verification questions and
   fact-checking annotations used throughout the work. It is available from its maintainers at
@@ -118,7 +118,7 @@ The dissertation relies on three main resources:
 - **LUSA News Corpus** is the external journalistic collection used for evidence retrieval. It is
   accessed through its associated restricted search API and is not redistributed here.
 
-As part of the dissertation, CLEVER was extended with external evidence annotations covering
+As part of this work, CLEVER was extended with external evidence annotations covering
 1,269 distinct claim span-document pairs and 527 manually identified evidence excerpts. These
 annotations provide reference evidence for retrieval evaluation, supervision for document
 relevance and Claim-Evidence Entailment, and evidence for the controlled article-generation
@@ -135,7 +135,7 @@ CLEVER/
 ├── clever.json                          the 228 articles, with the claim spans, gold questions and
 │                                        verification, and the LUSA news items retrieved for each claim
 │                                        span, annotated for relevance, relation and evidence excerpts
-├── clever_train.json                    training partition of the document relevance and
+├── clever_train.json                    training and test partitions of the document relevance and
 ├── clever_test.json                     Claim-Evidence Entailment experiments
 ├── clean_files/<document>.txt           the article texts
 └── README.md                            the fields and identifiers of CLEVER
@@ -161,23 +161,9 @@ are available in the Hugging Face collection:
 - **Claim-Evidence Entailment:**  
   [liaad/facta-pt-cee-xlm-roberta-large-xnli](https://huggingface.co/liaad/facta-pt-cee-xlm-roberta-large-xnli)
 
-Gemma 4 E4B IT is used as the Writer in FACTA-PT but is not a model fine-tuned or released as
-part of this repository.
+The Writers of FACT-PT, Gemma 4 E4B IT (the default) and AMALIA-9B-0626-DPO without the
+question-generation adapter, are not models fine-tuned or released as part of this repository.
 
-
-## Citation
-
-If you use this work, please cite the dissertation:
-
-```bibtex
-@mastersthesis{lazaro2026questiongeneration,
-  author = {Gabriel Rodrigues Lázaro},
-  title  = {Automatic Question Generation for Supporting Claim Annotation with Evidence in European Portuguese News Articles},
-  school = {Universidade da Beira Interior},
-  type   = {Master's dissertation},
-  year   = {2026}
-}
-```
 
 ## [Copyright and Terms of Use of this Academic Work by Third Parties](docs/Copyright-Notice.pdf)
 

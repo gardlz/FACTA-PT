@@ -5,7 +5,7 @@ This document provides the longer command sequences supporting the [Question Gen
 ## Environment and model access
 
 - Install the dependencies as indicated in the [stage README](../README.md#installation).
-- The experiments of the dissertation ran on the Deucalion supercomputer with NVIDIA A100-SXM4 80 GB GPUs, using Python 3.11.5, PyTorch 2.10.0 with CUDA 12.8, Transformers 5.6.2, PEFT 0.19.1, Accelerate 1.13.0 and bitsandbytes 0.49.2 (Section 4.3.2). Each training job used four GPUs, with one training process assigned to each GPU.
+- The reported experiments ran on the Deucalion supercomputer with NVIDIA A100-SXM4 80 GB GPUs, using Python 3.11.5, PyTorch 2.10.0 with CUDA 12.8, Transformers 5.6.2, PEFT 0.19.1, Accelerate 1.13.0 and bitsandbytes 0.49.2. Each training job used four GPUs, with one training process assigned to each GPU.
 - Run each GPU-bound process on one GPU, selected with `CUDA_VISIBLE_DEVICES` (e.g. `CUDA_VISIBLE_DEVICES=0`): CodeCarbon then measures each run on its own GPU, and process hours are GPU-hours.
 - The model commands use `--offline`, so obtain the model files and accept the required licences beforehand.
 - `GEMINI_API_KEY` or `GOOGLE_API_KEY` must be set in a `.env` file in `Question Generation/` for silver-question generation. Do not commit it.
@@ -16,7 +16,7 @@ The model configurations are in `configs/models_encdec.yaml`, `configs/models_de
 
 ### Optional: regenerate silver questions
 
-The dissertation's **fixed** silver supervision is already stored in the ClaimPT JSON files. The following calls generate **new** files; outputs can differ even when the same generation settings are used.
+The **fixed** silver supervision used in the experiments is already stored in the ClaimPT JSON files. The following calls generate **new** files; outputs can differ even when the same generation settings are used.
 
 ```bash
 python silver_generation/generate_questions.py \
@@ -28,29 +28,29 @@ python silver_generation/generate_questions.py \
     --output silver_generation/outputs/claimpt_test_silver_questions.jsonl
 ```
 
-The script uses the settings of Section 3.3.2: gemini-3.5-flash with temperature 0.0 (its defaults), output constrained to the JSON format `{"questions": [...]}`, and one request per ClaimPT claim span. The prompt is reproduced in Appendix A.3. Each output line holds one claim span (`id`, `document`, `publication_time`, `claim_time`, `claim_span`, `span_begin`, `span_end`, `claimers`, `claim_objects`) and its `questions`. Claim spans that still fail after the retries are written to `<output>_failed.jsonl`; running the same command again skips the claim spans already in the output and retries the others. These commands write output files without modifying the input datasets.
+The script uses gemini-3.5-flash with temperature 0.0 (its defaults), output constrained to the JSON format `{"questions": [...]}`, and one request per ClaimPT claim span. The prompt, in European Portuguese, is defined in `generate_questions.py`: the question-formulation criteria, six CLEVER claim spans with their reference questions as demonstrations, and the claim span with its article, publication date, claim time, claimers and claim objects. Each output line holds one claim span (`id`, `document`, `publication_time`, `claim_time`, `claim_span`, `span_begin`, `span_end`, `claimers`, `claim_objects`) and its `questions`. Claim spans that still fail after the retries are written to `<output>_failed.jsonl`; running the same command again skips the claim spans already in the output and retries the others. These commands write output files without modifying the input datasets.
 
 ### Manual evaluation
 
-For the **fixed sample of 50 claim spans (104 questions; seed 42)**, the manual-evaluation interface and the script that prints Tables 3.8 and 3.9 are:
+For the **fixed sample of 50 claim spans (104 questions; seed 42)**, the first command opens the manual-evaluation interface and the second prints the compliance rates:
 
 ```bash
 streamlit run silver_generation/app.py
 python silver_generation/tabelas_avaliacao.py
 ```
 
-The interface reads and writes the evaluation files `ratings.json` and `ratings_clever.json` in `silver_generation/avaliacao/`, which holds the evaluation reported in the dissertation. Its evaluation form covers the two evaluation dimensions of Section 3.3.2: general question quality ([`CRITERIOS.md`](../silver_generation/CRITERIOS.md)) and adherence to the CLEVER question-formulation guidelines ([`CRITERIOS_CLEVER.md`](../silver_generation/CRITERIOS_CLEVER.md); the guidelines are in Appendix A.1). `tabelas_avaliacao.py` reads the same files and prints the compliance rates of [Tables 3.8 and 3.9](#results).
+The interface reads and writes the evaluation files `ratings.json` and `ratings_clever.json` in `silver_generation/avaliacao/`, which hold the evaluation reported in the [results](#silver-questions-for-claimpt). Its evaluation form covers two dimensions, each with four criteria: general question quality ([`CRITERIOS.md`](../silver_generation/CRITERIOS.md)) and adherence to the CLEVER question-formulation guidelines, which the CLEVER annotators followed to write the reference questions ([`CRITERIOS_CLEVER.md`](../silver_generation/CRITERIOS_CLEVER.md)); both rubrics are in European Portuguese. `tabelas_avaliacao.py` reads the same files and prints the compliance rates of the [general-quality](#general-question-quality) and [guideline-adherence](#adherence-to-the-clever-question-formulation-guidelines) tables.
 
 ## 2. Fixed CLEVER split and data preparation
 
-The question-generation split differs from the benchmark split used for the document-relevance and entailment experiments. It holds out **100 of 140 claim spans** and reserves **40 claim spans** for training/development, grouped by source document (Section 4.2.1).
+The question-generation split differs from the benchmark split used for the document-relevance and entailment experiments. It holds out **100 of 140 claim spans** and reserves **40 claim spans** for training/development, grouped by source document: all claim spans of an article fall on the same side.
 
 ```bash
 python split_por_documento.py   # optional: draws the split again
 python src/prepare_data.py
 ```
 
-The split is stored in `split/clever_split_ids_seed0.json`, which `prepare_data.py` reads. `split_por_documento.py` is the procedure that draws it; with the published CLEVER it rewrites that file unchanged (`--output` writes it elsewhere). `prepare_data.py` writes the CLEVER examples to `data/clever/` (`clever_train_40.jsonl`, `clever_test_100.jsonl`, `clever_all.jsonl`) and the nested silver subsets to `data/processed/` (`claimpt_silver_{25,50,75,100}.jsonl`), and prints the counts of Tables 3.7 and 4.8.
+The split is stored in `split/clever_split_ids_seed0.json`, which `prepare_data.py` reads. `split_por_documento.py` is the procedure that draws it; with the published CLEVER it rewrites that file unchanged (`--output` writes it elsewhere). `prepare_data.py` writes the CLEVER examples to `data/clever/` (`clever_train_40.jsonl`, `clever_test_100.jsonl`, `clever_all.jsonl`) and the nested silver subsets to `data/processed/` (`claimpt_silver_{25,50,75,100}.jsonl`), and prints their claim span and question counts: the [synthetic question statistics](#general-statistics-of-the-synthetic-questions) and the sizes of the supervision configurations of step 4.
 
 ## 3. Zero-shot and 3-shot inference (14 models)
 
@@ -74,7 +74,7 @@ python src/metrics.py \
   --metrics_dir outputs/metrics
 ```
 
-Every model receives the complete prompt of Appendix A.5; in the 3-shot regime, the three fixed demonstrations are CLEVER training claim spans with one, two and three reference questions. A prompt that does not fit a model's input window stops that model with an error, and `run_inference.py` moves on to the next model. Predictions are written to `outputs/predictions/` and the energy measurements to `outputs/carbon/`. The summary `outputs/metrics/summary_metrics.csv` holds the values of [Tables 4.4 and 4.5](#results). These commands generate the full prompting evaluation and can require substantial compute and local model storage.
+Every model receives the same prompt, defined in `src/prompts.py`: a task instruction in European Portuguese, the claim span, its publication date and its ±1-sentence context (the sentence before the claim span, its own sentence and the sentence after). In the 3-shot regime, the three fixed demonstrations are CLEVER training claim spans with one, two and three reference questions. A prompt that does not fit a model's input window stops that model with an error, and `run_inference.py` moves on to the next model. Predictions are written to `outputs/predictions/` and the energy measurements to `outputs/carbon/`. The summary `outputs/metrics/summary_metrics.csv` holds the values of the [zero-shot](#zero-shot-results) and [3-shot](#3-shot-results) tables. These commands generate the full prompting evaluation and can require substantial compute and local model storage.
 
 ## 4. Prepare four-fold cross-validation
 
@@ -98,7 +98,7 @@ The six configurations and their command-line identifiers are:
 
 ## 5. Train one cross-validation fold
 
-The following is a **command template**, not a directly runnable command. Replace every angle-bracket placeholder with the value specified by `qg_kfold/configs/models_manifest.json` or by the training protocol. In particular, `<script>`, `<yaml>`, `<family>` and `<batch>` correspond to `script`, `config_yaml`, `familia_adaptacao` and `physical_batch_size` in the manifest.
+The following is a **command template**, not a directly runnable command. `<script>`, `<yaml>`, `<family>` and `<batch>` are the `script`, `config_yaml`, `familia_adaptacao` and `physical_batch_size` of the model `<model>` (its `short_name`) in `qg_kfold/configs/models_manifest.json`; `<configuration>` is one of the identifiers above and `<k>` the fold (1 to 4); step 6 gives `<lr>`, `<H>`, `<run>` and `<results>`.
 
 ```bash
 python qg_kfold/scripts/<script> --config configs/<yaml> --only <model> \
@@ -122,7 +122,7 @@ python qg_kfold/scripts/select_learning_rates.py
 python qg_kfold/scripts/promote_selected_lr_results.py
 ```
 
-`select_learning_rates.py` keeps, for each family, the candidate with the highest mean cross-validated H-BERT over its models, and writes `qg_kfold/runs/v3/selected_learning_rates.json`: 3 × 10⁻⁵ for full fine-tuning and 1 × 10⁻⁴ for LoRA and QLoRA (Table 4.6). `promote_selected_lr_results.py` copies the cross-validation results of these models at the selected rates into `qg_kfold/runs/v3/results/`, so their `human40_silver100` runs are not repeated in the next step.
+`select_learning_rates.py` keeps, for each family, the candidate with the highest mean cross-validated H-BERT over its models, and writes `qg_kfold/runs/v3/selected_learning_rates.json`: 3 × 10⁻⁵ for full fine-tuning and 1 × 10⁻⁴ for LoRA and QLoRA. `promote_selected_lr_results.py` copies the cross-validation results of these models at the selected rates into `qg_kfold/runs/v3/results/`, so their `human40_silver100` runs are not repeated in the next step.
 
 **Epoch selection.** With the selected rate for each family, run each model and supervision configuration on all four folds with an initial horizon of 20 epochs, with `<run>` = `qg_kfold/runs/v3` and `<results>` = `qg_kfold/runs/v3/results` (the trainers' defaults).
 
@@ -137,7 +137,7 @@ If the scripts report pending extensions, repeat the affected runs **from scratc
 - `qg_kfold/runs/v3/lr_ablation/extensions_pending.csv` (learning-rate selection; all candidate rates of the listed model are rerun)
 - `qg_kfold/runs/v3/reports/extensoes_pendentes.csv` (epoch selection)
 
-A restart is necessary because the linear learning-rate schedule is defined over the complete training horizon: changing the horizon changes the learning-rate trajectory from the beginning of training (Figure 4.3).
+A restart is necessary because the linear learning-rate schedule is defined over the complete training horizon: changing the horizon changes the learning-rate trajectory from the beginning of training.
 
 ## 7. Final training and evaluation
 
@@ -162,7 +162,7 @@ python src/metrics.py \
     --metrics_dir qg_kfold/runs/v3/results/final/metrics
 ```
 
-The summary holds the values of [Tables 4.9 and 4.10](#results); the Mean row of Table 4.9 is the unweighted mean of the 14 models.
+The summary holds the values of the [supervision-configuration](#h-bert-under-the-six-supervision-configurations) and [Gold91+Silver1073](#models-fine-tuned-on-gold91silver1073) tables; the Mean row of the first is the unweighted mean of the 14 models.
 
 ## 8. Energy measurements and figures
 
@@ -170,30 +170,42 @@ The summary holds the values of [Tables 4.9 and 4.10](#results); the Mean row of
 python src/resumo_carbono.py --pastas outputs/carbon qg_kfold/runs/v3/carbon
 ```
 
-Each run writes its CodeCarbon measurement to `<carbon_dir>/<name>.json`. `resumo_carbono.py` adds them up per regime, prints the runs, hours, kWh and kg CO₂eq of each regime and writes them to `outputs/metrics/carbono_por_regime.csv`. With these two folders, which are also its defaults, it gives the runs, GPU-hours, kWh and kg CO₂eq of the computational-cost summary in **Table 4.7**.
+Each run writes its CodeCarbon measurement to `<carbon_dir>/<name>.json`. `resumo_carbono.py` adds them up per regime, prints the runs, hours, kWh and kg CO₂eq of each regime and writes them to `outputs/metrics/carbono_por_regime.csv`. With these two folders, which are also its defaults, it gives the runs, GPU-hours, kWh and kg CO₂eq of the [computational-cost table](#computational-cost-and-estimated-carbon-emissions).
 
-The figure scripts produce **Figures 4.1–4.3**, as PDF and PNG files in `figuras/`. Figure 4.1, with the named entities, additionally requires:
+The three figure scripts write PDF files, each with a PNG copy, to `figuras/`. The context figure marks the named entities with spaCy, whose Portuguese model is downloaded once:
 
 ```bash
 python -m spacy download pt_core_news_lg
 ```
 
-Figure 4.1 shows the context of the claim span used as the example in Sections 4.1 and 4.2.3, whose text the first command reads from the prepared CLEVER data; Figures 4.2 and 4.3 read the cross-validation results in `qg_kfold/runs/v3/results/`:
+`fig_contexto.py` draws a claim span inside its article and highlights the ±1-sentence context given to the models (`figuras/contexto.pdf`); `--id` selects the claim span in the prepared CLEVER data, here `clever_016_c7` ("falou-se até de retirar poderes à direção executiva"), and `--ner` underlines the named entities. `fig_hbert_epocas.py` draws the validation H-BERT per epoch of four models under Gold91+Silver1073, with the selected epoch (`figuras/hbert_epocas.pdf`), and `fig_learning_rate.py` the linear learning-rate schedule for horizons of 20, 30 and 40 epochs (`figuras/learning_rate.pdf`); both read the cross-validation results in `qg_kfold/runs/v3/results/`:
 
 ```bash
-CLAIM=$(python -c "import json; print(next(e['claim_span'] for e in map(json.loads, open('data/clever/clever_train_40.jsonl', encoding='utf-8')) if e['id'] == 'clever_016_c7'))")
-python figuras/fig_contexto.py --claim "$CLAIM" --ner
+python figuras/fig_contexto.py --id clever_016_c7 --ner
 python figuras/fig_hbert_epocas.py
 python figuras/fig_learning_rate.py
 ```
 
 ## Results
 
-The tables below are copied from the dissertation, with its bold marks.
+Bold marks the best value among the 14 models of each metric marked ↑ or ↓ in the per-model tables, the best configuration of each row in the H-BERT table of the six supervision configurations, and the totals in the cost table.
 
-### Silver questions for ClaimPT (Section 3.3.2)
+### Silver questions for ClaimPT
 
-Table 3.8: Manual evaluation of the general quality of 104 synthetic questions associated with 50 claim spans from ClaimPT.
+#### General statistics of the synthetic questions
+
+| Property | Value |
+|---|---:|
+| Claim spans | 522 |
+| Synthetic questions | 1073 |
+| Average questions per claim span | 2.06 |
+| Claim spans with 1 question | 0 |
+| Claim spans with 2 questions | 493 |
+| Claim spans with 3 questions | 29 |
+
+#### General question quality
+
+Manual evaluation of 104 synthetic questions associated with 50 ClaimPT claim spans.
 
 | Criterion | Compliance | Rate |
 |---|:---:|:---:|
@@ -202,7 +214,9 @@ Table 3.8: Manual evaluation of the general quality of 104 synthetic questions a
 | Clarity and searchability | 100/104 | 96.2% |
 | Temporal and local anchor | 103/104 | 99.0% |
 
-Table 3.9: Manual evaluation of adherence to the CLEVER question-formulation guidelines in the sample of 50 claim spans from ClaimPT.
+#### Adherence to the CLEVER question-formulation guidelines
+
+Manual evaluation of the same 50 claim spans. Each criterion is counted in its own unit; special-case compliance counts only the 30 claim spans to which a special case applies.
 
 | Criterion | Compliance | Rate | Unit |
 |---|:---:|:---:|:---:|
@@ -211,9 +225,25 @@ Table 3.9: Manual evaluation of adherence to the CLEVER question-formulation gui
 | Neutrality and factual focus | 103/104 | 99.0% | Question |
 | Special-case compliance | 26/30 | 86.7% | Claim span |
 
-### Question generation on CLEVER (Chapter 4)
+### Question generation on CLEVER
 
-Table 4.4: Zero-shot results on the CLEVER test set. Reported values are macro-averaged over claim spans. Enc.-Dec. denotes encoder-decoder and Dec.-only denotes decoder-only.
+The metrics compare the questions generated for each claim span with its reference questions and are macro-averaged over the 100 test claim spans. H-BERT, H-ROUGE-L and H-METEOR match the generated and reference questions one-to-one by BERTScore F1, ROUGE-L or METEOR, and divide the total similarity by the larger number of questions; Cov-BERT is the mean, over the reference questions, of the best BERTScore F1 of a generated question; CountErr is the absolute difference between the numbers of generated and reference questions; Q/Ex. is the number of generated questions per claim span (2.16 for the reference questions). Enc.-Dec. denotes encoder-decoder and Dec.-only denotes decoder-only.
+
+#### Named-entity anchoring across context sizes
+
+Share of the named entities of the reference questions (spaCy `pt_core_news_lg`: PER, ORG, LOC and MISC) that also appear in the context, and median context length. The models receive the ±1-sentence context.
+
+| Context | Entity anchoring | Median length |
+|---|---:|---:|
+| Claim sentence only | 63.5% | 173 chars |
+| ±1 sentence | 74.2% | 526 chars |
+| ±2 sentences | 77.4% | 863 chars |
+| ±3 sentences | 78.8% | 1,135 chars |
+| Full article | 82.9% | 2,995 chars |
+
+#### Zero-shot results
+
+Results on the CLEVER test set.
 
 | Model | Architecture | Language | H-BERT ↑ | Cov-BERT ↑ | H-ROUGE-L ↑ | H-METEOR ↑ | CountErr ↓ | Q/Ex. (Ref.=2.16) |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -232,7 +262,9 @@ Table 4.4: Zero-shot results on the CLEVER test set. Reported values are macro-a
 | AMALIA-9B-0626-DPO | Dec.-only | PT-PT | 70.25 | 89.72 | 22.20 | 27.36 | 0.72 | 2.50 |
 | GlórIA-1.3B | Dec.-only | PT-PT | 44.13 | 76.60 | 7.68 | 9.17 | 1.48 | 2.16 |
 
-Table 4.5: Few-shot results on the CLEVER test set in the 3-shot setting. Reported values are macro-averaged over claim spans. Enc.-Dec. denotes encoder-decoder and Dec.-only denotes decoder-only.
+#### 3-shot results
+
+Results on the CLEVER test set, with three fixed demonstrations in the prompt.
 
 | Model | Architecture | Language | H-BERT ↑ | Cov-BERT ↑ | H-ROUGE-L ↑ | H-METEOR ↑ | CountErr ↓ | Q/Ex. (Ref.=2.16) |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -251,7 +283,21 @@ Table 4.5: Few-shot results on the CLEVER test set in the 3-shot setting. Report
 | AMALIA-9B-0626-DPO | Dec.-only | PT-PT | 72.13 | 90.73 | 28.00 | 32.55 | 0.54 | 1.80 |
 | GlórIA-1.3B | Dec.-only | PT-PT | 40.28 | 77.05 | 3.32 | 2.02 | 1.99 | 3.09 |
 
-Table 4.9: H-BERT on the CLEVER test set under the six supervision configurations.
+#### Computational cost and estimated carbon emissions
+
+All runs of the 14 models; FT denotes fine-tuning.
+
+| Experiment | Runs | GPU-h | % GPU-h | kWh | kg CO₂eq |
+|---|---:|---:|---:|---:|---:|
+| FT 4-fold CV | 316 | 232.41 | 88.50 | 97.998 | 16.224 |
+| FT final training | 84 | 26.16 | 9.96 | 10.383 | 1.719 |
+| Zero-shot | 14 | 2.03 | 0.77 | 0.582 | 0.096 |
+| Few-shot | 14 | 2.00 | 0.76 | 0.588 | 0.097 |
+| **Total** | **428** | **262.60** | **100.00** | **109.551** | **18.136** |
+
+#### H-BERT under the six supervision configurations
+
+H-BERT on the CLEVER test set; the Mean row is the unweighted mean of the 14 models.
 
 | Model | Gold91 | Gold91+Silver266 | Gold91+Silver535 | Gold91+Silver802 | Gold91+Silver1073 | Silver1073 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -271,7 +317,9 @@ Table 4.9: H-BERT on the CLEVER test set under the six supervision configuration
 | GlórIA-1.3B | 59.61 | 71.64 | 72.02 | 72.16 | 74.12 | **74.36** |
 | **Mean** | 65.00 | 71.15 | 71.80 | 72.22 | 72.90 | **73.77** |
 
-Table 4.10: Comparison of the models in the main training configuration, Gold91+Silver1073, on the CLEVER test set. Reported values are macro-averaged over claim spans. Enc.-Dec. denotes encoder-decoder and Dec.-only denotes decoder-only.
+#### Models fine-tuned on Gold91+Silver1073
+
+Comparison of the models in the main training configuration, Gold91+Silver1073, on the CLEVER test set.
 
 | Model | Architecture | Language | H-BERT ↑ | Cov-BERT ↑ | H-ROUGE-L ↑ | H-METEOR ↑ | CountErr ↓ | Q/Ex. (Ref.=2.16) |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -289,7 +337,3 @@ Table 4.10: Comparison of the models in the main training configuration, Gold91+
 | Gervásio-8B PT-PT | Dec.-only | PT-PT | 75.78 | 91.29 | **31.09** | **36.14** | 0.47 | 2.05 |
 | AMALIA-9B-0626-DPO | Dec.-only | PT-PT | **76.31** | 91.22 | 31.06 | 35.47 | **0.44** | 2.02 |
 | GlórIA-1.3B | Dec.-only | PT-PT | 74.12 | 90.29 | 25.71 | 28.34 | 0.49 | 2.05 |
-
-## Dissertation sections
-
-For the complete methodological description, definitions and detailed results, consult **Section 3.3, Chapter 4 and Appendices A.1, A.3 and A.5** of the dissertation. This technical guide complements rather than replaces that record. For the citation, see the [repository README](../../README.md#citation).

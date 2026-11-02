@@ -28,6 +28,11 @@ export function dataCurta(iso) {
   return data.toLocaleDateString(codigo(), { day: "2-digit", month: "short", year: "numeric" });
 }
 
+/** A percentage (0-100) as the interface's language writes it, in whole numbers. */
+export function percentagem(valor) {
+  return new Intl.NumberFormat(codigo(), { style: "percent", maximumFractionDigits: 0 }).format(valor / 100);
+}
+
 export function dataLonga(iso) {
   const data = comoData(iso);
   if (!data) return iso ? String(iso).slice(0, 10) : "";

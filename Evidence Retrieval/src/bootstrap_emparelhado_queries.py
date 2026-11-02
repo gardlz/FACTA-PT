@@ -32,7 +32,8 @@ def por_span(dados, gold, chave, relacoes):
     """{(condition, configuration): {"rel": (hits, targets), "dec": (hits, targets), "dcsc": covered}}.
 
     Spans keep the order of `gold` for every condition, which makes the resampling paired.
-    DCSC per span follows Eq. 5.7.
+    For DCSC, a span is covered when a decisive reference document with its reference status
+    is retrieved.
     """
     saida = {}
     for leitura, _ in cq.CONFIGURACOES:

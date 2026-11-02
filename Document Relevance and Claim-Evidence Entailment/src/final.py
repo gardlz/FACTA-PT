@@ -1,7 +1,8 @@
 """Final training of one model on the whole training split, then one pass over the test split.
 
 Epochs = median of the model's 15 selected epochs, tau = their mode (ties -> lower tau); fresh
-fine-tuning without development set or early stopping. Writes to outputs/final/.
+fine-tuning without development set or early stopping. Writes the result and the per-example test
+predictions to outputs/final/.
 """
 
 import argparse
@@ -159,6 +160,7 @@ def main():
         logits = torch.cat(saida)
         ajust = motor.ajustar_logits(logits, priors, sel["tau_final"])
         previsto = [classes[i] for i in ajust.argmax(-1)]
+        probs = torch.softmax(ajust, dim=-1).tolist()
 
     verdade = [fo.rotulo(x, tarefa) for x in teste]
     spans = [x["span_id"] for x in teste]
@@ -170,6 +172,17 @@ def main():
         ap = sum(1 for i in alvo if previsto[i] == "relevante")
         r["revocacao_por_rotulo_original"] = {"decisivo": {
             "n": len(alvo), "revocacao": round(ap / len(alvo), 4) if alvo else None}}
+
+    # one line per test example, so that the metrics and their intervals can be recomputed
+    with (SAIDA / f"{marca}_previsoes.jsonl").open("w", encoding="utf-8") as fh:
+        for x, v_, pv, pr, lg in zip(teste, verdade, previsto, probs, logits.tolist()):
+            fh.write(json.dumps({
+                "id": x["id"], "par_id": x["par_id"], "span_id": x["span_id"],
+                "lusa_doc_id": x["lusa_doc_id"], "tarefa": tarefa, "verdade": v_, "previsto": pv,
+                "rotulo4": x["rotulo4"],
+                "probs": {c: round(p, 5) for c, p in zip(classes, pr)},
+                "logits": {c: round(p, 5) for c, p in zip(classes, lg)}},
+                ensure_ascii=False) + "\n")
 
     # The checkpoint is saved after the inference, so it is exactly the model behind the result.
     # Its config gets our id2label, not the source checkpoint's (whose class order may differ).
@@ -187,8 +200,9 @@ def main():
             "entrada": {
                 "premissa": ("documento da LUSA: título + '. ' + corpo, cortado a 380 palavras"
                              if tarefa == "relevance" else
-                             "uma janela de TRÊS FRASES do documento, literal e seguida, "
-                             "sem o título da notícia — ver folds.exemplos_entailment"),
+                             "uma janela de TRÊS FRASES seguidas do documento (frases do "
+                             "NLTK, Punkt de português, unidas por um espaço), sem o título da "
+                             "notícia — ver folds.exemplos_entailment"),
                 "hipotese": "o claim span, com espaços e pontos das pontas retirados",
                 "ordem": "tokenizador(premissa, hipotese) — nesta ordem",
                 "max_len": gr.protocolo()["treino"]["max_len"],

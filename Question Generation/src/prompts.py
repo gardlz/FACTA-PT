@@ -10,7 +10,7 @@ from typing import List
 from io_utils import NAO_FORNECIDO, _PUBDATE_KEYS
 
 # Identifier of this prompt format. The released question-generation adapter records it as
-# `prompt_version` in its checkpoint_info.json, and the FACTA-PT inference service checks it.
+# `prompt_version` in its checkpoint_info.json, and the FACT-PT inference service checks it.
 PROMPT_VERSION = "claim_span_publication_date_context_v5_criterios"
 
 DATA_NAO_FORNECIDA = "Não fornecida."
@@ -54,7 +54,7 @@ INPUT_TEMPLATE = (
 )
 
 
-# Section headers of the template (plus the few-shot block header). A model that copies the
+# Field headers of the template (plus the few-shot block header). A model that copies the
 # template instead of answering emits them; the parser drops a candidate that is only a header.
 ETIQUETAS_DO_MOLDE = tuple(re.findall(r"^([A-ZÀ-Þ][A-ZÀ-Þ ]*):", INPUT_TEMPLATE, re.M)) + (
     "Exemplos",)

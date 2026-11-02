@@ -33,7 +33,7 @@ CONFIGURACOES = (
     ("orcamento_igual", "Matched retrieval volume"),
 )
 
-# Condition ids of evidencias.csv -> names used in the dissertation.
+# Condition ids of evidencias.csv -> names shown in the reports.
 NOMES = {
     "claim_frase": "Claim", "claim_span": "Claim span",
     "FT_ptt5_large": "PTT5 Large", "FT_ptt5v2_large": "PTT5-v2 Large", "FT_ptt5v2_3b": "PTT5-v2 3B",
@@ -66,11 +66,14 @@ def ler_export():
 
 def ler_gold(spans_do_export):
     """{span_id: {"decisivo", "relevante", "Supported", "Refuted": sets of doc_id}}, from the
-    retrieved documents annotated in CLEVER."""
+    retrieved documents annotated in CLEVER. Stops when a claim span of the export is not a
+    CLEVER claim span."""
     gold = defaultdict(lambda: {"decisivo": set(), "relevante": set(),
                                 "Supported": set(), "Refuted": set()})
+    spans_clever = set()
     for _documento, _item, span_id, span in sorted(iter_claim_spans(ler_clever(DATASET)),
                                                    key=lambda x: x[2]):
+        spans_clever.add(span_id)
         if span_id not in spans_do_export:
             continue
         for doc in span["retrieved_documents"]:
@@ -79,6 +82,11 @@ def ler_gold(spans_do_export):
                 gold[span_id][doc["relation"]].add(doc["lusa_doc_id"])
             if doc["relevant"]:
                 gold[span_id]["relevante"].add(doc["lusa_doc_id"])
+    fora = sorted(spans_do_export - spans_clever)
+    if fora:
+        sys.exit(f"{len(fora)} claim span(s) de {EXPORT.name} não existem no CLEVER, ex.: "
+                 f"{fora[:3]}. As pesquisas guardadas identificam cada claim span pelo id do "
+                 f"CLEVER.")
     return gold
 
 
