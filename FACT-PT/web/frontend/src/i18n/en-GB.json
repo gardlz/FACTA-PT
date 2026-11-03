@@ -1,0 +1,545 @@
+{
+  "pagina": {
+    "titulo": "FACT-PT",
+    "descricao": "FACT-PT is a system designed to support automated fact-checking of claims in European Portuguese, based on the generation of verification questions. Given a claim, the system generates questions that guide the retrieval of evidence from Agência Lusa news articles published before the claim's publication date. The retrieved evidence is then analysed to determine its relevance and identify whether it supports, refutes, or provides insufficient information to assess the veracity of the claim. Finally, the system produces a verification result and generates an article grounded in the collected evidence, with citations that allow users to consult the original sources. This approach aims to make the verification process more transparent and traceable, supporting human analysis.",
+    "comoUsar": "How to use: (1) Enter the claim you wish to verify, its publication date, and the context needed to interpret it, or select one of the available examples; (2) Start the verification process; (3) Explore the generated questions and the results of the retrieved evidence analysis; (4) Review the generated fact-checking article and its citations to examine the sources used.",
+    "saltar": "Skip to content",
+    "tema": "Toggle theme",
+    "lingua": "Interface language"
+  },
+  "arranque": {
+    "titulo": "The interface failed to start",
+    "texto": "Reload the page. If the problem persists, check the browser console and the container log."
+  },
+  "erro": {
+    "noticia": "The news item could not be opened: {{erro}}"
+  },
+  "entrada": {
+    "titulo": "Verify a claim.",
+    "nota": "The claim is tested against the LUSA corpus up to the day it was made. The result is an article explaining what the evidence shows, with every sentence linked to the news item behind it.",
+    "oQueE": "What is FACT-PT?",
+    "maisSobre": "More about the project"
+  },
+  "form": {
+    "claim": "Claim",
+    "claimPista": "Paste the claim to verify, exactly as it was made.",
+    "data": "Date it was made",
+    "contexto": "Context",
+    "opcional": "optional",
+    "contextoPista": "The paragraph in which the claim was made.",
+    "verificar": "Verify",
+    "aVerificar": "Verifying…",
+    "redator": "Article model",
+    "erroClaim": "The claim must be at least 8 characters long.",
+    "erroData": "Enter the date on which the claim was made.",
+    "usarExemplo": "Try one of the examples"
+  },
+  "cal": {
+    "meses": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "diasCurtos": [
+      "M",
+      "T",
+      "W",
+      "T",
+      "F",
+      "S",
+      "S"
+    ],
+    "diasLongos": [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday"
+    ],
+    "porExtenso": "{{dia}} {{mes}} {{ano}}",
+    "mesAnterior": "Previous month",
+    "mesSeguinte": "Next month",
+    "ano": "Year",
+    "hoje": "Today",
+    "fechar": "Close",
+    "escolher": "Choose a date",
+    "escolhida": "{{rotulo}}: {{data}}. Change.",
+    "porEscolher": "{{rotulo}}: not selected."
+  },
+  "casos": {
+    "titulo": "Examples",
+    "sobre": "About the examples",
+    "nota": "The examples were originally processed in European Portuguese over the Lusa News Agency archive. In the English interface, the texts shown are translated versions of those Portuguese runs.",
+    "semGravacao": "no run recorded with {{n}} news items per question",
+    "pista": "Pick one to fill in the form"
+  },
+  "veredito": {
+    "supported": {
+      "nome": "Supported",
+      "nota": "The retrieved evidence supports the claim."
+    },
+    "refuted": {
+      "nome": "Refuted",
+      "nota": "The retrieved evidence contradicts the claim."
+    },
+    "nei": {
+      "nome": "Not Enough Information",
+      "nota": "There is relevant evidence, but not enough to decide."
+    },
+    "nei_sem_evidencia": {
+      "nome": "No evidence",
+      "nota": "Nothing retrieved counts as evidence."
+    }
+  },
+  "passo": {
+    "perguntas": {
+      "nome": "Verification questions",
+      "trabalho": "Writing the questions that will search for the evidence…",
+      "feito_one": "{{count}} question written",
+      "feito_other": "{{count}} questions written"
+    },
+    "evidencia": {
+      "nome": "Evidence retrieval",
+      "trabalho": "Searching the LUSA corpus for news…",
+      "feito_one": "{{count}} document retrieved, {{n}} considered relevant",
+      "feito_other": "{{count}} documents retrieved, {{n}} were considered relevant"
+    },
+    "classificacao": {
+      "nome": "Evidence classification",
+      "trabalho": "Comparing each piece of evidence with the claim…",
+      "feito_one": "{{count}} piece of evidence classified",
+      "feito_other": "{{count}} pieces of evidence classified"
+    },
+    "artigo": {
+      "nome": "Fact-checking article",
+      "trabalho": "Writing the article…",
+      "feito": "Article written by {{modelo}}"
+    },
+    "falhou": "failed",
+    "estado": {
+      "pending": "pending",
+      "running": "running",
+      "skipped": "skipped",
+      "error": "failed"
+    }
+  },
+  "bloco": {
+    "perguntas": "Verification questions",
+    "eixo": "Evidence over time",
+    "balanco": "What the evidence decides"
+  },
+  "eixo": {
+    "meses": [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],
+    "claim": "claim",
+    "ultima": "latest news",
+    "marcador": "{{titulo}} - published on {{data}}",
+    "leitura": "Each mark is a news item, on the day it was published: above the line those that support the claim, below those that refute it, on the line those that decide nothing. Dashed marks were ruled irrelevant, and can be opened and brought back. Hover a mark to read it.",
+    "semRelevantes": "None of the retrieved news items is relevant to the claim.",
+    "contas_one": "{{count}} document retrieved, {{n}} considered relevant.",
+    "contas_other": "{{count}} documents retrieved, {{n}} were considered relevant.",
+    "lacuna_one": "Last news item {{count}} day before the claim",
+    "lacuna_other": "Last news item {{count}} days before the claim",
+    "abrir": "Open the news item",
+    "recuperados_one": "{{count}} document retrieved, relevance being assessed.",
+    "recuperados_other": "{{count}} documents retrieved, relevance being assessed.",
+    "comoLer": "How to read the evidence over time",
+    "leituraRecuperados": "Each mark is a news item retrieved from Lusa, on the day it was published. Once relevance is assessed, the ones not about the claim's subject stay dashed, and can be opened and brought back.",
+    "apoiam": "support",
+    "contrariam": "refute",
+    "irrelevante": "Ruled out",
+    "passagens_one": "{{proporcao}} · {{count}} passage",
+    "passagens_other": "{{proporcao}} · {{count}} passages",
+    "semPassagens": "No classified passages.",
+    "tornarIrrelevante": "Exclude from the evidence",
+    "tornarRelevante": "Include in the evidence",
+    "dicaEdicao": "Click a mark to read the news item and mark passages in it; exclude one from the evidence in the panel that opens.",
+    "alteradoAMao": "Changed by hand",
+    "automatico": "Automatic"
+  },
+  "balanco": {
+    "supported": "Passages that support",
+    "refuted": "Passages that refute",
+    "nei": "Passages deciding nothing",
+    "total_one": "{{count}} passage in the evidence.",
+    "total_other": "{{count}} passages in the evidence.",
+    "fonteAutomatica": "Automated tally, from the pipeline's classification.",
+    "fonteRevista": "Tally from the reviewed evidence."
+  },
+  "artigo": {
+    "selo": "Fact-checking article",
+    "escritoPor": "Written by {{modelo}}",
+    "modeloDoArtigo": "Model that wrote the article",
+    "comparar": "Compare",
+    "compararCom": "with",
+    "usarEste": "Use this article",
+    "usarEstePista": "Saves it as this verification's article, as a new version.",
+    "anteriores_one": "{{count}} more article was written from earlier evidence; it is in the history.",
+    "anteriores_other": "{{count}} more articles were written from earlier evidence; they are in the history.",
+    "citada": "Cited evidence",
+    "excertos_one": "{{count}} excerpt",
+    "excertos_other": "{{count}} excerpts",
+    "reescrever": "Rewrite from the evidence",
+    "reescreverPista": "The article can be written from the reviewed evidence.",
+    "semArtigo": "There is no article yet. Write it from the reviewed evidence.",
+    "pedido": {
+      "na-fila": "Rewrite queued…",
+      "em-curso": "Writing the article…",
+      "aEscrever": "Writing…"
+    },
+    "erro": {
+      "revisao_artigo_falhou": "The article could not be written. Try again.",
+      "revisao_artigo_desatualizado": "The evidence changed while the article was being written. Ask for the rewrite again.",
+      "revisao_sem_evidencia": "There is not enough evidence to write the article.",
+      "revisao_artigo_indisponivel": "The inference service does not have the {{redator}} writer. Choose another writer and rewrite."
+    },
+    "erroGenerico": "The article could not be written.",
+    "guardarEReescrever": "Save and rewrite",
+    "redator": "Article writer",
+    "editar": "Edit the text",
+    "concluirEdicao": "Done editing",
+    "pistaEdicao": "Edit the text where it stands. Citations are written [1], [2]… Changes go into the draft, and become a version only when you save it.",
+    "campo": {
+      "titulo": "Title",
+      "lead": "Lead",
+      "paragrafo": "Paragraph {{n}}",
+      "intertitulo": "Subheading {{n}}"
+    },
+    "removerBloco": "Remove",
+    "acrescentarParagrafo": "Add paragraph",
+    "acrescentarIntertitulo": "Add subheading",
+    "origem": {
+      "artigo": "Rewritten by {{redator}} · v{{versao}}",
+      "edicao": "Edited by {{autor}} · v{{versao}}",
+      "restauracao": "Restored by {{autor}} · v{{versao}}"
+    }
+  },
+  "rotulo": {
+    "supported": "Supports",
+    "refuted": "Refutes",
+    "nei": "Not enough information"
+  },
+  "citacao": {
+    "comTitulo": "Citation {{n}}: {{titulo}}",
+    "semTitulo": "Citation {{n}}"
+  },
+  "gaveta": {
+    "fechar": "Close document",
+    "fonte": "Lusa News Agency · {{id}}",
+    "semTitulo": "Untitled news item",
+    "palavras": "{{n}} words",
+    "destacarPista": "Select a stretch of the text to link it to the review as evidence.",
+    "destacarPassos": "Select a stretch and choose whether it supports, refutes or is not enough to decide. Click a passage already marked to change it.",
+    "ligarComo": "Link as",
+    "cancelarSelecao": "Cancel selection",
+    "irrelevante": "Ruled out",
+    "tornarIrrelevante": "Exclude from the evidence",
+    "tornarRelevante": "Include in the evidence",
+    "origemAutomatica": "Automatic passage",
+    "origemHumana": "Added by you",
+    "alteradaAMao": "Changed by hand",
+    "alterarComo": "Change to",
+    "excluida": "Left out of the evidence",
+    "excluir": "Leave out of the evidence",
+    "removerDestaque": "Remove highlight",
+    "fecharPassagem": "Close",
+    "excertos": "{{n}} excerpts"
+  },
+  "corrida": {
+    "aVerificar": "Checking",
+    "aAbrir": "Opening the check…",
+    "copiarLigacao": "Copy link",
+    "ligacaoCopiada": "Link copied",
+    "nova": "New check",
+    "seccoes": "Sections",
+    "fila_zero": "In the queue: this check is next.",
+    "fila_one": "In the queue: {{count}} check ahead.",
+    "fila_other": "In the queue: {{count}} checks ahead.",
+    "cancelar": "Cancel",
+    "tempos": "Time spent",
+    "tempoTotal": "Total",
+    "veredito": "Verdict",
+    "passos": "Steps",
+    "maisPassos": "What each step finds is set out in detail below, as it finishes.",
+    "contextoTodo": "Read the whole context",
+    "contextoMenos": "Show less",
+    "revistoPor": "Reviewed by {{autor}}"
+  },
+  "acesso": {
+    "titulo": "Restricted access.",
+    "texto": "Sign in with your account to use FACT-PT.",
+    "utilizador": "Username",
+    "campo": "Password",
+    "entrar": "Sign in",
+    "aEntrar": "Signing in…",
+    "falha": "Could not sign in: {{erro}}",
+    "semCookie": "The credentials are right, but the browser did not keep the session. The site has to be opened over HTTPS."
+  },
+  "nav": {
+    "sobre": "About",
+    "administracao": "Administration",
+    "verificacoes": "Verifications",
+    "sair": "Sign out",
+    "principal": "Main navigation",
+    "menu": "Open the menu",
+    "fechar": "Close the menu",
+    "inicio": "New verification",
+    "conta": "Account",
+    "modelos": "Models",
+    "preferencias": "Preferences",
+    "temaEscuro": "Dark theme",
+    "temaClaro": "Light theme"
+  },
+  "papel": {
+    "jornalista": "Journalist",
+    "administrador": "Administrator"
+  },
+  "permissao": {
+    "verificar": "Verify claims",
+    "segundo_plano": "Verify in the background",
+    "ver_resultados": "View results",
+    "ver_historico": "View history",
+    "editar_resultados": "Edit results",
+    "gerir_utilizadores": "Manage accounts",
+    "gerir_plataforma": "Manage platform"
+  },
+  "modelos": {
+    "titulo": "Model status",
+    "servico": "Inference service",
+    "questions": "Question generator",
+    "relevance": "Relevance classifier",
+    "stance": "Evidence-relation classifier",
+    "article_gemma": "Gemma writer",
+    "article_amalia": "AMALIA writer",
+    "article_amalia_q4": "AMALIA Q4 writer (Ollama)",
+    "naGpu": "on the GPU",
+    "estado": {
+      "ready": "ready",
+      "loading": "loading",
+      "waiting": "loads when needed",
+      "error": "unavailable",
+      "unavailable": "not answering"
+    }
+  },
+  "rodape": {
+    "descricao": "A Question-Driven Fact-Checking System for European Portuguese.",
+    "instituicoes": "Institutions",
+    "navegar": "Navigate",
+    "verificar": "Verify a claim",
+    "sobre": "About the project",
+    "corpus": "",
+    "direitos": "© {{ano}} FACT-PT"
+  },
+  "admin": {
+    "titulo": "Administration.",
+    "nota": "The accounts, what each role may do and the values the platform starts with. Changes apply at once.",
+    "aCarregar": "Loading…",
+    "guardado": "Saved.",
+    "semPermissao": "No access.",
+    "semPermissaoNota": "Your account does not have permission to administer the platform.",
+    "abas": {
+      "utilizadores": "Accounts",
+      "permissoes": "Permissions",
+      "plataforma": "Platform"
+    },
+    "utilizadores": {
+      "titulo": "Accounts",
+      "conta": "Account",
+      "papel": "Role",
+      "papelDe": "Role of {{utilizador}}",
+      "estado": "Status",
+      "ultimaEntrada": "Last sign-in",
+      "accoes": "Actions",
+      "activa": "active",
+      "inactiva": "inactive",
+      "nunca": "never",
+      "desactivar": "Deactivate",
+      "activar": "Activate",
+      "repor": "Reset password",
+      "novaPasse": "New password",
+      "guardarPasse": "Save",
+      "semContas": "There are no accounts yet.",
+      "nova": "New account",
+      "utilizador": "Username",
+      "utilizadorPista": "3 to 40 characters: lowercase, digits, '.', '_' or '-'.",
+      "nome": "Name",
+      "palavraPasse": "Password",
+      "palavraPassePista": "At least 12 characters.",
+      "criar": "Create account",
+      "criada": "Account '{{utilizador}}' created.",
+      "apagar": "Delete",
+      "apagarAviso": "Delete '{{utilizador}}' for good? This cannot be undone.",
+      "apagarConfirmar": "Yes, delete",
+      "apagarCancelar": "Cancel",
+      "apagada": "Account '{{utilizador}}' deleted."
+    },
+    "permissoes": {
+      "nota": "An administrator always has every permission. Only the journalist's row can be changed.",
+      "guardar": "Save permissions"
+    },
+    "plataforma": {
+      "topK": "News items per question, by default",
+      "redator": "Article model, by default",
+      "guardar": "Save settings"
+    }
+  },
+  "revisao": {
+    "aCarregar": "Loading the review…",
+    "erroCarregar": "The review could not be loaded: {{erro}}",
+    "soLeitura": "Read-only: you may look at the versions, but not change them.",
+    "situacao": {
+      "guardado": "Saved",
+      "aGuardar": "Saving…",
+      "conflito": "Someone else saved a version in the meantime.",
+      "erro": "Could not save.",
+      "automatica": "Automated result (v0)",
+      "guardada": "Version {{versao}} saved",
+      "porGuardar": "Unsaved changes",
+      "recuperado": "Draft recovered, not saved",
+      "aVerVersao": "Viewing v{{versao}}: save it to bring it back",
+      "aVerVersaoLeitura": "Viewing v{{versao}}"
+    },
+    "origem": {
+      "automatico": "Automated result"
+    },
+    "veredito": "Verdict",
+    "desfazer": "Undo",
+    "refazer": "Redo",
+    "tentarNovamente": "Try again",
+    "conflito": {
+      "recarregar": "Reload the latest version",
+      "manter": "Save my version on top"
+    },
+    "historico": {
+      "titulo": "History",
+      "actual": "current version",
+      "aVer": "viewing",
+      "abrir": "View",
+      "voltar": "Back"
+    },
+    "accao": {
+      "automatica": "Automated",
+      "edicao": "Edit",
+      "restauracao": "Restore",
+      "artigo": "Article rewritten"
+    },
+    "campo": {
+      "relevancia": "relevance",
+      "excertos": "passages",
+      "veredito": "verdict",
+      "explicacao": "explanation",
+      "artigo": "article"
+    },
+    "restauradaDe": "restored from v{{versao}}",
+    "mudarVeredito": "Change the verdict",
+    "alterar": "Change",
+    "seguirEvidenciaDa": "Automatic · {{veredito}}",
+    "automaticoNota": "Decided by the evidence you keep",
+    "aMao": "Set by hand",
+    "vereditoManual": "Verdict set by hand",
+    "vereditoAutomatico": "Automatic verdict",
+    "voltarAutomatico": "Back to automatic",
+    "semAlteracoes": "No changes yet",
+    "guia": {
+      "titulo": "You can edit this review",
+      "abrir": "What can I edit?",
+      "fechar": "Hide this tip",
+      "nota": "Changes go into a draft and become a version only when you save it.",
+      "itens": {
+        "eixo": "Exclude or include news items on the timeline",
+        "gaveta": "Open a news item and mark passages as evidence",
+        "veredito": "Change the verdict",
+        "artigo": "Edit the article or write it again"
+      }
+    },
+    "desfazerAtalho": "Undo (Ctrl+Z)",
+    "refazerAtalho": "Redo (Ctrl+Shift+Z)",
+    "descartar": "Discard changes",
+    "guardar": "Save version",
+    "guardarRestauro": "Bring back v{{versao}}",
+    "guardarAtalho": "Save as a new version (Ctrl+S)",
+    "voltarActual": "Back to the current version"
+  },
+  "sobre": {
+    "titulo": "About FACT-PT.",
+    "nota": "A system that checks claims in Portuguese: it looks for evidence in the LUSA archive, weighs it against the claim and writes an article in which every sentence points to the news item behind it.",
+    "consiste": {
+      "titulo": "What it is"
+    },
+    "funciona": {
+      "titulo": "How it works",
+      "passos": {
+        "perguntas": "The claim is broken into verification questions, which guide the search for evidence.",
+        "evidencia": "Each question looks for news in the LUSA corpus from before the claim's date, and a model decides which are relevant.",
+        "classificacao": "The relevant excerpts are weighed against the claim: they support it, contradict it or are not enough to decide.",
+        "artigo": "A model writes the fact-checking article, with every sentence linked to the news item that backs it."
+      }
+    },
+    "modelos": {
+      "titulo": "Models",
+      "nota": "The models FACT-PT trained are published on Hugging Face; the article is written by one of two general models, chosen with each claim.",
+      "tarefas": {
+        "perguntas": "Question generation",
+        "relevancia": "Document relevance",
+        "classificacao": "Claim-evidence entailment",
+        "artigo": "Article writing"
+      }
+    },
+    "limites": {
+      "titulo": "Limits",
+      "texto": "FACT-PT is a research prototype. Its results are produced by models and can contain errors: always read the news items cited, and do not take it as a substitute for the work of journalists who check facts."
+    },
+    "equipa": {
+      "titulo": "Who built it"
+    },
+    "instituicoes": {
+      "titulo": "Institutions"
+    },
+    "papeis": {
+      "mestrado": "MSc. Student",
+      "docente": "Professor",
+      "investigacao": "Research",
+      "desenvolvimento": "Development",
+      "orientacao": "Supervision"
+    }
+  },
+  "verificacoes": {
+    "titulo": "Your recent verifications",
+    "nota": "Your verifications of the last 24 hours, running or over. One that has stopped can be restarted.",
+    "vazio": "You have no recent verifications yet.",
+    "nova": "New verification",
+    "reiniciar": "Restart",
+    "estado": {
+      "na-fila_one": "Queued, {{count}} ahead",
+      "na-fila_other": "Queued, {{count}} ahead",
+      "na-fila_zero": "Queued",
+      "em-curso": "Running",
+      "guardada": "Finished",
+      "terminada": "Stopped",
+      "perdida": "Lost"
+    }
+  }
+}

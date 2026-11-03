@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="pt-PT" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FACT-PT</title>
+<meta name="description" content="Da claim ao artigo de verificação: perguntas, evidência da Lusa, classificação e texto com citações rastreáveis.">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;800&family=IBM+Plex+Sans:wght@400;600&display=swap">
+<script>
+  // Theme before the first paint, so a dark page does not flash light while the bundle loads.
+  try {
+    var tema = localStorage.getItem("facta-pt:tema");
+    if (tema === "light" || tema === "dark") document.documentElement.dataset.theme = tema;
+  } catch (e) {}
+</script>
+</head>
+<body>
+<div id="app"></div>
+<script type="module" src="/src/main.jsx"></script>
+</body>
+</html>

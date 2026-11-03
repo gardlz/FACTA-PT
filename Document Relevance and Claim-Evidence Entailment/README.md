@@ -7,7 +7,7 @@ This directory contains the code for **evidence characterization** in European P
 
 The experiments compare **11 pretrained encoders** with and without prior specialization in textual inference: four multilingual checkpoints fine-tuned for three-class natural language inference (NLI), two fine-tuned for binary textual inference on the Portuguese ASSIN2 dataset, and five Portuguese encoders without prior inference specialization. Both tasks use CLEVER annotations, but each model is fine-tuned separately for each task.
 
-**Released models**, also used by [FACT-PT](https://factapt.inesctec.pt):
+**Released models**, also used by [FACT-PT](https://factpt.inesctec.pt):
 - **Document relevance:** [BERTimbau-base](https://huggingface.co/liaad/facta-pt-relevance-bertimbau-base)
 - **Claim-Evidence Entailment:** [XLM-R-large-XNLI](https://huggingface.co/liaad/facta-pt-cee-xlm-roberta-large-xnli)
 

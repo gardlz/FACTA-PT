@@ -1,0 +1,39 @@
+# Secrets stay out of the repository, even a private one: copy .env to each machine by hand
+# (.env.example lists what it holds).
+.env
+secrets
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# The interface's dependencies and build: both made inside the web image.
+web/frontend/node_modules/
+web/app/static/
+
+# Local checkpoints, when mounted instead of downloaded (docker-compose.yml).
+checkpoints/
+
+# The run store, accounts and reviews, when mounted from the host (docker-compose.yml): data,
+# not code. Copy the folder to back it up; do not commit it.
+dados/
+
+# Old inference directory, now replaced by the new one in the web image. Anchored to the root:
+# unanchored it would also match web/inference/, and new files there would never be committed.
+/inference/
+
+# Per-machine compose overrides (the sign-in throttle switch-off, say): not for the repository.
+docker-compose.override.yml
+
+# Demo recordings.
+*.mp4
+
+.DS_Store
+
+# The example settings carry no secret: kept in the repository, whose own .gitignore leaves out
+# every other .env.* file.
+!.env.example
+
+# The stored examples carry LUSA news text, which is not distributed.
+web/app/demo/exemplos*.json

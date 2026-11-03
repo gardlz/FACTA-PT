@@ -1,0 +1,22 @@
+# NVIDIA GPU: builds the inference image with CUDA PyTorch, and reserves the GPUs.
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d --build
+# Needs the NVIDIA Container Toolkit on the host.
+
+services:
+  inference:
+    build:
+      args:
+        COM_GPU: "true"
+    image: facta-pt-inference:1.6.0-gpu
+    environment:
+      # Overrides the Dockerfile's `expandable_segments:True`. With it, a GPU that fills up fails
+      # with «CUDA driver error: device not ready» instead of the driver lending system memory
+      # (WSL2 on an 8 GB card, measured), and a model larger than the card could not load.
+      PYTORCH_CUDA_ALLOC_CONF: ""
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: ${INFERENCE_GPUS:-1}
+              capabilities: [gpu]

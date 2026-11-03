@@ -1,0 +1,5 @@
+# Unix line endings everywhere, also when cloned on Windows: the Dockerfiles' multi-line RUN
+# commands break on CRLF.
+* text=auto eol=lf
+*.png binary
+*.svg text eol=lf

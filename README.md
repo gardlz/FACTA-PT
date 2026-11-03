@@ -74,7 +74,7 @@ automatically by the preceding components in the FACT-PT prototype.
 ## FACT-PT prototype
 
 The components selected in the experiments are integrated into
-[FACT-PT](https://factapt.inesctec.pt), the interactive end-to-end prototype.
+[FACT-PT](https://factpt.inesctec.pt), the interactive end-to-end prototype.
 
 For a new verification, FACT-PT receives a claim span, its publication date and its context.
 The system then:
@@ -98,7 +98,7 @@ questions, the temporal distribution of the retrieved evidence and a summary of 
 factual relations. In the final article, evidence-based factual statements contain local
 citations that can be followed back to the corresponding LUSA source passages.
 
-The code of the prototype, with the instructions to run it, is in [`FACTA-PT/`](FACTA-PT/).
+The code of the prototype, with the instructions to run it, is in [`FACT-PT/`](FACT-PT/).
 
 
 ## Data

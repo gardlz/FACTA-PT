@@ -1,0 +1,545 @@
+{
+  "pagina": {
+    "titulo": "FACT-PT",
+    "descricao": "O FACT-PT é um sistema de apoio à verificação automática de claims em português europeu, baseado na geração de perguntas de verificação. A partir de uma claim, o sistema gera perguntas que orientam a pesquisa de evidências em notícias da Agência Lusa publicadas antes da data da claim. As evidências recuperadas são posteriormente analisadas para determinar a sua relevância e identificar se apoiam, refutam ou apresentam informação insuficiente para classificar a veracidade da claim. Por fim, o sistema produz um resultado de verificação e gera um artigo fundamentado nas evidências recolhidas, com citações que permitem consultar as fontes originais. Esta abordagem procura tornar o processo de verificação mais transparente e rastreável, apoiando a análise humana.",
+    "comoUsar": "Como utilizar: (1) Introduza a claim que pretende verificar, a respetiva data de publicação e o contexto necessário à sua interpretação, ou selecione um dos exemplos disponíveis; (2) Inicie o processo de verificação; (3) Explore as perguntas geradas e os resultados da análise das evidências recuperadas; (4) Consulte o artigo de verificação produzido e as respetivas citações para analisar as fontes utilizadas.",
+    "saltar": "Saltar para o conteúdo",
+    "tema": "Alternar tema",
+    "lingua": "Idioma da interface"
+  },
+  "arranque": {
+    "titulo": "A interface não arrancou",
+    "texto": "Recarregue a página. Se persistir, veja a consola do navegador e o registo do contentor."
+  },
+  "erro": {
+    "noticia": "Não foi possível abrir a notícia: {{erro}}"
+  },
+  "entrada": {
+    "titulo": "Verificar uma claim.",
+    "nota": "A claim é confrontada com o corpus LUSA anterior ao dia em que foi proferida. O resultado é um artigo que explica o que a evidência mostra, com cada frase ligada à notícia que a sustenta.",
+    "oQueE": "O que é o FACT-PT?",
+    "maisSobre": "Saber mais sobre o projeto"
+  },
+  "form": {
+    "claim": "Claim",
+    "claimPista": "Cole aqui a claim a verificar, tal como foi proferida.",
+    "data": "Data em que foi proferida",
+    "contexto": "Contexto",
+    "opcional": "opcional",
+    "contextoPista": "O parágrafo onde a claim foi proferida.",
+    "verificar": "Verificar",
+    "aVerificar": "A verificar…",
+    "redator": "Modelo do artigo",
+    "erroClaim": "A claim tem de ter pelo menos 8 caracteres.",
+    "erroData": "Indique a data em que a claim foi proferida.",
+    "usarExemplo": "Experimentar um dos exemplos"
+  },
+  "cal": {
+    "meses": [
+      "janeiro",
+      "fevereiro",
+      "março",
+      "abril",
+      "maio",
+      "junho",
+      "julho",
+      "agosto",
+      "setembro",
+      "outubro",
+      "novembro",
+      "dezembro"
+    ],
+    "diasCurtos": [
+      "S",
+      "T",
+      "Q",
+      "Q",
+      "S",
+      "S",
+      "D"
+    ],
+    "diasLongos": [
+      "segunda-feira",
+      "terça-feira",
+      "quarta-feira",
+      "quinta-feira",
+      "sexta-feira",
+      "sábado",
+      "domingo"
+    ],
+    "porExtenso": "{{dia}} de {{mes}} de {{ano}}",
+    "mesAnterior": "Mês anterior",
+    "mesSeguinte": "Mês seguinte",
+    "ano": "Ano",
+    "hoje": "Hoje",
+    "fechar": "Fechar",
+    "escolher": "Escolher data",
+    "escolhida": "{{rotulo}}: {{data}}. Alterar.",
+    "porEscolher": "{{rotulo}}: por escolher."
+  },
+  "casos": {
+    "titulo": "Exemplos",
+    "sobre": "Sobre os exemplos",
+    "nota": "Os exemplos foram processados originalmente em português europeu sobre o arquivo da Agência Lusa. Na interface em inglês, os textos apresentados são traduções dessas execuções em português.",
+    "semGravacao": "sem execução gravada com {{n}} notícias por pergunta",
+    "pista": "Escolha um para preencher o formulário"
+  },
+  "veredito": {
+    "supported": {
+      "nome": "Apoiada",
+      "nota": "A evidência recuperada apoia a claim."
+    },
+    "refuted": {
+      "nome": "Contrariada",
+      "nota": "A evidência recuperada contraria a claim."
+    },
+    "nei": {
+      "nome": "Informação Insuficiente",
+      "nota": "Há evidência relevante, mas não chega para decidir."
+    },
+    "nei_sem_evidencia": {
+      "nome": "Sem evidência",
+      "nota": "Nada do que foi recuperado serve de evidência."
+    }
+  },
+  "passo": {
+    "perguntas": {
+      "nome": "Perguntas de verificação",
+      "trabalho": "A formular as perguntas que vão procurar a evidência…",
+      "feito_one": "{{count}} pergunta formulada",
+      "feito_other": "{{count}} perguntas formuladas"
+    },
+    "evidencia": {
+      "nome": "Recuperação de evidências",
+      "trabalho": "À procura de notícias no corpus LUSA…",
+      "feito_one": "{{count}} documento recuperado, {{n}} considerados relevantes",
+      "feito_other": "{{count}} documentos recuperados, {{n}} foram considerados relevantes"
+    },
+    "classificacao": {
+      "nome": "Classificação da evidência",
+      "trabalho": "A confrontar cada evidência com a claim…",
+      "feito_one": "{{count}} evidência classificada",
+      "feito_other": "{{count}} evidências classificadas"
+    },
+    "artigo": {
+      "nome": "Artigo de verificação",
+      "trabalho": "A escrever o artigo…",
+      "feito": "Artigo escrito por {{modelo}}"
+    },
+    "falhou": "falhou",
+    "estado": {
+      "pending": "por fazer",
+      "running": "em curso",
+      "skipped": "ignorado",
+      "error": "falhou"
+    }
+  },
+  "bloco": {
+    "perguntas": "Perguntas de verificação",
+    "eixo": "Evidência no tempo",
+    "balanco": "O que a evidência decide"
+  },
+  "eixo": {
+    "meses": [
+      "jan",
+      "fev",
+      "mar",
+      "abr",
+      "mai",
+      "jun",
+      "jul",
+      "ago",
+      "set",
+      "out",
+      "nov",
+      "dez"
+    ],
+    "claim": "claim",
+    "ultima": "última notícia",
+    "marcador": "{{titulo}} - publicada a {{data}}",
+    "leitura": "Cada marca é uma notícia, na data em que foi publicada: acima da linha as que apoiam a claim, abaixo as que a contrariam, sobre a linha as que não decidem. As tracejadas foram consideradas irrelevantes, e podem ser abertas e trazidas de volta. Passe por cima de uma marca para a ler.",
+    "semRelevantes": "Nenhuma das notícias recuperadas é relevante para a claim.",
+    "contas_one": "{{count}} documento recuperado, {{n}} considerados relevantes.",
+    "contas_other": "{{count}} documentos recuperados, {{n}} foram considerados relevantes.",
+    "lacuna_one": "Última notícia {{count}} dia antes da claim",
+    "lacuna_other": "Última notícia {{count}} dias antes da claim",
+    "abrir": "Abrir a notícia",
+    "recuperados_one": "{{count}} documento recuperado, a avaliar a relevância.",
+    "recuperados_other": "{{count}} documentos recuperados, a avaliar a relevância.",
+    "comoLer": "Como ler a evidência no tempo",
+    "leituraRecuperados": "Cada marca é uma notícia recuperada da Lusa, na data em que foi publicada. Avaliada a relevância, as que não falam do assunto da claim ficam tracejadas, e podem ser abertas e trazidas de volta.",
+    "apoiam": "apoiam",
+    "contrariam": "contrariam",
+    "irrelevante": "Fora da evidência",
+    "passagens_one": "{{proporcao}} · {{count}} passagem",
+    "passagens_other": "{{proporcao}} · {{count}} passagens",
+    "semPassagens": "Sem passagens classificadas.",
+    "tornarIrrelevante": "Excluir da evidência",
+    "tornarRelevante": "Incluir na evidência",
+    "dicaEdicao": "Clique numa marca para ler a notícia e marcar passagens nela; exclua-a da evidência no painel que se abre.",
+    "alteradoAMao": "Alterada à mão",
+    "automatico": "Automática"
+  },
+  "balanco": {
+    "supported": "Passagens que apoiam",
+    "refuted": "Passagens que contrariam",
+    "nei": "Passagens sem decisão",
+    "total_one": "{{count}} passagem na evidência.",
+    "total_other": "{{count}} passagens na evidência.",
+    "fonteAutomatica": "Contagem automática, a partir da classificação do pipeline.",
+    "fonteRevista": "Contagem a partir da evidência revista."
+  },
+  "artigo": {
+    "selo": "Artigo de verificação",
+    "escritoPor": "Escrito por {{modelo}}",
+    "modeloDoArtigo": "Modelo que escreveu o artigo",
+    "comparar": "Comparar",
+    "compararCom": "com",
+    "usarEste": "Usar este artigo",
+    "usarEstePista": "Guarda-o como o artigo desta verificação, numa nova versão.",
+    "anteriores_one": "Há mais {{count}} artigo escrito a partir de evidência anterior; está no histórico.",
+    "anteriores_other": "Há mais {{count}} artigos escritos a partir de evidência anterior; estão no histórico.",
+    "citada": "Evidência citada",
+    "excertos_one": "{{count}} excerto",
+    "excertos_other": "{{count}} excertos",
+    "reescrever": "Reescrever a partir da evidência",
+    "reescreverPista": "O artigo pode ser escrito a partir da evidência revista.",
+    "semArtigo": "Ainda não há artigo. Escreva-o a partir da evidência revista.",
+    "pedido": {
+      "na-fila": "Reescrita na fila…",
+      "em-curso": "A escrever o artigo…",
+      "aEscrever": "A escrever…"
+    },
+    "erro": {
+      "revisao_artigo_falhou": "Não foi possível escrever o artigo. Tente novamente.",
+      "revisao_artigo_desatualizado": "A evidência mudou enquanto o artigo era escrito. Peça a reescrita outra vez.",
+      "revisao_sem_evidencia": "Não há evidência suficiente para escrever o artigo.",
+      "revisao_artigo_indisponivel": "O serviço de inferência não tem o modelo {{redator}}. Escolha outro modelo e reescreva."
+    },
+    "erroGenerico": "Não foi possível escrever o artigo.",
+    "guardarEReescrever": "Guardar e reescrever",
+    "redator": "Modelo de redação",
+    "editar": "Editar o texto",
+    "concluirEdicao": "Concluir edição",
+    "pistaEdicao": "Edite o texto onde está. As citações escrevem-se [1], [2]… As alterações entram no rascunho e só ficam numa versão quando a guardar.",
+    "campo": {
+      "titulo": "Título",
+      "lead": "Entrada",
+      "paragrafo": "Parágrafo {{n}}",
+      "intertitulo": "Intertítulo {{n}}"
+    },
+    "removerBloco": "Remover",
+    "acrescentarParagrafo": "Acrescentar parágrafo",
+    "acrescentarIntertitulo": "Acrescentar intertítulo",
+    "origem": {
+      "artigo": "Reescrito por {{redator}} · v{{versao}}",
+      "edicao": "Editado por {{autor}} · v{{versao}}",
+      "restauracao": "Reposto por {{autor}} · v{{versao}}"
+    }
+  },
+  "rotulo": {
+    "supported": "Apoia",
+    "refuted": "Contraria",
+    "nei": "Informação insuficiente"
+  },
+  "citacao": {
+    "comTitulo": "Citação {{n}}: {{titulo}}",
+    "semTitulo": "Citação {{n}}"
+  },
+  "gaveta": {
+    "fechar": "Fechar documento",
+    "fonte": "Agência Lusa · {{id}}",
+    "semTitulo": "Notícia sem título",
+    "palavras": "{{n}} palavras",
+    "destacarPista": "Selecione um trecho do texto para o ligar à revisão como evidência.",
+    "destacarPassos": "Selecione um trecho e escolha se apoia, contraria ou não chega para decidir. Clique numa passagem já marcada para a alterar.",
+    "ligarComo": "Ligar como",
+    "cancelarSelecao": "Cancelar seleção",
+    "irrelevante": "Fora da evidência",
+    "tornarIrrelevante": "Excluir da evidência",
+    "tornarRelevante": "Incluir na evidência",
+    "origemAutomatica": "Passagem automática",
+    "origemHumana": "Adicionada por si",
+    "alteradaAMao": "Alterada à mão",
+    "alterarComo": "Alterar para",
+    "excluida": "Excluída da evidência",
+    "excluir": "Excluir da evidência",
+    "removerDestaque": "Remover destaque",
+    "fecharPassagem": "Fechar",
+    "excertos": "{{n}} excertos"
+  },
+  "corrida": {
+    "aVerificar": "A verificar",
+    "aAbrir": "A abrir a verificação…",
+    "copiarLigacao": "Copiar ligação",
+    "ligacaoCopiada": "Ligação copiada",
+    "nova": "Nova verificação",
+    "seccoes": "Secções",
+    "fila_zero": "Na fila: é a próxima verificação.",
+    "fila_one": "Na fila: há {{count}} verificação à frente.",
+    "fila_other": "Na fila: há {{count}} verificações à frente.",
+    "cancelar": "Cancelar",
+    "tempos": "Tempo gasto",
+    "tempoTotal": "Total",
+    "veredito": "Veredito",
+    "passos": "Passos",
+    "maisPassos": "O que cada passo encontra é apresentado em detalhe abaixo, à medida que termina.",
+    "contextoTodo": "Ler o contexto todo",
+    "contextoMenos": "Mostrar menos",
+    "revistoPor": "Revisto por {{autor}}"
+  },
+  "acesso": {
+    "titulo": "Acesso reservado.",
+    "texto": "Entre com a sua conta para usar o FACT-PT.",
+    "utilizador": "Utilizador",
+    "campo": "Palavra-passe",
+    "entrar": "Entrar",
+    "aEntrar": "A entrar…",
+    "falha": "Não foi possível entrar: {{erro}}",
+    "semCookie": "As credenciais estão certas, mas o navegador não guardou a sessão. O site tem de ser aberto por HTTPS."
+  },
+  "nav": {
+    "sobre": "Sobre",
+    "administracao": "Administração",
+    "verificacoes": "Verificações",
+    "sair": "Terminar sessão",
+    "principal": "Navegação principal",
+    "menu": "Abrir o menu",
+    "fechar": "Fechar o menu",
+    "inicio": "Nova verificação",
+    "conta": "Conta",
+    "modelos": "Modelos",
+    "preferencias": "Preferências",
+    "temaEscuro": "Tema escuro",
+    "temaClaro": "Tema claro"
+  },
+  "papel": {
+    "jornalista": "Jornalista",
+    "administrador": "Administrador"
+  },
+  "permissao": {
+    "verificar": "Verificar claims",
+    "segundo_plano": "Verificar em segundo plano",
+    "ver_resultados": "Ver resultados",
+    "ver_historico": "Ver histórico",
+    "editar_resultados": "Editar resultados",
+    "gerir_utilizadores": "Gerir utilizadores",
+    "gerir_plataforma": "Gerir plataforma"
+  },
+  "modelos": {
+    "titulo": "Estado dos modelos",
+    "servico": "Serviço de inferência",
+    "questions": "Gerador de perguntas",
+    "relevance": "Classificador de relevância",
+    "stance": "Classificador de relação",
+    "article_gemma": "Redator Gemma",
+    "article_amalia": "Redator AMALIA",
+    "article_amalia_q4": "Redator AMALIA Q4 (Ollama)",
+    "naGpu": "na GPU",
+    "estado": {
+      "ready": "pronto",
+      "loading": "a carregar",
+      "waiting": "carrega quando for preciso",
+      "error": "indisponível",
+      "unavailable": "não responde"
+    }
+  },
+  "rodape": {
+    "descricao": "Um sistema de verificação de claims baseado em perguntas para o Português Europeu",
+    "instituicoes": "Instituições",
+    "navegar": "Navegar",
+    "verificar": "Verificar uma claim",
+    "sobre": "Sobre o projeto",
+    "corpus": "",
+    "direitos": "© {{ano}} FACT-PT"
+  },
+  "admin": {
+    "titulo": "Administração.",
+    "nota": "As contas, o que cada papel pode fazer e os valores com que a plataforma começa. As alterações valem de imediato.",
+    "aCarregar": "A carregar…",
+    "guardado": "Guardado.",
+    "semPermissao": "Sem acesso.",
+    "semPermissaoNota": "A sua conta não tem permissão para administrar a plataforma.",
+    "abas": {
+      "utilizadores": "Utilizadores",
+      "permissoes": "Permissões",
+      "plataforma": "Plataforma"
+    },
+    "utilizadores": {
+      "titulo": "Contas",
+      "conta": "Conta",
+      "papel": "Papel",
+      "papelDe": "Papel de {{utilizador}}",
+      "estado": "Estado",
+      "ultimaEntrada": "Última entrada",
+      "accoes": "Ações",
+      "activa": "ativa",
+      "inactiva": "inativa",
+      "nunca": "nunca",
+      "desactivar": "Desativar",
+      "activar": "Ativar",
+      "repor": "Repor palavra-passe",
+      "novaPasse": "Nova palavra-passe",
+      "guardarPasse": "Guardar",
+      "semContas": "Ainda não há contas.",
+      "nova": "Nova conta",
+      "utilizador": "Nome de utilizador",
+      "utilizadorPista": "3 a 40 caracteres: minúsculas, dígitos, «.», «_» ou «-».",
+      "nome": "Nome",
+      "palavraPasse": "Palavra-passe",
+      "palavraPassePista": "Pelo menos 12 caracteres.",
+      "criar": "Criar conta",
+      "criada": "Conta «{{utilizador}}» criada.",
+      "apagar": "Apagar",
+      "apagarAviso": "Apagar «{{utilizador}}» definitivamente? Não é possível anular.",
+      "apagarConfirmar": "Sim, apagar",
+      "apagarCancelar": "Cancelar",
+      "apagada": "Conta «{{utilizador}}» apagada."
+    },
+    "permissoes": {
+      "nota": "O administrador tem sempre todas as permissões. Só a linha do jornalista pode ser alterada.",
+      "guardar": "Guardar permissões"
+    },
+    "plataforma": {
+      "topK": "Notícias por pergunta, por omissão",
+      "redator": "Modelo do artigo, por omissão",
+      "guardar": "Guardar definições"
+    }
+  },
+  "revisao": {
+    "aCarregar": "A carregar a revisão…",
+    "erroCarregar": "Não foi possível carregar a revisão: {{erro}}",
+    "soLeitura": "Só de leitura: pode consultar as versões, mas não alterá-las.",
+    "situacao": {
+      "guardado": "Guardado",
+      "aGuardar": "A guardar…",
+      "conflito": "Outra pessoa guardou uma versão entretanto.",
+      "erro": "Não foi possível guardar.",
+      "automatica": "Resultado automático (v0)",
+      "guardada": "Versão {{versao}} guardada",
+      "porGuardar": "Alterações por guardar",
+      "recuperado": "Rascunho recuperado, por guardar",
+      "aVerVersao": "A ver a v{{versao}}: guarde-a para a repor",
+      "aVerVersaoLeitura": "A ver a v{{versao}}"
+    },
+    "origem": {
+      "automatico": "Resultado automático"
+    },
+    "veredito": "Veredito",
+    "desfazer": "Desfazer",
+    "refazer": "Refazer",
+    "tentarNovamente": "Tentar novamente",
+    "conflito": {
+      "recarregar": "Recarregar a versão mais recente",
+      "manter": "Guardar a minha versão por cima"
+    },
+    "historico": {
+      "titulo": "Histórico",
+      "actual": "versão actual",
+      "aVer": "a ver",
+      "abrir": "Ver",
+      "voltar": "Voltar"
+    },
+    "accao": {
+      "automatica": "Automática",
+      "edicao": "Edição",
+      "restauracao": "Reposição",
+      "artigo": "Artigo reescrito"
+    },
+    "campo": {
+      "relevancia": "relevância",
+      "excertos": "passagens",
+      "veredito": "veredito",
+      "explicacao": "explicação",
+      "artigo": "artigo"
+    },
+    "restauradaDe": "reposta da v{{versao}}",
+    "mudarVeredito": "Mudar o veredito",
+    "alterar": "Alterar",
+    "seguirEvidenciaDa": "Automático · {{veredito}}",
+    "automaticoNota": "Decidido pela evidência que mantém",
+    "aMao": "Escolhido à mão",
+    "vereditoManual": "Veredito escolhido à mão",
+    "vereditoAutomatico": "Veredito automático",
+    "voltarAutomatico": "Voltar ao automático",
+    "semAlteracoes": "Ainda sem alterações",
+    "guia": {
+      "titulo": "Pode editar esta revisão",
+      "abrir": "O que posso editar?",
+      "fechar": "Esconder esta dica",
+      "nota": "As alterações entram num rascunho e só ficam numa versão quando as guardar.",
+      "itens": {
+        "eixo": "Excluir ou incluir notícias na linha do tempo",
+        "gaveta": "Abrir uma notícia e marcar passagens como evidência",
+        "veredito": "Mudar o veredito",
+        "artigo": "Editar o artigo ou escrevê-lo de novo"
+      }
+    },
+    "desfazerAtalho": "Desfazer (Ctrl+Z)",
+    "refazerAtalho": "Refazer (Ctrl+Shift+Z)",
+    "descartar": "Descartar alterações",
+    "guardar": "Guardar versão",
+    "guardarRestauro": "Repor a v{{versao}}",
+    "guardarAtalho": "Guardar como nova versão (Ctrl+S)",
+    "voltarActual": "Voltar à versão actual"
+  },
+  "sobre": {
+    "titulo": "Sobre o FACT-PT.",
+    "nota": "Um sistema que verifica claims em português: procura evidência no arquivo da Lusa, confronta-a com a claim e escreve um artigo em que cada frase aponta para a notícia que a sustenta.",
+    "consiste": {
+      "titulo": "No que consiste"
+    },
+    "funciona": {
+      "titulo": "Como funciona",
+      "passos": {
+        "perguntas": "A claim é decomposta em perguntas de verificação, que orientam a pesquisa da evidência.",
+        "evidencia": "Cada pergunta procura notícias no corpus da Lusa anteriores à data da claim, e um modelo decide quais são relevantes.",
+        "classificacao": "Os excertos relevantes são confrontados com a claim: apoiam-na, contrariam-na ou não chegam para decidir.",
+        "artigo": "Um modelo escreve o artigo de verificação, com cada frase ligada à notícia que a sustenta."
+      }
+    },
+    "modelos": {
+      "titulo": "Modelos",
+      "nota": "Os modelos treinados para o FACT-PT estão publicados no Hugging Face; o artigo é escrito por um de dois modelos gerais, escolhido com cada claim.",
+      "tarefas": {
+        "perguntas": "Geração de perguntas",
+        "relevancia": "Relevância das notícias",
+        "classificacao": "Relação claim-evidência",
+        "artigo": "Redação do artigo"
+      }
+    },
+    "limites": {
+      "titulo": "Limites",
+      "texto": "O FACT-PT é um protótipo de investigação. Os resultados são produzidos por modelos e podem conter erros: leia sempre as notícias citadas, e não o tome como substituto do trabalho de verificação de jornalistas."
+    },
+    "equipa": {
+      "titulo": "Quem desenvolveu"
+    },
+    "instituicoes": {
+      "titulo": "Instituições"
+    },
+    "papeis": {
+      "mestrado": "Estudante de Mestrado",
+      "docente": "Docente",
+      "investigacao": "Investigação",
+      "desenvolvimento": "Desenvolvimento",
+      "orientacao": "Orientação"
+    }
+  },
+  "verificacoes": {
+    "titulo": "As suas verificações recentes",
+    "nota": "As verificações das últimas 24 horas, em curso ou terminadas. Uma que tenha parado pode ser reiniciada.",
+    "vazio": "Ainda não tem verificações recentes.",
+    "nova": "Nova verificação",
+    "reiniciar": "Reiniciar",
+    "estado": {
+      "na-fila_one": "Na fila, {{count}} à frente",
+      "na-fila_other": "Na fila, {{count}} à frente",
+      "na-fila_zero": "Na fila",
+      "em-curso": "Em curso",
+      "guardada": "Concluída",
+      "terminada": "Interrompida",
+      "perdida": "Perdida"
+    }
+  }
+}

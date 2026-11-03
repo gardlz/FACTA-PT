@@ -4,7 +4,7 @@ This directory contains the code used to generate **verification questions from 
 
 The experiments examine the effect of gold and synthetic supervision, and compare European Portuguese, other Portuguese and multilingual models. This stage provides the questions subsequently used for [evidence retrieval](../Evidence%20Retrieval/); the [main repository README](../README.md#how-the-stages-connect) describes how the stages connect.
 
-**Released model:** [AMALIA-9B-0626-DPO fine-tuned on Gold91+Silver1073](https://huggingface.co/liaad/facta-pt-qg-amalia-9b-0626-dpo), used by the [FACT-PT prototype](https://factapt.inesctec.pt). Its selection also considers downstream evidence-retrieval performance, evaluated in the [Evidence Retrieval](../Evidence%20Retrieval/) stage.
+**Released model:** [AMALIA-9B-0626-DPO fine-tuned on Gold91+Silver1073](https://huggingface.co/liaad/facta-pt-qg-amalia-9b-0626-dpo), used by the [FACT-PT prototype](https://factpt.inesctec.pt). Its selection also considers downstream evidence-retrieval performance, evaluated in the [Evidence Retrieval](../Evidence%20Retrieval/) stage.
 
 ## Experimental overview
 

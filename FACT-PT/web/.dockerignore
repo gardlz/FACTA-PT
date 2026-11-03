@@ -1,0 +1,8 @@
+**/__pycache__/
+**/*.pyc
+.env
+**/.git
+# Built inside the image, from the sources in frontend/.
+frontend/node_modules
+app/static
+static-legacy

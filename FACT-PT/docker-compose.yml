@@ -1,0 +1,174 @@
+name: facta-pt
+
+# What a run needs, for the website (worked examples, citations) and the worker (the queue).
+x-pipeline: &pipeline
+  INFERENCE_URL: ${INFERENCE_URL:-http://inference:8100}
+  INFERENCE_TIMEOUT: ${INFERENCE_TIMEOUT:-900}
+  ARTICLE_TIMEOUT: ${ARTICLE_TIMEOUT:-10800}
+  API_URL_LUSA: ${API_URL_LUSA:-}
+  USER_LUSA: ${USER_LUSA:-}
+  PASSWORD_LUSA: ${PASSWORD_LUSA:-}
+  LUSA_DATASET: ${LUSA_DATASET:-LUSA}
+  TOP_K_PER_QUESTION: ${TOP_K_PER_QUESTION:-5}
+  # The article writers offered (gemma, amalia), the default first; only those the
+  # inference service runs.
+  ARTICLE_WRITERS: ${ARTICLE_WRITERS:-gemma,amalia}
+  # The model the Gemma writer runs on OpenRouter, which names it on the page.
+  ARTICLE_API_MODEL: ${ARTICLE_API_MODEL:-google/gemma-4-31b-it}
+  # Finished runs, written by the worker and read by the website: a folder both mount, so the
+  # verifications, the accounts and the reviews are ordinary files on the host (RUNS_DIR).
+  RUN_STORE_DIR: ${RUN_STORE_DIR:-/dados/execucoes}
+  RUN_RETENTION: ${RUN_RETENTION:-64}
+  # Finished verifications kept for good, each at an address of its own; 0, all of them.
+  SAVED_RETENTION: ${SAVED_RETENTION:-0}
+  REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+  # Seconds a run may take, waiting for the models included, before the worker stops it.
+  RUN_TIMEOUT: ${RUN_TIMEOUT:-14400}
+  # Seconds a run goes on when its page stops reading it (a dropped connection reconnects).
+  RUN_DETACHED_GRACE: ${RUN_DETACHED_GRACE:-300}
+
+services:
+  web:
+    build:
+      context: ./web
+    image: facta-pt-web:1.6.0
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8000}:8000"
+    environment:
+      <<: *pipeline
+      CORS_ORIGINS: ${CORS_ORIGINS:-}
+      # Accounts and roles: the first administrator is made on the first start, from the hash
+      # `python -m app.acesso` prints. `ACCESS_PASSWORD_HASH` is the old shared password, accepted
+      # only to make that first administrator on an older deployment.
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:-}
+      ACCESS_PASSWORD_HASH: ${ACCESS_PASSWORD_HASH:-}
+      SESSION_SECRET: ${SESSION_SECRET:?run python -m app.acesso and put its output in .env}
+      # Accounts and platform settings; empty, they sit on the data volume beside the runs.
+      UTILIZADORES_FILE: ${UTILIZADORES_FILE:-}
+      PLATAFORMA_FILE: ${PLATAFORMA_FILE:-}
+      # Leave true: the session cookie is Secure, so the site has to be served over HTTPS.
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      SESSION_HOURS: ${SESSION_HOURS:-12}
+      WEB_WORKERS: ${WEB_WORKERS:-2}
+      # Runs that may wait in the queue; past them a new one is asked to try again later.
+      QUEUE_MAX: ${QUEUE_MAX:-20}
+      # Runs one browser session, and one client address, may have waiting or under way; 0, no
+      # limit. Behind Docker's port publishing all clients may share an address: keep that one
+      # for a site behind a proxy that passes the client's address on.
+      RUNS_PER_SESSION: ${RUNS_PER_SESSION:-2}
+      RUNS_PER_ADDRESS: ${RUNS_PER_ADDRESS:-0}
+      # The reverse proxy whose X-Forwarded-For names the client: its address as this container
+      # sees it, or a network. Anyone else's is ignored, so no client can pick its own address.
+      FORWARDED_ALLOW_IPS: ${FORWARDED_ALLOW_IPS:-127.0.0.1,::1}
+    volumes:
+      - ${RUNS_DIR:-./dados}:/dados
+    depends_on:
+      - redis
+    networks:
+      - facta-pt
+
+  # Takes the runs from the queue one at a time: the models answer one request at a time anyway.
+  # More at once: `docker compose up -d --scale worker=2`.
+  worker:
+    # The website's image: built once, used by both.
+    build:
+      context: ./web
+    image: facta-pt-web:1.6.0
+    restart: unless-stopped
+    command: ["python", "-m", "app.trabalhador"]
+    environment:
+      <<: *pipeline
+    volumes:
+      - ${RUNS_DIR:-./dados}:/dados
+    depends_on:
+      - redis
+    # The image's check asks the website, which this container does not serve.
+    healthcheck:
+      disable: true
+    networks:
+      - facta-pt
+
+  # The queue and the runs' events. Nothing in it outlives a run by more than a day: no disk.
+  redis:
+    image: redis:8.2-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    networks:
+      - facta-pt
+
+  inference:
+    build:
+      context: ./web/inference
+      args:
+        COM_GPU: ${COM_GPU:-false}
+    image: facta-pt-inference:1.6.0
+    restart: unless-stopped
+    environment:
+      # The question generator and the AMALIA writer answer on Modal, behind one gateway: its
+      # address and its key, and the seconds its GPU stays on after a request (MODELS.md).
+      MODAL_API_URL: ${MODAL_API_URL:-}
+      MODAL_API_KEY: ${MODAL_API_KEY:-}
+      MODAL_GPU_IDLE_S: ${MODAL_GPU_IDLE_S:-}
+      # Without the gateway, each behind an OpenAI-compatible API of its own (vLLM, say): its
+      # address, with or without /v1, the model's name there, and its key.
+      QG_API_URL: ${QG_API_URL:-}
+      QG_API_MODEL: ${QG_API_MODEL:-}
+      QG_API_KEY: ${QG_API_KEY:-}
+      AMALIA_API_URL: ${AMALIA_API_URL:-}
+      AMALIA_API_MODEL: ${AMALIA_API_MODEL:-}
+      AMALIA_API_KEY: ${AMALIA_API_KEY:-}
+      # The Gemma article writer, on OpenRouter: the model's name there (`:free` for the free
+      # variant), the account's key, and the checkpoint whose tokenizer counts the prompt (only its
+      # tokenizer files are downloaded).
+      ARTICLE_API_URL: ${ARTICLE_API_URL:-https://openrouter.ai/api/v1}
+      ARTICLE_API_MODEL: ${ARTICLE_API_MODEL:-google/gemma-4-31b-it}
+      ARTICLE_API_KEY: ${ARTICLE_API_KEY:-}
+      ARTICLE_API_TOKENIZER: ${ARTICLE_API_TOKENIZER:-google/gemma-4-31b-it}
+      API_TIMEOUT_S: ${API_TIMEOUT_S:-3600}
+      # Each model is a Hugging Face id, downloaded once into the `modelos` volume, or a local
+      # path (mount the folder below). A `_REVISION` pins the commit; empty takes the latest.
+      # FACT-PT's published models (https://huggingface.co/liaad). Of the question generator's
+      # base and adapter only the tokenizer and checkpoint_info.json are read: the prompt is
+      # built and fitted with them.
+      QG_MODEL_PATH: ${QG_MODEL_PATH:-amalia-llm/AMALIA-9B-0626-DPO}
+      # Empty: the base revision the adapter was trained on (its checkpoint_info.json).
+      QG_MODEL_REVISION: ${QG_MODEL_REVISION:-}
+      QG_ADAPTER_PATH: ${QG_ADAPTER_PATH:-liaad/facta-pt-qg-amalia-9b-0626-dpo}
+      QG_ADAPTER_REVISION: ${QG_ADAPTER_REVISION-f8aff451e824fb4800c74385a36fea5f19579cfd}
+      RELEVANCE_MODEL_PATH: ${RELEVANCE_MODEL_PATH:-liaad/facta-pt-relevance-bertimbau-base}
+      RELEVANCE_MODEL_REVISION: ${RELEVANCE_MODEL_REVISION-8b6df9f96bda2c5ba3ec15d2e19deb8a1dbbce20}
+      STANCE_MODEL_PATH: ${STANCE_MODEL_PATH:-liaad/facta-pt-cee-xlm-roberta-large-xnli}
+      STANCE_MODEL_REVISION: ${STANCE_MODEL_REVISION-585f4cd2c89fdff1421093f60763a0a67be5174e}
+      DEVICE: ${DEVICE:-auto}
+      # Seconds a model may sit unused on the GPU before it leaves it; 0 keeps them there.
+      GPU_IDLE_TTL_S: ${GPU_IDLE_TTL_S:-600}
+      # Seconds a model may sit unused before it is let go of main memory too; 0 keeps them loaded.
+      RAM_IDLE_TTL_S: ${RAM_IDLE_TTL_S:-1800}
+      # Whether the GPU driver lends system memory when the card is full (Windows, WSL); empty, it
+      # is guessed from the kernel (GPU-GUIDE.md).
+      GPU_LENDS_MEMORY: ${GPU_LENDS_MEMORY:-}
+      ARTICLE_MAX_PROMPT_TOKENS: ${ARTICLE_MAX_PROMPT_TOKENS:-16384}
+      # Only for private or gated repositories; the models above need none.
+      HF_TOKEN: ${HF_TOKEN:-}
+    volumes:
+      # Hub downloads: always here, also when the checkpoints themselves come from the folder
+      # below.
+      - modelos:/cache/huggingface
+      # Local checkpoints, read-only: one folder per model, the *_PATH variables pointing at
+      # /checkpoints/<folder> (MODELS.md). Unused while the paths are Hugging Face ids.
+      - ${CHECKPOINTS_DIR:-./checkpoints}:/checkpoints:ro
+    # `host.docker.internal` resolves by itself on Docker Desktop; on a Linux host it needs the
+    # route, which is how the AMALIA models are reached when their API runs on this machine.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - facta-pt
+
+volumes:
+  modelos:
+
+networks:
+  facta-pt:
+    driver: bridge

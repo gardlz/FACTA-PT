@@ -1,0 +1,277 @@
+/* FACTA-PT — Tailwind theme: the Modernist system. Ink on light grey, square corners, Archivo
+   headings over IBM Plex Sans, one ink for every control and colour kept for what the evidence
+   says. Every colour is a token, redefined for dark mode below, so the utilities follow the theme. */
+
+@import "tailwindcss";
+
+@theme {
+  --color-fundo: #f3f2f2;
+  --color-superficie: #eae9e9;
+  --color-tinta: #201e1d;
+  --color-divisor: color-mix(in srgb, #201e1d 40%, transparent);
+  --color-regra: color-mix(in srgb, #201e1d 15%, transparent);
+  --color-mudo: color-mix(in srgb, #201e1d 64%, transparent);
+  --color-pairar: color-mix(in srgb, #201e1d 5%, transparent);
+  /* The claim's highlight and the cited passage. */
+  --color-marca: color-mix(in srgb, #201e1d 11%, transparent);
+
+  --color-apoia: #1d6644;
+  --color-contraria: #9b3324;
+  /* Ochre for "undecided", so it does not read like the grey of "no evidence". */
+  --color-indeciso: #8a6a08;
+  --color-neutro: #7d7979;
+  --color-pendente: color-mix(in srgb, #201e1d 30%, transparent);
+  /* The one accent, for the word "claim" in the title: not a colour the evidence uses. */
+  --color-destaque: #2a4fc4;
+
+  --font-titulo: "Archivo", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  --ease-suave: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --default-transition-duration: 200ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --barra-altura: 66px;
+    --goteira: clamp(16px, 4vw, 48px);
+    --coluna: 1380px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --color-fundo: #141313; --color-superficie: #1e1d1d; --color-tinta: #f3f2f2;
+      --color-divisor: color-mix(in srgb, #f3f2f2 38%, transparent);
+      --color-regra: color-mix(in srgb, #f3f2f2 14%, transparent);
+      --color-mudo: color-mix(in srgb, #f3f2f2 64%, transparent);
+      --color-pairar: color-mix(in srgb, #f3f2f2 6%, transparent);
+      --color-marca: color-mix(in srgb, #f3f2f2 16%, transparent);
+      --color-apoia: #63b487; --color-contraria: #e0897a; --color-indeciso: #d4ad4a; --color-neutro: #9b9797;
+      --color-pendente: color-mix(in srgb, #f3f2f2 30%, transparent);
+      --color-destaque: #8fa6ff;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --color-fundo: #141313; --color-superficie: #1e1d1d; --color-tinta: #f3f2f2;
+    --color-divisor: color-mix(in srgb, #f3f2f2 38%, transparent);
+    --color-regra: color-mix(in srgb, #f3f2f2 14%, transparent);
+    --color-mudo: color-mix(in srgb, #f3f2f2 64%, transparent);
+    --color-pairar: color-mix(in srgb, #f3f2f2 6%, transparent);
+    --color-marca: color-mix(in srgb, #f3f2f2 16%, transparent);
+    --color-apoia: #63b487; --color-contraria: #e0897a; --color-indeciso: #d4ad4a; --color-neutro: #9b9797;
+    --color-pendente: color-mix(in srgb, #f3f2f2 30%, transparent);
+    --color-destaque: #8fa6ff;
+  }
+
+  body {
+    min-height: 100dvh;
+    margin: 0;
+    background: var(--color-fundo);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  h1, h2, h3, h4 { font-family: var(--font-titulo); font-weight: 800; line-height: 1.12; letter-spacing: -0.015em; }
+  button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer; }
+  ::placeholder { color: var(--color-mudo); opacity: 1; }
+  :focus { outline: none; }
+  :focus-visible { outline: 2px solid var(--color-tinta); outline-offset: 2px; }
+  ::selection { background: var(--color-marca); }
+
+  /* Pure loops stay in CSS; framer-motion drives the transitions. Both stop for readers who
+     asked for less motion (framer-motion through `MotionConfig`). */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* Small uppercase label over a 2px rule: every section heading on the page. */
+@utility rubrica {
+  font-family: var(--font-titulo);
+  font-weight: 800;
+  font-size: 12px;
+  line-height: 1.3;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* The claim, highlighted across line breaks. */
+@utility marcado {
+  background: var(--color-marca);
+  padding: 0 4px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* The accented word of the title: plain ink at rest, accent ink over a wash of it while the
+   pointer is on it. `Titulo` also plays it once when the page loads. */
+@utility destaque {
+  background: linear-gradient(color-mix(in srgb, var(--color-destaque) 16%, transparent), color-mix(in srgb, var(--color-destaque) 16%, transparent)) no-repeat left / 0% 100%;
+  padding: 0 0.08em;
+  margin: 0 -0.08em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  transition: color 0.3s, background-size 0.5s;
+  &:hover { color: var(--color-destaque); background-size: 100% 100%; }
+}
+
+@utility sem-barra {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+/* A cited passage, tinted with what it says about the claim (dimmed, so the text stays readable)
+   and underlined in it; the one the drawer was opened for flares up first. */
+@keyframes acender {
+  0% { background: color-mix(in srgb, var(--realce) 48%, transparent); }
+  100% { background: color-mix(in srgb, var(--realce) 18%, transparent); }
+}
+@utility realce {
+  --realce: var(--color-tinta);
+  background: color-mix(in srgb, var(--realce) 18%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--realce) 70%, transparent);
+  color: var(--color-tinta);
+  padding: 1px 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  &[data-rotulo="supported"] { --realce: var(--color-apoia); }
+  &[data-rotulo="refuted"] { --realce: var(--color-contraria); }
+  &[data-rotulo="nei"] { --realce: var(--color-indeciso); }
+  /* Where a supporting and a refuting passage overlap: both colours, stacked (red over green) so
+     the split holds on every line. */
+  &[data-rotulo="ambos"] {
+    background: linear-gradient(180deg, color-mix(in srgb, var(--color-contraria) 18%, transparent) 50%, color-mix(in srgb, var(--color-apoia) 18%, transparent) 50%);
+    box-shadow:
+      inset 0 -2px 0 color-mix(in srgb, var(--color-apoia) 70%, transparent),
+      inset 0 -4px 0 color-mix(in srgb, var(--color-contraria) 70%, transparent);
+  }
+  &[data-foco] { animation: acender 1.1s ease-out; }
+  /* A passage a person highlighted in the review: a dashed underline, so it is not mistaken for
+     the article's citations. */
+  &[data-humano] {
+    text-decoration: underline dashed color-mix(in srgb, var(--realce) 80%, transparent);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1.5px;
+  }
+  /* A passage left out of the evidence: still readable in the source, but no longer counted. */
+  &[data-rotulo="excluido"] {
+    --realce: var(--color-mudo);
+    background: color-mix(in srgb, var(--color-mudo) 9%, transparent);
+    box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--color-mudo) 45%, transparent);
+    text-decoration: underline dotted color-mix(in srgb, var(--color-mudo) 60%, transparent);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+  }
+  /* The passages can be clicked to change their relation. */
+  &[data-escolhivel] { cursor: pointer; }
+  &[data-escolhivel]:hover { background: color-mix(in srgb, var(--realce) 26%, transparent); }
+  /* In a passage that joins several classified excerpts, the one under the pointer. */
+  & [data-excerto] {
+    background: color-mix(in srgb, var(--realce) 34%, transparent);
+    box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--realce) 90%, transparent);
+  }
+}
+
+/* The steps' drawings (components/corrida/Ilustracao.jsx). Every part has a resting look for a
+   pending step and a finished one for a done step; only a running step moves, on a loop.
+   `--atraso` (set on a part) staggers the parts of one drawing. */
+.ilustracao { display: block; width: 100%; max-width: 220px; height: 64px; overflow: visible; }
+.ilustracao * { transform-box: fill-box; }
+
+/* Shared: a track the ink fills, and lines that are written from the left. */
+.il-pista { fill: var(--color-regra); }
+.il-q { fill: var(--color-tinta); }
+.il-linha { fill: var(--color-tinta); transform-origin: left center; transform: scaleX(0); }
+.il-texto { fill: color-mix(in srgb, var(--color-tinta) 70%, transparent); }
+.ilustracao:is([data-estado="done"]) .il-linha { transform: scaleX(1); }
+
+/* The same drawing at reading size, under the title of a section still being written
+   (components/corrida/EmCurso.jsx): the row above keeps its 64px. */
+.em-curso .ilustracao { max-width: 320px; height: 128px; }
+
+@keyframes il-escrever {
+  0% { transform: scaleX(0); opacity: 1; }
+  35%, 82% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+.il-perguntas[data-estado="running"] .il-linha { animation: il-escrever 2.4s var(--ease-suave) infinite backwards; animation-delay: var(--atraso); }
+
+/* Retrieval: the scanner sweeps; each item flares as it passes, the relevant ones stay marked. */
+.il-doc { fill: transparent; stroke: var(--color-divisor); stroke-width: 1.5; }
+.il-evidencia[data-estado="done"] .il-relevante { fill: color-mix(in srgb, var(--color-tinta) 60%, transparent); stroke: var(--color-tinta); }
+.il-scanner { fill: var(--color-tinta); opacity: 0; }
+@keyframes il-varrer {
+  0% { transform: translateX(0); opacity: 0; }
+  6%, 92% { opacity: 1; }
+  100% { transform: translateX(152px); opacity: 0; }
+}
+@keyframes il-achar {
+  0% { fill: color-mix(in srgb, var(--color-tinta) 30%, transparent); stroke: var(--color-tinta); }
+  30%, 100% { fill: transparent; stroke: var(--color-divisor); }
+}
+@keyframes il-achar-relevante {
+  0% { fill: var(--color-tinta); stroke: var(--color-tinta); }
+  30%, 100% { fill: color-mix(in srgb, var(--color-tinta) 60%, transparent); stroke: var(--color-tinta); }
+}
+.il-evidencia[data-estado="running"] .il-scanner { animation: il-varrer 1.8s linear infinite; }
+.il-evidencia[data-estado="running"] .il-doc { animation: il-achar 1.8s linear infinite; animation-delay: var(--atraso); }
+.il-evidencia[data-estado="running"] .il-relevante { animation-name: il-achar-relevante; }
+
+/* Classification: off the line to the side each piece of evidence takes. */
+.il-eixo { fill: var(--color-divisor); }
+.il-ponto { fill: var(--color-pendente); stroke: var(--color-pendente); stroke-width: 2; }
+.il-classificacao[data-estado="done"] .il-sobe { transform: translateY(-18px); fill: var(--color-apoia); stroke: var(--color-apoia); }
+.il-classificacao[data-estado="done"] .il-desce { transform: translateY(18px); fill: var(--color-contraria); stroke: var(--color-contraria); }
+.il-classificacao[data-estado="done"] .il-fica { fill: var(--color-fundo); stroke: var(--color-indeciso); }
+@keyframes il-sobe {
+  0%, 15% { transform: translateY(0); fill: var(--color-pendente); stroke: var(--color-pendente); opacity: 1; }
+  42%, 84% { transform: translateY(-18px); fill: var(--color-apoia); stroke: var(--color-apoia); opacity: 1; }
+  100% { transform: translateY(-18px); fill: var(--color-apoia); stroke: var(--color-apoia); opacity: 0; }
+}
+@keyframes il-desce {
+  0%, 15% { transform: translateY(0); fill: var(--color-pendente); stroke: var(--color-pendente); opacity: 1; }
+  42%, 84% { transform: translateY(18px); fill: var(--color-contraria); stroke: var(--color-contraria); opacity: 1; }
+  100% { transform: translateY(18px); fill: var(--color-contraria); stroke: var(--color-contraria); opacity: 0; }
+}
+@keyframes il-fica {
+  0%, 15% { fill: var(--color-pendente); stroke: var(--color-pendente); opacity: 1; }
+  42%, 84% { fill: var(--color-fundo); stroke: var(--color-indeciso); opacity: 1; }
+  100% { fill: var(--color-fundo); stroke: var(--color-indeciso); opacity: 0; }
+}
+.il-classificacao[data-estado="running"] .il-ponto { animation: 2.8s var(--ease-suave) infinite backwards; animation-delay: var(--atraso); }
+.il-classificacao[data-estado="running"] .il-sobe { animation-name: il-sobe; }
+.il-classificacao[data-estado="running"] .il-desce { animation-name: il-desce; }
+.il-classificacao[data-estado="running"] .il-fica { animation-name: il-fica; }
+
+/* Article: lines typed in turn, a citation popping in, the caret blinking. */
+.il-citacao { fill: transparent; stroke: var(--color-apoia); stroke-width: 1.5; transform-origin: center; transform: scale(0); }
+.il-artigo[data-estado="done"] .il-citacao { transform: scale(1); }
+.il-cursor { fill: var(--color-tinta); opacity: 0; }
+@keyframes il-redigir {
+  0% { transform: scaleX(0); opacity: 1; }
+  18%, 86% { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+@keyframes il-citar {
+  0%, 40% { transform: scale(0); }
+  48%, 86% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0; }
+}
+@keyframes il-piscar { 50% { opacity: 1; } }
+.il-artigo[data-estado="running"] .il-linha { animation: il-redigir 3.6s var(--ease-suave) infinite backwards; animation-delay: var(--atraso); }
+.il-artigo[data-estado="running"] .il-citacao { animation: il-citar 3.6s var(--ease-suave) infinite; }
+.il-artigo[data-estado="running"] .il-cursor { animation: il-piscar 0.9s steps(1) infinite; }

@@ -4,7 +4,7 @@ This directory contains the code for **evidence-grounded fact-checking article g
 
 The **Writer** receives a claim span, its context and publication date, evidence passages already labelled **Supported**, **Refuted** or **Not Enough Information (NEI)**, and a **predetermined factual conclusion**. It does **not** retrieve new evidence or decide the claim's veracity. Evidence-based factual statements are linked to their source passages using local citations such as `[E1]` and `[E2]`.
 
-The selected Writer is **Gemma 4 E4B IT**, also used by the [FACT-PT prototype](https://factapt.inesctec.pt). It is an existing instruction-tuned model, **not a model fine-tuned or released by this repository**.
+The selected Writer is **Gemma 4 E4B IT**, also used by the [FACT-PT prototype](https://factpt.inesctec.pt). It is an existing instruction-tuned model, **not a model fine-tuned or released by this repository**.
 
 ## Experimental overview
 

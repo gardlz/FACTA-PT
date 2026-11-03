@@ -1,0 +1,25 @@
+{
+  "name": "facta-pt-interface",
+  "private": true,
+  "version": "1.6.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "framer-motion": "14.2.0",
+    "i18next": "26.4.5",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-i18next": "17.0.16",
+    "react-router": "7.18.4"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "4.3.3",
+    "@vitejs/plugin-react": "6.1.2",
+    "tailwindcss": "4.3.3",
+    "vite": "8.3.4"
+  }
+}
