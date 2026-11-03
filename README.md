@@ -90,7 +90,7 @@ The system then:
    NEI;
 5. consolidates the resulting passage-level predictions and prepares the evidence for article
    generation;
-6. uses **Gemma 4 E4B IT** or **AMALIA-9B-0626-DPO**, as chosen on the page, to generate a
+6. uses **Gemma 4 31B** or **AMALIA-9B-0626-DPO**, as chosen on the page, to generate a
    structured fact-checking article from the prepared evidence and the predetermined conclusion.
 
 The interface exposes selected intermediate verification information, including the generated
@@ -160,7 +160,7 @@ are available on Hugging Face:
 - **Claim-Evidence Entailment:**  
   [liaad/facta-pt-cee-xlm-roberta-large-xnli](https://huggingface.co/liaad/facta-pt-cee-xlm-roberta-large-xnli)
 
-The Writers of FACT-PT, Gemma 4 E4B IT (the default) and AMALIA-9B-0626-DPO without the
+The Writers of FACT-PT, Gemma 4 31B (the default) and AMALIA-9B-0626-DPO without the
 question-generation adapter, are not models fine-tuned or released as part of this repository.
 
 
